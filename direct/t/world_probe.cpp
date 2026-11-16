@@ -21,7 +21,7 @@ int main(){
   for(uint16_t i=0;i<240;++i){
    reset_cycles();world::frame(1.0f/60.0f);uint32_t elapsed=cycles();
    if(elapsed>maximum){maximum=elapsed;max_frame=i;}
-   if(!(i&7)){
+   if(true){
     text("# WORLD ");hex(i);out(' ');number(world::ball.Position.X);number(world::ball.Position.Y);
     number(world::ball.Direction.X);number(world::ball.Direction.Y);number(world::ball.Speed);
     hex(world::contacts);out('\n');

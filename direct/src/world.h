@@ -15,4 +15,7 @@ extern uint16_t contacts;
 bool load();
 void launch();
 void frame(float dt);
+void start();
+void input(bool left,bool right,bool pullback);
+void tick();
 }

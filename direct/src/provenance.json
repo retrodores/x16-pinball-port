@@ -16,6 +16,9 @@
     "DotProduct",
     "Distance_Squared",
     "Distance",
-    "magnitudeSq"
+    "magnitudeSq",
+    "SinCos",
+    "RotatePt",
+    "distance_to_flipper"
   ]
 }

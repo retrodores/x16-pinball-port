@@ -1,5 +1,22 @@
 # Changelog
 
+## Direct mechanics checkpoint — 2026-11-16
+
+- Port original moving-flipper contact, rebound, motion and swept-collision methods
+  to native C++; export original constructor geometry instead of recreating it.
+- Port original plunger messages and feed/charge/release callbacks, with bounded
+  native timers and a single-ball ownership adapter. Integrate actual charged
+  launches and moving flippers into the original-coordinate world probe.
+- Reject distant static edges with conservative banked bounds; retain the original
+  float formulas and compare every launch frame to the prior direct baseline.
+- Fit the combined diagnostic in native main memory using banked lookup data,
+  compact parameter initialization and size-oriented compilation.
+- Pass 736 functional/differential checks across 512 KiB and 2 MiB. Keep the strict
+  133333-cycle gameplay gate failing: 525087 launch-only cycles and 1089833
+  combined-mechanics cycles are still over budget.
+- Preserve pristine vendor source, the previous direct reference, and the older
+  Prog8 prototype. This is a development checkpoint, not a playable release.
+
 ## 0.2.0
 
 - Enlarge the silver ball from 5 to 7 pixels and run two solver steps per frame,

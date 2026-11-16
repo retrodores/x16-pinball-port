@@ -1,86 +1,111 @@
-# CmdrX Cadet: direct engine baseline
+# CmdrX Cadet: direct mechanics checkpoint
 
-This branch begins a direct C++ port of k4zmu2a/SpaceCadetPinball to the
-Commander X16 through LLVM-MOS. It replaces the direction of the earlier
-screen-space Prog8 prototype. It is a diagnostic baseline, not a new playable
-release or a complete port.
+This is a direct C++ port of the recovered k4zmu2a/SpaceCadetPinball engine to
+Commander X16 through LLVM-MOS. The current programs are native diagnostic
+probes, not a playable game or a complete port. The older Prog8 prototype is
+preserved on master and under src/; building these probes does not change it.
 
-## What runs natively
+## Implemented and exercised natively
 
-- Original line intersection, circle intersection, normalization and rebound
-  method bodies, extracted verbatim from the pinned recovered source.
-- A four-second launch integration probe in the original world coordinates,
-  with the original ball radius, gravity, damping and base-plane collision geometry.
-- Banked storage for 653 physical edges (181888 bytes including the broad-phase grid).
-- Differential floating-point cases against the same source compiled for the VM.
-- Independent r49 runs at 512 KB and 2048 KB.
+- Original line/circle intersection, normalization and rebound methods.
+- Original flipper contact detection, rebound, motion, substep scheduling and
+  swept contact against a stationary ball. Seven flipper/control method bodies
+  are extracted verbatim; table geometry comes from the initialized desktop engine.
+- Original plunger input/messages, charge/release response and feed/pullback/release
+  timer callbacks, also extracted verbatim. The integrated probe waits for ball
+  feed, lets the ball settle, holds charge and releases through the original chute.
+- Base-plane world coordinates, gravity, damping, half-ball-radius subdivisions,
+  653 static physical edges and banked broad-phase lookup.
+- Conservative integer rejection of distant edges, followed by the unchanged
+  floating-point contact formulas. A retained unoptimized world implementation
+  is compared against the optimized one at every frame of the launch trace.
 
-The ball clears the original chute and travels around the top into the table.
-The test checks actual table coordinates, rather than the old premature launch-state
-transition that let a failing launch pass.
+Native tests run independently at 512 KiB and 2 MiB. Flipper tests cover full
+extension/retraction, reversal, rest/moving/held/retracting contact and moving
+flippers striking stationary balls. Dedicated plunger tests cover partial/full
+charge, exact timer boundaries, occupied-feed retry, reset cancellation and
+original relaunch/tilt paths. Tests also require identical results at both RAM sizes.
 
-## Provenance and adaptations
+## Provenance and platform adaptations
 
 Upstream: https://github.com/k4zmu2a/SpaceCadetPinball
 Pinned revision: cb9b7b886244a27773f66b0b19fdc2998392565e
-License: vendor/LICENSE (MIT). Original artwork/audio remain original game assets.
+License: vendor/LICENSE (MIT). Original artwork/audio retain their original origin.
 
-vendor/ is a pristine source snapshot. tools/extract_math.py extracts selected
-method bodies without changing them. src/provenance.json records the input hash.
-src/port_types.h supplies the small ball data shell and a positive-finite square
-root implementation missing from the target math library. The original full
-TBall class and object ownership graph have not yet been ported.
+vendor/ remains pristine. tools/extract_math.py copies the selected method bodies
+without rewriting them; src/*provenance.json records their sources.
 
-tools/export_table.py builds an instrumented COPY of the original desktop engine.
-It exports its initialized collision geometry, including original radius offsets,
-groups, active states, elasticity, smoothness, thresholds and boosts.
-data/table.json contains 1227 line/circle edges; moving flippers are separate
-objects and are not included in that count.
+The platform shells replace SDL ownership, dynamic component lists and heap timers:
 
-src/world.cpp adapts the base-plane portion of pb::timed_frame and
-TTableLayer::FieldEffect. It preserves the original half-ball-radius subdivision
-and swept ray/contact sequence. Its fixed grid and banked records replace desktop
-pointer containers. Gravity noise is held at its midpoint and the full-charge
-launch starts at the settled plunger contact with a midpoint boost of 105 so traces
-are repeatable. This is not yet an end-to-end port of plunger input/feed timers.
-The offline packer currently reconstructs line coefficients from exported endpoints.
+- TBall retains only fields needed by this stage. The ownership adapter supports
+  one ball, not the original multiball/object graph.
+- Flipper constructor state is exported from the original initialized objects.
+  A compact offset/value initializer reduces target code size. Both exported
+  flippers have collision group 1, checked by the packer.
+- port_types.h supplies the positive-finite square-root shim and sin/cos
+  polynomials for the flippers' approximately +/-1.215-radian travel. These are
+  not general-purpose libm replacements. Native/desktop flipper records must
+  agree within 2e-5*(1+abs(reference)).
+- A fixed eight-entry timer pool preserves millisecond deadlines, insertion order,
+  and the original two-callback/overdue policy. The integrated tick is 60 Hz.
+  Timer exhaustion is reported; no heap allocation is used.
+- Plunger sound and rules callbacks are counted but are not yet connected to
+  audio playback or mission rules. Random values are held at .5 for repeatable
+  diagnostics; gameplay RNG is not integrated.
+- world.cpp adapts the single-ball base-plane portion of pb::timed_frame and
+  TTableLayer::FieldEffect. It interleaves ball and flipper substeps in the
+  original order. Its 16-contact guard is a bounded diagnostic safeguard.
+- The broad-phase bounds live in banked RAM, with a one-edge unbanked cache.
+  WORLD.BIN uses 193640 bytes beginning at bank 32; its final bounds are in bank 55,
+  so it fits the 512 KiB configuration. The packer still reconstructs static
+  line coefficients from exported endpoints.
 
-The native square-root shim differs slightly from desktop libm; the current 256
-primitive cases agree within 0.000000554 relative-to-max(1, magnitude).
-Long billiard trajectories can amplify tiny float differences; matching these
-primitive tests does not prove full engine equivalence.
+The retained reference world is the previous direct baseline, not the full
+original desktop engine. Matching its trajectory and the primitive/component
+checks does not establish complete game parity.
 
 ## Reproduce
 
-Install LLVM-MOS SDK 23.4.0 and set MOS_CXX to mos-cx16-clang++ if necessary.
-The VM default is /opt/llvm-mos-sdk-23.4.0/llvm-mos/bin/mos-cx16-clang++.
+Use LLVM-MOS SDK 23.4.0. MOS_CXX can override the VM default:
+/opt/llvm-mos-sdk-23.4.0/llvm-mos/bin/mos-cx16-clang++.
 
     sh direct/build.sh
     prove -v direct/t/native.t
-    perl direct/t/frame_budget.pl  # expected to FAIL until optimized
+    perl direct/t/frame_budget.pl
 
-The existing t/run_x16.pl supplies the bounded native emulator runner. MATH and
-WORLD are headless diagnostic PRGs; WORLD.BIN must accompany the latter.
-Tests report frame cost separately from correctness. The 60 Hz gameplay limit
-remains 133333 cycles at 8 MHz.
+The last command is the strict gameplay release gate and is currently expected
+to fail. Its limit remains 133333 cycles per 8 MHz frame; do not raise it.
+The native build uses -Oz to fit the combined mechanics in unbanked RAM.
 
-To refresh the full original inventory, run tools/export_table.py, build its
-direct/build/reference CMake project, and launch that desktop executable with
-CMDRX_EXPORT set to an absolute JSON path from the original game asset directory.
-The original Windows EXE is never part of a native package.
+MATH, WORLD, REFERENCE, FLIPPER, MECHANISMS and PLUNGER are diagnostic PRGs. Run
+with the bounded t/run_x16.pl testbench runner. WORLD.BIN must be in the filesystem
+for WORLD, REFERENCE and MECHANISMS. They are not interactive game programs.
 
-## Remaining work
+    perl t/run_x16.pl direct/build/mechanisms.prg direct/build
 
-The slowest initial measured world frame is approximately 1.12 million cycles
-(140 ms at 8 MHz), so this baseline is NOT suitable for a 60 Hz gameplay release.
-First optimize candidate lookup, memory access and numeric hot paths while retaining
-the direct version as the comparison reference. Do not silently alter bounce
-parameters or slow simulation time to disguise the performance problem.
+To refresh the original state export, run direct/tools/export_table.py, build its
+COPY of the original engine under direct/build/reference, and run that executable
+from the user's original game-asset directory with CMDRX_EXPORT set to the absolute
+output JSON path. No original Windows executable or ROM belongs in a package.
 
-Port the moving flippers and their contact response, actual plunger timing,
-gates, ramps/collision layers, targets, drains, timers and mission rules. Connect
-VERA presentation, original audio, controls, explicit start instructions and a calm
-attract mode. Preserve 128-bit scores in arithmetic, display and storage.
+## Performance and next work
 
-The existing 0.2.0 game remains on master at d82a1ac for reference. Its physics are
-not fixed by building these independent probes.
+The combined mechanics now fit in native main memory, but the 60 Hz CPU budget
+is still not met. Exact current measurements are in evidence/direct-mechanics/.
+The optimized launch-only path is about 66 ms worst case; the integrated
+launch/flipper scenarios are about 136 ms. The former was about 140 ms before
+collision filtering. These are different scopes and must not be compared as
+though they measure the same workload.
+
+Further work must address software-floating-point hot paths and banked code/data
+layout while retaining the original implementations for behavioral comparison.
+Do not change bounce coefficients, loosen comparison tolerances or slow simulation
+time to hide a performance problem. Main-memory headroom is small and will need
+attention before adding the rest of the engine.
+
+Still unfinished: gates, ramps/collision layers, targets, full drain/game lifecycle,
+mission rules, gameplay rendering, controls, original audio and scoring integration.
+The final game still requires the original graphics/audio, separate sound/music
+switches, listening mode, a calm attract screen, clear start/launch instructions,
+and unsigned 128-bit scores throughout arithmetic, presentation and storage.
+No physical X16 hardware verification has been performed.

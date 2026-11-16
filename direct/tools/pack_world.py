@@ -6,7 +6,7 @@ j=json.loads((r/'build/table.json').read_text())
 # First integration stage: base-plane physical walls, bumpers, plunger and drain.
 # Preserve the full export for ramps, targets, gates and the rules-engine stage.
 edges=[e for e in j['edges'] if e['mask']&1 and e['active'] and e['class'] in ['5TWall','11TTableLayer','7TBumper','8TPlunger','6TDrain']]
-grid=[[] for _ in range(24*32)];records=[]
+grid=[[] for _ in range(24*32)];records=[];bounds=[]
 for idx,e in enumerate(edges):
  kind={'8TPlunger':1,'6TDrain':2,'7TBumper':3}.get(e['class'],0)
  if 'line' in e:
@@ -19,6 +19,7 @@ for idx,e in enumerate(edges):
  else:
   x,y,r2=e['circle'];radius=math.sqrt(r2);shape=[x,y,r2]+[0]*9;typ=1
   loX=x-radius;hiX=x+radius;loY=y-radius;hiY=y+radius
+ bounds.append([math.floor(loX*256)-1,math.floor(loY*256)-1,math.ceil(hiX*256)+1,math.ceil(hiY*256)+1])
  rec=struct.pack('<BBH16f',typ,kind,e['component']&65535,e['elasticity'],e['smoothness'],e['threshold'],e['boost'],*shape)
  records.append(rec.ljust(128,b'\0'))
  # Expand each box by one half-ball step; one cell suffices for that ray.
@@ -28,7 +29,12 @@ for idx,e in enumerate(edges):
 assert max(map(len,grid))<=63
 blob=b''.join(struct.pack('<64H',len(ids),*ids,*([65535]*(63-len(ids)))) for ids in grid)+b''.join(records)
 blob=bytearray(blob);blob[126:128]=b'CX'
+# Bounds live in their own bank; only the current cell's small bounds cache is unbanked.
+bounds_offset=(len(blob)+8191)//8192*8192
+blob.extend(b'\0'*(bounds_offset-len(blob)))
+blob.extend(b''.join(struct.pack('<4h',*b) for b in bounds))
 (r/'build/WORLD.BIN').write_bytes(blob)
+(r/'src/edge_bounds.h').write_text('// Conservative Q8.8 banked broad-phase bounds.\n#pragma once\nconstexpr unsigned char edge_bounds_bank=%d;\nconstexpr unsigned char max_cell_edges=%d;\n'%(32+bounds_offset//8192,max(map(len,grid))))
 def f(v):
  s=format(v,'.9g')
  if '.' not in s and 'e' not in s:s+='.0'

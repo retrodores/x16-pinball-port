@@ -1,0 +1,13 @@
+{
+  "upstream": "https://github.com/k4zmu2a/SpaceCadetPinball",
+  "revision": "cb9b7b886244a27773f66b0b19fdc2998392565e",
+  "source_sha256": "9cc51b8b1926726f566b7f6afca6c95e263dc7cb21cbd6ba407473674a42f01e",
+  "method_bodies": "verbatim",
+  "methods": [
+    "FindCollisionDistance",
+    "EdgeCollision",
+    "set_control_points",
+    "flipper_angle_delta",
+    "SetMotion"
+  ]
+}

@@ -1,0 +1,10 @@
+{
+  "upstream": "https://github.com/k4zmu2a/SpaceCadetPinball",
+  "revision": "cb9b7b886244a27773f66b0b19fdc2998392565e",
+  "source_sha256": "e0391f5f5a06e5de298242677669d68503426779c50a594aeedc5fb37f5f57aa",
+  "method_bodies": "verbatim",
+  "methods": [
+    "GetFlipperStepAngle",
+    "FlipperCollision"
+  ]
+}

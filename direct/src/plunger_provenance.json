@@ -1,0 +1,13 @@
+{
+  "upstream": "https://github.com/k4zmu2a/SpaceCadetPinball",
+  "revision": "cb9b7b886244a27773f66b0b19fdc2998392565e",
+  "source_sha256": "02f7267425befa7012324c549ed538a0de83dd21f2e5a6c2cdd11ab5bfcbcccf",
+  "method_bodies": "verbatim",
+  "methods": [
+    "Collision",
+    "Message",
+    "BallFeedTimer",
+    "PullbackTimer",
+    "ReleasedTimer"
+  ]
+}
