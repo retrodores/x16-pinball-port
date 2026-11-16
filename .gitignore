@@ -1,0 +1,5 @@
+build/
+evidence/
+*.zip
+*.HI
+__pycache__/
