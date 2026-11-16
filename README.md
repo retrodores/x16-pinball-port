@@ -1,3 +1,9 @@
+# Active branch: direct engine port
+
+The user selected a direct C++ port of the recovered original engine. See
+[direct/README.md](direct/README.md) for current implementation, tests, measured
+performance and unfinished work. The Prog8 prototype below remains a reference.
+
 # CmdrX Cadet 0.2.0
 
 A playable Commander X16 mechanics prototype based on the supplied Space Cadet

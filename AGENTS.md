@@ -5,7 +5,9 @@ The selected display is 320x240 8bpp. Keep the game title CmdrX Cadet.
 The first prototype uses reduced screen-space mechanics; do not describe it as
 a faithful complete port. Preserve original asset and decompilation attribution.
 
-Use Prog8 for maintainable code and assembly for measured hot paths.
+On direct-engine, follow direct/AGENTS.md and the user decision to port recovered
+C++ directly through LLVM-MOS. Preserve src/ as the old prototype reference.
+Use assembly or fixed-point adaptation only after measuring and comparing behavior.
 Parenthesize numeric casts inside compound arithmetic expressions in Prog8.
 The score is unsigned 128-bit little endian, including saves and comparisons.
 Never silently wrap, truncate, or narrow score intermediates.

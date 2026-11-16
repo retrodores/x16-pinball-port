@@ -1,0 +1,17 @@
+{
+  "scope": "base-plane physical geometry; not the complete rules engine",
+  "full_export_edges": 1227,
+  "included_edges": 653,
+  "max_candidates": 36,
+  "bytes": 181888,
+  "start_bank": 32,
+  "edge_bank": 44,
+  "grid_origin": [
+    -12,
+    -16
+  ],
+  "grid_size": [
+    24,
+    32
+  ]
+}

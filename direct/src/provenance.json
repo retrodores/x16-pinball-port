@@ -1,0 +1,21 @@
+{
+  "upstream": "https://github.com/k4zmu2a/SpaceCadetPinball",
+  "revision": "cb9b7b886244a27773f66b0b19fdc2998392565e",
+  "maths_cpp_sha256": "f0ca770257ec109b738dc98ecd0aa85d97e6620dd5e589964beacb5f376e6215",
+  "method_bodies": "verbatim",
+  "methods": [
+    "ray_intersect_circle",
+    "normalize_2d",
+    "line_init",
+    "ray_intersect_line",
+    "cross",
+    "vector_sub",
+    "vector_add",
+    "vector_mul",
+    "basic_collision",
+    "DotProduct",
+    "Distance_Squared",
+    "Distance",
+    "magnitudeSq"
+  ]
+}
