@@ -1,3 +1,16 @@
+# 2026-11-16 — Runnable direct-engine preview
+
+- Added a normal-boot CMDRX.PRG, original table/sprites, charge bar, status and
+  N/Space/flipper/P/Esc controls, with a calm start screen.
+- Banked the display module in RAM bank 1 to retain main memory for C++ mechanics.
+- Matched the recovered engine default of 120 physics updates/second; the former
+  60 Hz adapter could miss the original plunger release window. Forty release
+  timings now clear the chute. Original extracted method bodies remain unchanged.
+- Latched short command taps in the keyboard IRQ so slow frames cannot lose them.
+- Added normal-ROM and actual SDL keyboard tests at 512 KB and 2048 KB, Windows
+  launchers, and explicit scope/performance notes. Gameplay CPU gate still fails;
+  audio, scoring, missions, ramps and other table mechanisms remain unfinished.
+
 # Changelog
 
 ## Direct mechanics checkpoint — 2026-11-16

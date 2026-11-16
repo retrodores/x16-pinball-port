@@ -52,5 +52,6 @@ void reset(TBall& b){
 }
 void input(bool pressed){instance.Message(pressed?MessageCode::PlungerInputPressed:MessageCode::PlungerInputReleased,0);}
 void feed(){instance.Message(MessageCode::PlungerStartFeedTimer,0);}
+void advance_half_frame(){phase+=1;uint16_t ms=8;if(phase>=3){++ms;phase-=3;}timer::advance(ms);}
 void advance_frame(){phase+=2;uint16_t ms=16;if(phase>=3){++ms;phase-=3;}timer::advance(ms);}
 }

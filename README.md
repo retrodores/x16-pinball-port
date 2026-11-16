@@ -2,7 +2,9 @@
 
 The user selected a direct C++ port of the recovered original engine. See
 [direct/README.md](direct/README.md) for current implementation, tests, measured
-performance and unfinished work. The Prog8 prototype below remains a reference.
+performance and unfinished work. A runnable direct-engine preview is now available: see [direct/PREVIEW.md](direct/PREVIEW.md).
+Build it with `sh direct/build-preview.sh` after the direct core build.
+The Prog8 prototype below remains a reference.
 
 # CmdrX Cadet 0.2.0
 

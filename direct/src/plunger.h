@@ -45,4 +45,5 @@ void reset(TBall& ball);
 void input(bool pressed);
 void feed();
 void advance_frame();
+void advance_half_frame();
 }

@@ -89,6 +89,8 @@ void input(bool left,bool right,bool pullback){
   previous_input[i]=next[i];
  }
 }
+// Match upstream options::DefUps=120: two simulation updates per display frame.
+void preview_tick(){for(uint8_t i=0;i<2;++i){frame(1.f/120.f);if(mechanisms)plunger::advance_half_frame();}}
 void tick(){frame(1.0f/60.0f);if(mechanisms)plunger::advance_frame();}
 void frame(float dt) {
  if(drained&&!mechanisms)return;

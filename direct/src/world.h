@@ -18,4 +18,5 @@ void frame(float dt);
 void start();
 void input(bool left,bool right,bool pullback);
 void tick();
+void preview_tick();
 }

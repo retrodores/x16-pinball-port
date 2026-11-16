@@ -1,8 +1,10 @@
-# CmdrX Cadet: direct mechanics checkpoint
+# CmdrX Cadet: direct engine and runnable preview
 
 This is a direct C++ port of the recovered k4zmu2a/SpaceCadetPinball engine to
-Commander X16 through LLVM-MOS. The current programs are native diagnostic
-probes, not a playable game or a complete port. The older Prog8 prototype is
+Commander X16 through LLVM-MOS. The normal-boot preview now displays the original table and sprites and accepts
+keyboard controls. See [PREVIEW.md](PREVIEW.md) for launch instructions and limits.
+It is an unfinished mechanics preview, not a complete or performance-approved game.
+The native diagnostic probes remain available separately. The older Prog8 prototype is
 preserved on master and under src/; building these probes does not change it.
 
 ## Implemented and exercised natively
@@ -47,7 +49,10 @@ The platform shells replace SDL ownership, dynamic component lists and heap time
   not general-purpose libm replacements. Native/desktop flipper records must
   agree within 2e-5*(1+abs(reference)).
 - A fixed eight-entry timer pool preserves millisecond deadlines, insertion order,
-  and the original two-callback/overdue policy. The integrated tick is 60 Hz.
+  and the original two-callback/overdue policy. The retained diagnostic tick is 60 Hz.
+  The visible preview uses the upstream default of 120 physics updates per second,
+  with two updates per display frame and 8/8/9 ms timer increments. Forty release
+  timings regress the missed plunger impulse observed with the former 60 Hz adapter.
   Timer exhaustion is reported; no heap allocation is used.
 - Plunger sound and rules callbacks are counted but are not yet connected to
   audio playback or mission rules. Random values are held at .5 for repeatable
@@ -63,6 +68,22 @@ The platform shells replace SDL ownership, dynamic component lists and heap time
 The retained reference world is the previous direct baseline, not the full
 original desktop engine. Matching its trajectory and the primitive/component
 checks does not establish complete game parity.
+
+## Visible preview
+
+    sh direct/build.sh
+    sh direct/build-preview.sh
+    python3 direct/t/preview_native.py
+    xvfb-run -a python3 direct/t/preview_boot.py 512
+    xvfb-run -a python3 direct/t/preview_boot.py 2048
+
+The distribution is direct/build/preview/CMDRX.PRG plus UI.BIN, WORLD.BIN,
+TABLE.BIN, PALETTE.BIN, SPRITES.BIN and PLUNGER.BIN. The small VERA presentation
+module lives in RAM bank 1, with no compiler zero-page register use. It has a
+fixed nine-byte state interface generated from the linked C++ symbol address.
+N/P/Esc presses are latched in the raw keyboard callback so short taps survive
+slow floating-point frames. Flippers and plunger retain continuous held state.
+See PREVIEW-VALIDATION.md for the completed checks.
 
 ## Reproduce
 
@@ -104,7 +125,7 @@ time to hide a performance problem. Main-memory headroom is small and will need
 attention before adding the rest of the engine.
 
 Still unfinished: gates, ramps/collision layers, targets, full drain/game lifecycle,
-mission rules, gameplay rendering, controls, original audio and scoring integration.
+mission rules, full gameplay presentation, original audio and scoring integration.
 The final game still requires the original graphics/audio, separate sound/music
 switches, listening mode, a calm attract screen, clear start/launch instructions,
 and unsigned 128-bit scores throughout arithmetic, presentation and storage.
