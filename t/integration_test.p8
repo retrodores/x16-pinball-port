@@ -31,6 +31,7 @@ main {
         tap.ok(cx16.VERA_DC_HSCALE==64 and cx16.VERA_DC_VSCALE==64,"320x240 integer scaling configured")
         tap.ok(cx16.vpeek(1,$fc08)==$80 and cx16.vpeek(1,$fc09)==$89,"left flipper points to converted sprite data")
         tap.ok(cx16.vpeek(1,$3000+322)==57 and cx16.vpeek(1,$3000+323)==191,"sprite data resident in VERA")
+        tap.ok(cx16.vpeek(1,$fc50)==0 and cx16.vpeek(1,$fc51)==$8e,"plunger uses the original eight-frame sprite bank")
         score.clear()
         sys.memset(&score.total,16,255)
         score.format()

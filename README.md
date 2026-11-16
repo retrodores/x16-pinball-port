@@ -1,7 +1,7 @@
-# CmdrX Cadet 0.1.0
+# CmdrX Cadet 0.2.0
 
 A playable Commander X16 mechanics prototype based on the supplied Space Cadet
-table artwork. This is the first native build, using the selected 320x240,
+table artwork. This is a native prototype, using the selected 320x240,
 256-color layout. Prog8 handles the game loop; small 65C02 routines handle
 keyboard state, wide score arithmetic, decimal conversion, and digit drawing.
 
@@ -11,10 +11,10 @@ Extract this folder beside your r49 x16emu.exe distribution and matching ROM.
 Double-click RUN-WINDOWS.bat, or from Git Bash in the emulator directory:
 
 ```sh
-./x16emu.exe -run -scale 2 -fsroot ./CmdrX_Cadet_0.1.0/play -prg ./CmdrX_Cadet_0.1.0/play/CMDRX.PRG
+./x16emu.exe -run -scale 2 -fsroot ./CmdrX_Cadet_0.2.0 -prg ./CmdrX_Cadet_0.2.0/CMDRX.PRG
 ```
 
-Keep the three .BIN files beside CMDRX.PRG. The Windows installer EXE is not an
+Keep all seven asset files beside CMDRX.PRG (six .BIN files plus MUSIC.PCM). The Windows installer EXE is not an
 X16 program. A ROM is not included in this package.
 
 At scale 2, the emulator displays a 1280x960 image; the 235-pixel table asset
@@ -27,37 +27,51 @@ aspect ratio. The internal resolution stays 320x240.
 | Z or Left Shift | Left flipper, held continuously |
 | / or Right Shift | Right flipper, held continuously |
 | P | Pause/resume |
+| S | Sound effects on/off |
+| M | Music on/off |
+| L | Music-only listening / return |
 | N | Save current best and start a new three-ball game |
 | Esc | Save best, restore keyboard handling, return to BASIC |
 
 ## Implemented
 
-- A ball, gravity, a launch lane, outer boundaries, seven bumpers, two animated
+- A ball, gravity, a launch lane, outer boundaries, seven bumpers, original static walls, two animated
   flippers, draining, three lives, pause and restart.
 - Original table artwork and converted ball/flipper/bumper graphics.
-- Short PSG effects for launch, hits and drain.
+- Original WAV effects and the complete original MIDI theme, converted to PCM.
+  Music streams from disk so it does not need to fit in banked RAM.
 - Unsigned 128-bit scoring, saturation at the maximum, exact decimal display,
   full-width comparison and versioned high-score storage in CMDRX.HI.
 - A maximum score of 340282366920938463463374607431768211455.
   Awards and carry chains cannot silently wrap the total.
-- Score presentation queues complete values: conversion uses one simulation
-  frame and the 39-digit display is drawn in three following frames. Pending
+- Score presentation queues complete values: conversion uses two simulation
+  frames and the 39-digit display is drawn in three following frames. Pending
   values remain coherent while further points accumulate.
 
 BEST shows the stored best from startup/new game. The current score is observed
 for a new best during play and saved on game over, N, or Esc. Close the program
-with Esc to save an unfinished game's best. The tiny unlabeled two-digit value
-beside BALLS is launch charge (0-64); a 1 beside it indicates pause.
+with Esc to save an unfinished game's best. The CHARGE value beside BALLS shows launch charge (0-64); a 1 beside it indicates pause.
 
 ## What this prototype leaves for the next stage
 
-The physics are a reduced screen-space model, with approximate outer rails and
-bumper radii. Flipper pivots, projected endpoints, artwork and bumper centers
+The physics remain a screen-space model. The static wall field is baked from
+56 original base-layer wall groups; ball contact normals are smoothed for the
+low-resolution grid. Bumper radii and responses remain approximate. Flipper pivots, projected endpoints, artwork and bumper centers
 come from the original resources, but the engine does not yet reproduce all
-1,229 original collision edges. Ramps, height/occlusion, slingshots, most lanes
-and targets, missions, rank progression, original music/samples, multiplayer,
+1,229 original collision edges. Ramps, height/occlusion, slingshots, most target rules, missions, rank progression, multiplayer,
 and a complete high-score table are not implemented. No physical X16 hardware
 test has been performed. The extra artwork does not imply active collisions.
+
+At startup, attract mode automatically plays and cycles lamps. Press N or Space
+to play. Idle games return to attract mode after 30 seconds while waiting for a
+ball. Demo scores are excluded from saved best scores. L plays the theme without
+simulation, and automatically enables music; M can still mute it independently.
+
+The theme uses the original MIDI notes rendered through TimGM6mb instruments.
+It is approximately 8 minutes 57 seconds long and loops. Both music and original
+WAV effects are converted to mono signed 8-bit PCM at about 8 kHz for stock VERA.
+This preserves the original recordings/composition, but is not bit-identical to
+Windows MIDI synthesis. Effects and music are mixed into the PCM FIFO.
 
 The current goal is to judge size, controls, motion and flipper response before
 spending effort reproducing the entire table.
@@ -82,12 +96,15 @@ X16_RAM_KB=2048 prove -v t/native.t
 The suite executes the actual production modules as native 65C02 code:
 128-bit boundaries and randomized reference vectors, decimal conversion,
 save/load, raw key press/release and alias behavior, VERA asset loads, mechanics,
-a deterministic 5000-frame soak, and measured 8 MHz frame budgets.
+a deterministic 5000-frame soak, continuous natural launches, eight-frame
+plunger animation, attract/listening modes, independent audio controls, sector
+streaming, and measured 8 MHz frame budgets.
 
 Tested contact scenarios include both resting and moving flippers plus the
 maximum 39-digit score. Test results and actual cycle measurements are under
 evidence/. They cover those scenarios, not every possible future table state.
-Disk I/O and initial loading are outside the active-play frame budget.
+Music sector refills and mixing are included in the active-play budget tests.
+Initial loading and high-score saves are outside that budget.
 
 To regenerate artwork, supply your own PINBALL.DAT and an inventory made by the
 study's analyze_dat.pl, then run:
@@ -95,6 +112,10 @@ study's analyze_dat.pl, then run:
 ```sh
 python3 tools/build_assets.py /path/to/PINBALL.DAT --inventory /path/to/inventory.json
 ```
+
+Pillow, NumPy and SciPy are offline conversion dependencies. The additional
+VM scripts tools/build_boundaries.py and tools/build_audio.py use the retained
+analysis workspace. Audio rendering uses FluidSynth and TimGM6mb.
 
 Pillow is an offline conversion dependency only. No Python, Perl, or Prog8
 compiler is needed to play the PRG on an X16.

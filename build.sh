@@ -7,5 +7,5 @@ if [ -n "${JAR:-}" ]; then
 else
     "${PROG8C:-prog8c}" -target cx16 -srcdirs src -out build src/cmdrx.p8
 fi
-cp assets/*.BIN build/
+cp assets/*.BIN assets/*.PCM build/
 cp build/cmdrx.prg build/CMDRX.PRG

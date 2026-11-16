@@ -10,7 +10,8 @@ score {
     str text = "0000000000000000000000000000000000000000"
     bool saturated = false
     bool dirty = true
-    ubyte nbytes, bits
+    ubyte bits,budget
+    bool busy=false
     sub clear() {
         ubyte i
         for i in 0 to 15 { total[i]=0 award[i]=0 }
@@ -56,7 +57,11 @@ _done:
     }
     ; Binary-to-packed-BCD via decimal carry. Each decimal section is atomic;
     ; no generic compiler runtime executes while the decimal flag is set.
-    asmsub format() clobbers(A,X,Y) {
+    sub format() {
+        begin_format()
+        while busy { format_step() }
+    }
+    asmsub begin_format() clobbers(A,X,Y) {
         %asm {{
             php
             sei
@@ -75,6 +80,21 @@ _zero:
             bpl _zero
             lda #128
             sta p8b_score.p8v_bits
+            lda #1
+            sta p8b_score.p8v_busy
+            stz p8b_score.p8v_dirty
+            plp
+            rts
+        }}
+    }
+    asmsub format_step() clobbers(A,X,Y) {
+        %asm {{
+            php
+            sei
+            cld
+            lda #64
+            sta p8b_score.p8v_budget
+
 _bit:
             asl p8b_score.p8v_temp
             rol p8b_score.p8v_temp+1
@@ -156,7 +176,11 @@ _bit:
             cld
             dec p8b_score.p8v_bits
             beq _converted
-            jmp _bit
+            dec p8b_score.p8v_budget
+            bne +
+            plp
+            rts
++           jmp _bit
 _converted:
             ldy #19
             ldx #0
@@ -178,7 +202,7 @@ _digits:
             dey
             bpl _digits
             stz p8b_score.p8v_text+40
-            stz p8b_score.p8v_dirty
+            stz p8b_score.p8v_busy
             plp
             rts
         }}

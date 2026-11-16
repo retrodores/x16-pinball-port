@@ -2,6 +2,8 @@
 %import syslib
 %import sprites
 %import glyphs
+%import boundaries
+%import session
 video {
     bool error=false
     sub load(str filename,ubyte length,ubyte bank,uword address) {
@@ -21,6 +23,10 @@ video {
         if error { return }
         load("SPRITES.BIN",11,1,$3000)
         if error { return }
+        load("PLUNGER.BIN",11,1,$c000)
+        if error { return }
+        boundaries.load()
+        if not boundaries.ready { error=true return }
         sys.set_irqd()
         cx16.VERA_CTRL=0
         cx16.VERA_DC_HSCALE=64
@@ -41,28 +47,35 @@ video {
         }
         sprites.pos(1,geometry.lax as word,geometry.lay as word)
         sprites.pos(2,geometry.rax as word,geometry.ray as word)
+        sprites.init(10,1,$c000,0,3,128,0)
+        sprites.pos(10,170,192)
         cx16.VERA_DC_VIDEO=$51
         sys.clear_irqd()
     }
     sub objects() {
         ubyte i
         sys.set_irqd()
-        if physics.lives!=0 {
-            sprites.pos(0,((physics.x>>8) as word)-2,((physics.y>>8) as word)-2)
+        if physics.lives!=0 and session.mode!=session.LISTEN {
+            sprites.pos(0,((physics.x>>8) as word)-3,((physics.y>>8) as word)-3)
         } else { sprites.pos(0,-16,-16) }
         sprites.data(1,1,$3000+(physics.left_angle as uword)*1024)
         sprites.data(2,1,$5000+(physics.right_angle as uword)*1024)
+        sprites.data(10,1,$c000+(physics.plunger_frame as uword)*512)
         for i in 0 to 6 {
             uword address=$7000+(i as uword)*2048
-            if physics.bumper_flash!=0 and physics.hit_bumper==i { address+=1024 }
+            if physics.bumper_flash!=0 and physics.hit_bumper==i or session.mode==session.ATTRACT and session.lamp==i { address+=1024 }
             sprites.data(i+3,1,address)
         }
         sys.clear_irqd()
     }
     uword @shared glyph_address
     ubyte @shared glyph_number,glyph_index,glyph_bits,glyph_count
+    ubyte @shared glyph_limit=10
+    ubyte @shared ink=255
+    ubyte @shared background=247
     sub digit(ubyte number,uword x,ubyte y) {
         glyph_address=((y as uword)*320)+x
+        glyph_limit=10
         glyph_number=number
         blit(&glyphs.rows)
     }
@@ -86,7 +99,7 @@ _row:
             lda p8b_video.p8v_glyph_address+1
             sta $9f21
             lda p8b_video.p8v_glyph_number
-            cmp #10
+            cmp p8b_video.p8v_glyph_limit
             bcs _blank
             ldy p8b_video.p8v_glyph_index
             lda (cx16.r0),y
@@ -99,31 +112,32 @@ _got:
             asl a
             sta p8b_video.p8v_glyph_bits
             asl p8b_video.p8v_glyph_bits
-            lda #0
+            lda p8b_video.p8v_background
             bcc +
-            lda #255
+            lda p8b_video.p8v_ink
 +           sta $9f23
             asl p8b_video.p8v_glyph_bits
-            lda #0
+            lda p8b_video.p8v_background
             bcc +
-            lda #255
+            lda p8b_video.p8v_ink
 +           sta $9f23
             asl p8b_video.p8v_glyph_bits
-            lda #0
+            lda p8b_video.p8v_background
             bcc +
-            lda #255
+            lda p8b_video.p8v_ink
 +           sta $9f23
             asl p8b_video.p8v_glyph_bits
-            lda #0
+            lda p8b_video.p8v_background
             bcc +
-            lda #255
+            lda p8b_video.p8v_ink
 +           sta $9f23
             asl p8b_video.p8v_glyph_bits
-            lda #0
+            lda p8b_video.p8v_background
             bcc +
-            lda #255
+            lda p8b_video.p8v_ink
 +           sta $9f23
-            stz $9f23
+            lda p8b_video.p8v_background
+            sta $9f23
             clc
             lda p8b_video.p8v_glyph_address
             adc #64
@@ -178,7 +192,7 @@ _done:
         for col in 0 to 12 {
             c=10
             if active_start<40 { c=active[active_start]-48 active_start++ }
-            digit(c,204+(col as uword)*6,44+active_row*9)
+            digit(c,204+(col as uword)*6,53+active_row*9)
         }
         sys.clear_irqd()
         active_row++
@@ -187,19 +201,53 @@ _done:
     ; Conversion and pixel drawing occupy separate simulation frames. A pending
     ; presentation is immutable; new score events queue the next complete value.
     sub present_score() {
+        if score.busy {
+            score.format_step()
+            if not score.busy { request_score() }
+            return
+        }
         if score.dirty and remaining==0 and not latest_pending {
-            score.format()
-            request_score()
+            score.begin_format()
+            score.format_step()
         } else {
             score_row()
         }
     }
+    sub label(str text,uword x,ubyte y,ubyte color) {
+        ubyte c,i=0
+        ink=color
+        glyph_limit=32
+        while text[i]!=0 {
+            c=text[i]
+            glyph_address=((y as uword)*320)+x+(i as uword)*6
+            if c<64 {
+                glyph_number=c-32
+                blit(&glyphs.label0)
+            } else {
+                glyph_number=c-64
+                blit(&glyphs.label1)
+            }
+            i++
+        }
+        ink=255
+    }
+    sub status(ubyte mode,bool music,bool effects) {
+        sys.set_irqd()
+        if mode==0 { label("ATTRACT MODE    ",204,169,249) }
+        if mode==1 { label("PLAY            ",204,169,248) }
+        if mode==2 { label("MUSIC ONLY      ",204,169,249) }
+        if effects { label("S: SOUND ON     ",204,181,252) }
+        else { label("S: SOUND OFF    ",204,181,250) }
+        if music { label("M: MUSIC ON     ",204,193,252) }
+        else { label("M: MUSIC OFF    ",204,193,250) }
+        sys.clear_irqd()
+    }
     sub counters() {
         sys.set_irqd()
-        digit(physics.lives,204,133)
-        if physics.paused { digit(1,228,133) } else { digit(10,228,133) }
-        digit(physics.charge/10,246,133)
-        digit(physics.charge % 10,252,133)
+        digit(physics.lives,208,151)
+        if physics.paused { digit(1,226,151) } else { digit(10,226,151) }
+        digit(physics.charge/10,270,151)
+        digit(physics.charge % 10,276,151)
         sys.clear_irqd()
     }
 }

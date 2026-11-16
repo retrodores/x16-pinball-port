@@ -13,7 +13,7 @@ groups=j['groups']
 pale=next(e for g in groups for e in g['entries'] if e['type']==5)
 rgb=[(r,g,b) for b,g,r,a in struct.iter_unpack('BBBB',data[pale['offset']:pale['offset']+1024])]
 rgb[:10]=[(0,0,0),(128,0,0),(0,128,0),(128,128,0),(0,0,128),(128,0,128),(0,128,128),(192,192,192),(192,220,192),(166,202,240)]
-rgb[246:255]=[(0,0,0)]*9;rgb[255]=(255,255,255)
+rgb[246:255]=[(17,17,34),(34,34,51),(68,221,221),(255,204,68),(136,153,187),(255,102,119),(85,221,153),(51,68,85),(68,85,102)];rgb[255]=(255,255,255)
 rgb=[tuple(round(v/17)*17 for v in c) for c in rgb]
 palette=[v for c in rgb for v in c]
 def bitmap(gid):
@@ -33,9 +33,17 @@ def project(x,y,z=0):
 table,_=bitmap(107)
 bg=Image.new('P',(320,240));bg.putpalette(palette)
 bg.paste(table.resize((183,235),Image.Resampling.NEAREST),(8,2))
-draw=ImageDraw.Draw(bg);font=ImageFont.load_default()
-for x,y,t in [(204,6,'CMDRX CADET'),(204,20,'PROTOTYPE 0.1'),(204,31,'SCORE'),(204,75,'BEST'),(204,119,'BALLS'),(204,145,'SPACE: CHARGE'),(204,157,'RELEASE: LAUNCH'),(204,173,'Z / LSHIFT: L'),(204,185,'/ / RSHIFT: R'),(204,201,'P: PAUSE'),(204,213,'N: NEW GAME'),(204,225,'ESC: EXIT')]:
- draw.text((x,y),t,font=font,fill=255)
+draw=ImageDraw.Draw(bg)
+draw.rounded_rectangle((197,2,318,237),radius=5,fill=246,outline=253)
+draw.rectangle((201,6,314,32),fill=247)
+draw.line((204,34,311,34),fill=248)
+font=ImageFont.truetype('/usr/share/fonts/truetype/dejavu/DejaVuSansMono.ttf',9)
+title=ImageFont.truetype('/usr/share/fonts/truetype/dejavu/DejaVuSansMono-Bold.ttf',13)
+draw.text((211,10),'CMDRX CADET',font=title,fill=249)
+for x,y,t,color in [(204,38,'SCORE',250),(204,88,'PERSONAL BEST',250),(204,135,'BALLS   CHARGE',250),(204,208,'Z / SHIFT   /',250),(204,221,'L LISTEN N PLAY',250)]:
+ draw.text((x,y),t,font=font,fill=color)
+for box in [(202,49,312,82),(202,100,312,132),(202,147,312,162),(202,166,312,204)]:
+ draw.rounded_rectangle(box,radius=2,fill=247)
 (root/'assets/TABLE.BIN').write_bytes(bg.tobytes())
 (root/'assets/PALETTE.BIN').write_bytes(bytes(v for r,g,b in rgb for v in ((g//17)*16+b//17,r//17)))
 patterns=bytearray();anchors=[];tips=[];pivots=[]
@@ -70,8 +78,15 @@ for base in bumperids:
   v=attr(base,600);centers.append(tuple(round(n) for n in project(v[1],v[2])))
  except StopIteration:centers.append((ax+round(b['width']/4),ay+round(b['height']/4)))
 balladdr=0x13000+len(patterns)
-im,b=bitmap(108);ball=Image.new('P',(8,8));ball.paste(im.resize((5,5),Image.Resampling.NEAREST),(0,0));patterns.extend(ball.tobytes())
+im,b=bitmap(108);ball=Image.new('P',(8,8));ball.paste(im.resize((7,7),Image.Resampling.NEAREST),(0,0));patterns.extend(ball.tobytes())
 (root/'assets/SPRITES.BIN').write_bytes(patterns)
+plunger=bytearray()
+for gid in range(473,481):
+ im,meta=bitmap(gid)
+ frame=Image.new('P',(8,64))
+ frame.paste(im.resize((max(1,round(im.width/2)),max(1,round(im.height/2))),Image.Resampling.NEAREST),(round((meta['x']-137)/2+8)-170,round((meta['y']-2)/2+2)-192))
+ plunger.extend(frame.tobytes())
+(root/'assets/PLUNGER.BIN').write_bytes(plunger)
 lines=['%encoding iso','geometry {']
 def const(name,value):lines.append(f'    const uword {name}={value}')
 def arr(name,values):lines.append('    ubyte['+str(len(values))+'] '+name+'=['+','.join(map(str,values))+']')
@@ -82,6 +97,7 @@ for k,side in enumerate(('l','r')):
 arr('bx',[p[0] for p in centers]);arr('by',[p[1] for p in centers])
 arr('bax',[p[0] for p in banchors]);arr('bay',[p[1] for p in banchors])
 const('BALL_BANK',balladdr>>16);const('BALL_ADDR',balladdr&65535)
+const('BALL_DIAMETER',7)
 for k in range(2):
  lines.append('    uword[256] invlen'+str(k)+'=['+','.join(map(str,[0 if i==0 else round(4096/math.sqrt(i)) for i in range(k*256,(k+1)*256)]))+']')
 lines+=['}']
@@ -93,3 +109,11 @@ rows=[int(s[i:i+5],2) for s in fontrows for i in range(0,35,5)]
 bg.resize((1280,960),Image.Resampling.NEAREST).save(root/'evidence/table-at-scale2.png')
 (root/'evidence/assets.json').write_text(json.dumps({'flipper_anchors':anchors,'flipper_pivots':pivots,'flipper_tips':tips,'bumper_centers':centers,'sprite_bytes':len(patterns),'ball_address':balladdr,'palette':'original indexed rounded to 12-bit'},indent=2))
 print('sprites',len(patterns),'bytes; flipper pivots',pivots,'bumpers',centers)
+
+font={'A': [14, 17, 17, 31, 17, 17, 17], 'B': [30, 17, 17, 30, 17, 17, 30], 'C': [14, 17, 16, 16, 16, 17, 14], 'D': [30, 17, 17, 17, 17, 17, 30], 'E': [31, 16, 16, 30, 16, 16, 31], 'F': [31, 16, 16, 30, 16, 16, 16], 'G': [14, 17, 16, 23, 17, 17, 15], 'H': [17, 17, 17, 31, 17, 17, 17], 'I': [14, 4, 4, 4, 4, 4, 14], 'J': [7, 2, 2, 2, 18, 18, 12], 'K': [17, 18, 20, 24, 20, 18, 17], 'L': [16, 16, 16, 16, 16, 16, 31], 'M': [17, 27, 21, 21, 17, 17, 17], 'N': [17, 25, 21, 19, 17, 17, 17], 'O': [14, 17, 17, 17, 17, 17, 14], 'P': [30, 17, 17, 30, 16, 16, 16], 'Q': [14, 17, 17, 17, 21, 18, 13], 'R': [30, 17, 17, 30, 20, 18, 17], 'S': [15, 16, 16, 14, 1, 1, 30], 'T': [31, 4, 4, 4, 4, 4, 4], 'U': [17, 17, 17, 17, 17, 17, 14], 'V': [17, 17, 17, 17, 17, 10, 4], 'W': [17, 17, 17, 21, 21, 21, 10], 'X': [17, 17, 10, 4, 10, 17, 17], 'Y': [17, 17, 10, 4, 4, 4, 4], 'Z': [31, 1, 2, 4, 8, 16, 31], ':': [0, 4, 4, 0, 4, 4, 0], ' ': [0, 0, 0, 0, 0, 0, 0]}
+labelrows=[]
+for ch in range(32,96):labelrows.extend(font.get(chr(ch),[0]*7))
+parts=[]
+for k in range(2):
+ parts.append('    ubyte[224] label'+str(k)+'=['+','.join(map(str,labelrows[k*224:(k+1)*224]))+']')
+p=root/'src/glyphs.p8';s=p.read_text().replace('\n}', '\n'+'\n'.join(parts)+'\n}');p.write_text(s)

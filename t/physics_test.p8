@@ -1,5 +1,6 @@
 %encoding iso
 %import physics
+%import boundaries
 %import score
 %import video
 %import storage
@@ -20,26 +21,41 @@ main {
     sub start() {
         uword i
         long cycles
+        boundaries.load()
+        tap.ok(boundaries.ready,"original wall field loads into banked RAM")
         physics.new_game()
-        tap.ok(physics.lives==3 and physics.state==0 and physics.x==175*256,"new game serves a ball")
+        tap.ok(physics.lives==3 and physics.state==0 and physics.x==169*256,"new game serves a ball")
         repeat 64 { physics.frame(4) }
         tap.ok(physics.charge==64 and physics.state==0,"holding plunger charges without launching")
         physics.frame(0)
         tap.ok(physics.state==1 and physics.vy < -320,"release launches charged plunger")
-        repeat 200 { physics.frame(0) }
+        bool continuous=true
+        bool entered=false
+        long previous_x=physics.x
+        long previous_y=physics.y
+        repeat 500 {
+            physics.frame(0)
+            if physics.state==0 { break }
+            if abs(physics.x-previous_x)>4*256 or abs(physics.y-previous_y)>4*256 { continuous=false }
+            previous_x=physics.x
+            previous_y=physics.y
+            if physics.state==2 { entered=true }
+        }
+        tap.ok(continuous,"launch has no teleport or abrupt position jump")
+        tap.ok(entered,"charged launch follows lane into the table")
         tap.ok(physics.state!=1,"ball leaves the launch channel")
         sample(100,120,0,0)
         physics.frame(0)
         tap.ok(physics.vy>0 and physics.y>120*256,"gravity accelerates downward")
-        sample(10,100,-128,0)
+        sample(77,100,-384,0)
         physics.frame(0)
-        tap.ok(physics.vx>0 and physics.x>=35*256,"left rail contains and reflects ball")
-        sample(190,100,128,0)
+        tap.ok(physics.vx>0 and physics.x>=74*256,"left rail contains and reflects ball")
+        sample(131,100,384,0)
         physics.frame(0)
-        tap.ok(physics.vx<0 and physics.x<=165*256,"right rail contains and reflects ball")
-        sample(100,22,0,-256)
+        tap.ok(physics.vx<0 and physics.x<=133*256,"right rail contains and reflects ball")
+        sample(100,10,0,-256)
         physics.frame(0)
-        tap.ok(physics.vy>0 and physics.y>=22*256,"roof reflects upward motion")
+        tap.ok(physics.vy>0 and physics.y>=10*256,"roof reflects upward motion")
         sample(100,214,0,300)
         physics.frame(0)
         tap.ok(physics.lives==2 and physics.state==0 and physics.drains==1,"drain consumes one life and serves")
@@ -111,6 +127,7 @@ main {
         cycles=emudbg.cpu_cycles()
         tap.say("# max-score contact and conversion-phase cycles: ") txt.print_l(cycles) txt.nl()
         tap.ok(cycles<133333,"max-score update and scheduled rendering fit a 60 Hz frame")
+        video.present_score()
         video.score_row()
         video.score_row()
         video.score_row()

@@ -22,14 +22,14 @@ sub capture {
       or do {kill 'KILL',-$pid;waitpid($pid,0);die $@};
     open my $fh,'<',$log or die $!;local $/;return ($status,<$fh>);
 }
-for my $source(qw(score_vectors physics_test frame_budget integration_test)) {
+for my $source(qw(score_vectors physics_test frame_budget integration_test features02_test)) {
     subtest $source => sub {
         my $temp=tempdir(CLEANUP=>1);
         my @compiler=$ENV{JAR} ? ('java','-jar',$ENV{JAR}) : ($ENV{PROG8C}//'prog8c');
         my ($status,$log)=capture("$temp/compile.log",@compiler,'-target','cx16','-srcdirs','src','-srcdirs','t','-out',$temp,"t/$source.p8");
         if($status) {diag($log);BAIL_OUT("native compilation failed")}
         mkdir "$temp/fs" or die $!;
-        for my $file(glob 'assets/*.BIN') {
+        for my $file(glob 'assets/*') {
             (my $name=$file)=~s{.*/}{};
             copy($file,"$temp/fs/$name") or die $!;
         }
