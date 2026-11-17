@@ -41,3 +41,17 @@ Do not regress plunger release timing: t/preview_launch.cpp tests forty holds.
 Run t/preview_native.py and actual SDL t/preview_boot.py at both RAM sizes. The
 preview is explicitly over budget and incomplete; never relabel it as a finished
 or stock-speed gameplay release. New/Pause/Exit commands must latch short taps.
+
+User correction: the float preview was too slow to test; runtime must now be
+integer-only. Current adaptation is direct/integer, generated from retained
+float methods. Build with integer/build.sh and integer/build-preview.sh. Never
+edit generated build/integer/src. All runtime math, including projection, is
+fixed point; verify absence of soft-float symbols in the linked PRG. Keep the
+original float reference and its test tolerances intact. Run integer/verify.py,
+integer/preview_native.py and actual SDL tests on both RAM sizes. Fixed-point
+comparison bounds are explicit in verify.py. Keep normal/test UI addresses
+paired correctly. Float WORLD.BIN is incompatible with the integer loader.
+FLIP.BIN uses banks 8..23. Exact integer time division avoids dt quantization.
+Current normal build is -Os; instrumented build -Oz. Do not represent the latter
+as an exact timing profile of the former. Frame spikes still exceed 133333 cycles;
+only label this as a preview until the strict gameplay gate passes.

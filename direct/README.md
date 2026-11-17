@@ -1,3 +1,9 @@
+# Current runnable build
+
+The current preview uses integer-only runtime physics and projection. See
+[integer/README.md](integer/README.md) and [integer/VALIDATION.md](integer/VALIDATION.md).
+The floating-point implementation below remains the behavioral reference.
+
 # CmdrX Cadet: direct engine and runnable preview
 
 This is a direct C++ port of the recovered k4zmu2a/SpaceCadetPinball engine to

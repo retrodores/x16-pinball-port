@@ -1,3 +1,17 @@
+# 2026-11-16 — Integer-only runtime preview
+
+- Converted world physics, flippers, plunger and projection to fixed-point
+  integers, retaining float methods and pristine vendor sources as reference.
+- Added a tested 65C02 quarter-square multiplier and integer square root;
+  removed runtime floating-point helpers. Precomputed flipper geometry uses
+  512 orientations per side in banks 8..23.
+- Added exact rational time multiplication and integer line-plane rejection.
+- Tested native/host equality, 96 flipper differential records / 40 contacts,
+  40 launch timings and actual 8 MHz SDL controls at 512 KB and 2 MB. Float
+  regression suite remains 736/736. Stock-speed launcher only.
+- Measured instrumented preview: 12.04 ms average, 48.72 ms maximum across
+  760 mixed-state frames. Strict 60 Hz gate still fails during heavy contacts.
+
 # 2026-11-16 — Runnable direct-engine preview
 
 - Added a normal-boot CMDRX.PRG, original table/sprites, charge bar, status and

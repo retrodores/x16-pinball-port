@@ -1,3 +1,9 @@
+# Current runnable build: integer engine
+
+The user requested integer-only runtime physics. See
+[direct/integer/README.md](direct/integer/README.md) for the current 8 MHz preview.
+The floating-point port remains the comparison reference.
+
 # Active branch: direct engine port
 
 The user selected a direct C++ port of the recovered original engine. See
