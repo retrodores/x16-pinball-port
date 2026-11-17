@@ -1,4 +1,4 @@
-# CmdrX Cadet — integer preview, 2026-11-16
+# CmdrX Cadet — integer performance preview 2, 2026-11-16
 
 This build replaces the preview's runtime floating-point arithmetic with
 fixed-point integers. Collision detection, gravity, rebounds, moving flippers,
@@ -71,3 +71,12 @@ Recovered engine: Andrey Muzychenko / k4zmu2a and contributors,
 https://github.com/k4zmu2a/SpaceCadetPinball at
 cb9b7b886244a27773f66b0b19fdc2998392565e; MIT license included.
 X16 platform/toolchain: Commander X16 community, LLVM-MOS and 64tass.
+
+## Performance preview 2 and the 65816 experiment
+
+See PERFORMANCE.md for measured improvements and unchanged trace validation.
+The standard build now caches four static edges and simplifies exact bounds
+and step arithmetic. The optional cpu816/build.sh and cpu816/verify.py --sdl
+build/test a native 16-bit multiplier while retaining 8-bit C++ elsewhere.
+Use -c816 and that build's own UI.BIN for the experimental version.
+Both variants still exceed the strict 60 Hz frame budget on heavy contacts.

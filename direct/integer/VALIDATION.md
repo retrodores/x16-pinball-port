@@ -1,4 +1,4 @@
-# Integer preview validation — 2026-11-16
+# Integer performance preview 2 validation — 2026-11-16
 
 Checked using r49 plus its matching ROM, at 512 KB and 2048 KB RAM.
 
@@ -21,8 +21,8 @@ Checked using r49 plus its matching ROM, at 512 KB and 2048 KB RAM.
 - The retained floating-point suite still passes all 736 tests. Its original
   files and vendor sources have not changed.
 
-The instrumented -Oz preview's 760-frame sequence measured **96297 cycles
-average (12.04 ms)** and **389733 cycles maximum (48.72 ms)** at 8 MHz; 88 frames
+The instrumented -Oz preview's 760-frame sequence measured **78764 cycles
+average (9.85 ms)** and **313156 cycles maximum (39.14 ms)** at 8 MHz; 44 frames
 exceeded 133333 cycles. These figures include feeding, charging, flight,
 flippers and pause; they are not an active-play-only average. The distribution
 uses -Os and was exercised separately through actual SDL keyboard input.
@@ -30,9 +30,14 @@ The strict 60 Hz gameplay gate remains FAIL; this is an improved preview,
 not a performance-approved finished game. No accelerated CPU is required by
 the included launcher, and no 40 MHz launcher is included.
 
-The normal PRG is 37057 bytes. UI.BIN is 6985 bytes, WORLD.BIN 193640 bytes,
+The normal PRG is 36809 bytes. UI.BIN is 6985 bytes, WORLD.BIN 193640 bytes,
 and FLIP.BIN 131072 bytes. The latter uses banks 8..23; bank 1 is presentation
 and banks 32..55 hold the world. Keep all files from the same package together.
 
 The source checkpoint retains detailed native traces, differential error
 measurements, build hashes, real keyboard logs and representative captures.
+
+The optional native 65816 multiplier build measures 310684 maximum cycles
+and 78636 average cycles, also with 44 over-budget frames. Its matching native
+and SDL tests pass at both RAM sizes. See PERFORMANCE.md for the controlled
+comparison, unchanged integer traces, and limits of this mixed-mode experiment.

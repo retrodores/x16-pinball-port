@@ -1,3 +1,15 @@
+# 2026-11-16 — Performance preview 2 and 65816 experiment
+
+- Reuse four collision edge records, simplify exact raw-coordinate bounds and
+  subdivision arithmetic, and avoid endpoint sprite divisions. Recorded
+  integer physics traces are unchanged.
+- Reduce mixed-sequence diagnostic worst frame from 389733 to 313156 cycles
+  at 8 MHz; over-budget frames fall from 88 to 44 of 760. Gate still fails.
+- Add a tested native 65816 multiplier and separate experimental build. It
+  achieves 310684 worst-frame cycles; the C++ core still uses 8-bit arithmetic.
+- Validate both CPU variants at 512 KB and 2 MB, including real SDL controls.
+  See direct/integer/PERFORMANCE.md for scope, timings and reproduction.
+
 # 2026-11-16 — Integer-only runtime preview
 
 - Converted world physics, flippers, plunger and projection to fixed-point

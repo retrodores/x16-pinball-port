@@ -55,3 +55,10 @@ FLIP.BIN uses banks 8..23. Exact integer time division avoids dt quantization.
 Current normal build is -Os; instrumented build -Oz. Do not represent the latter
 as an exact timing profile of the former. Frame spikes still exceed 133333 cycles;
 only label this as a preview until the strict gameplay gate passes.
+
+Performance preview 2: the integer static-edge cache has four slots. Preserve
+bit-identical integer traces when making data-reuse optimizations. Optional
+cpu816/build.sh replaces only multiplication with native 16-bit assembly;
+it is not a full native-mode core. Its PRG requires -c816 and its own paired
+UI.BIN. Both CPU variants still fail the strict frame gate. Consult
+integer/PERFORMANCE.md before making CPU speed claims.

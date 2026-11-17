@@ -16,6 +16,7 @@ for n in names:
  s=(r/'src'/n).read_text();s=re.sub(r'\bfloat\b','Fixed',s)
  if n.startswith('original_'):s='// Generated fixed-point adaptation; original source remains under direct/src.\n'+s
  if n=='preview.cpp':
+  s=s.replace('return (uint8_t)(e.CurrentAngle/e.AngleMax*7+.5f);', 'if(e.CurrentAngle==0)return 0;if(e.CurrentAngle==e.AngleMax)return 7;return (uint8_t)(e.CurrentAngle/e.AngleMax*7+.5f);')
   s=s.replace('int main(){','#ifdef __CX16__\n__attribute__((minsize))\n#endif\nint main(){').replace('static void project(){','__attribute__((noinline)) static void project(){')
   s=s.replace('static void inject(uint8_t code){', 'static void hexout(uint32_t n){for(int i=7;i>=0;--i)*(volatile uint8_t*)0x9fbb="0123456789abcdef"[(n>>(i*4))&15];}\nstatic void inject(uint8_t code){')
   s=s.replace('unsigned test_frame=0;','uint32_t max_cycles=0,total_cycles=0;unsigned over_budget=0;\n unsigned test_frame=0;')
@@ -26,6 +27,18 @@ for n in names:
   s=s.replace('#pragma once','#pragma once\n#include "fixed.h"').replace('vector2 RayIntersect;', 'vector2 RayIntersect;\n Fixed PlaneC;')
  if n=='world.h':s=s.replace('sizeof(Edge)==68','sizeof(Edge)==72')
  if n=='world.cpp':
+  # Q12 -> Q8.8 is an exact truncating division by 16. Avoid constructing
+  # Fixed(256) and passing through the general fixed multiply for each ray.
+  s=s.replace('(int16_t)(ray.Origin.X*256)', '(int16_t)(ray.Origin.X.raw/16)').replace('(int16_t)(ray.Origin.Y*256)', '(int16_t)(ray.Origin.Y.raw/16)')
+  # Positive ceil(travel/half), in raw units. Preserve the old quotient and
+  # remainder semantics without a Q12 division followed by a fixed multiply.
+  s=s.replace('steps=(int)(travel/half);if(steps*half<travel)++steps;', 'steps=(int)(travel.raw/half.raw);if((int32_t)steps*half.raw<travel.raw)++steps;')
+  # Four direct-mapped records retain adjacent candidates across ray substeps.
+  # This only changes data reuse, not candidate order or intersection math.
+  s=s.replace('static Edge cache;', 'static Edge cache[4];')
+  s=s.replace('static uint16_t cache_id=65535;', 'static uint16_t cache_id[4]={65535,65535,65535,65535};')
+  s=s.replace('cache_id=65535;', 'for(uint8_t i=0;i<4;++i)cache_id[i]=65535;')
+  s=s.replace('if(cache_id!=id){read_record(44+(id>>6),(id&63)*128,&cache,sizeof edge);cache_id=id;}\n  Edge& candidate=cache;', 'uint8_t slot=id&3;\n  if(cache_id[slot]!=id){read_record(44+(id>>6),(id&63)*128,&cache[slot],sizeof edge);cache_id[slot]=id;}\n  Edge& candidate=cache[slot];')
   s=s.replace('force.X*dt','time_product(force.X,dt)').replace('force.Y*dt','time_product(force.Y,dt)').replace('travel=ball.Speed*dt','travel=time_product(ball.Speed,dt)')
   s=s.replace('direct/build/WORLD.BIN','direct/build/integer/WORLD.BIN')
   s=s.replace('return ok;', 'return ok&&load_integer_geometry();')
