@@ -1,3 +1,9 @@
+# Current playable rebuild
+
+See [wireframe/README.md](wireframe/README.md) for the new original practice table,
+integer engine, sound, controls and runnable builds. Earlier recovered-table
+engines remain below and in direct/ as preserved reference work.
+
 # Current runnable build: integer engine
 
 The user requested integer-only runtime physics. See

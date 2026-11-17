@@ -1,0 +1,943 @@
+{
+  "radius": 0.300000012,
+  "max_speed": 60.0000038,
+  "plunger": [
+    -7.02093887,
+    10.0848541
+  ],
+  "edges": [
+    {
+      "component": 280,
+      "class": "5TWall",
+      "mask": 1,
+      "active": 1,
+      "elasticity": 0.65,
+      "smoothness": 0.95,
+      "threshold": 1,
+      "boost": 0,
+      "line": [
+        7.7,
+        14.0,
+        7.7,
+        -10.0
+      ]
+    },
+    {
+      "component": 281,
+      "class": "5TWall",
+      "mask": 1,
+      "active": 1,
+      "elasticity": 0.65,
+      "smoothness": 0.95,
+      "threshold": 1,
+      "boost": 0,
+      "line": [
+        7.772223019290411,
+        -9.804762587963209,
+        4.772223019290411,
+        -13.304762587963209
+      ]
+    },
+    {
+      "component": 282,
+      "class": "5TWall",
+      "mask": 1,
+      "active": 1,
+      "elasticity": 0.65,
+      "smoothness": 0.95,
+      "threshold": 1,
+      "boost": 0,
+      "line": [
+        5.0,
+        -13.2,
+        -5.0,
+        -13.2
+      ]
+    },
+    {
+      "component": 283,
+      "class": "5TWall",
+      "mask": 1,
+      "active": 1,
+      "elasticity": 0.65,
+      "smoothness": 0.95,
+      "threshold": 1,
+      "boost": 0,
+      "line": [
+        -4.772223019290411,
+        -13.304762587963209,
+        -7.772223019290411,
+        -9.804762587963209
+      ]
+    },
+    {
+      "component": 284,
+      "class": "5TWall",
+      "mask": 1,
+      "active": 1,
+      "elasticity": 0.65,
+      "smoothness": 0.95,
+      "threshold": 1,
+      "boost": 0,
+      "line": [
+        -7.7,
+        -10.0,
+        -7.7,
+        14.0
+      ]
+    },
+    {
+      "component": 106,
+      "class": "6TDrain",
+      "mask": 1,
+      "active": 1,
+      "elasticity": 0.65,
+      "smoothness": 0.95,
+      "threshold": 1,
+      "boost": 0,
+      "line": [
+        -8,
+        14.5,
+        8,
+        14.5
+      ]
+    },
+    {
+      "component": 290,
+      "class": "5TWall",
+      "mask": 1,
+      "active": 1,
+      "elasticity": 0.65,
+      "smoothness": 0.95,
+      "threshold": 1,
+      "boost": 0,
+      "line": [
+        -6.55,
+        12.0,
+        -6.55,
+        -9.1
+      ]
+    },
+    {
+      "component": 291,
+      "class": "5TWall",
+      "mask": 1,
+      "active": 1,
+      "elasticity": 0.65,
+      "smoothness": 0.95,
+      "threshold": 1,
+      "boost": 0,
+      "line": [
+        -5.95,
+        -9.1,
+        -5.95,
+        12.0
+      ]
+    },
+    {
+      "component": 292,
+      "class": "5TWall",
+      "mask": 1,
+      "active": 1,
+      "elasticity": 0.7,
+      "smoothness": 0.95,
+      "threshold": 1,
+      "boost": 0,
+      "circle": [
+        -6.25,
+        -9.1,
+        0.09
+      ]
+    },
+    {
+      "component": 102,
+      "class": "8TPlunger",
+      "mask": 1,
+      "active": 1,
+      "elasticity": 0.65,
+      "smoothness": 0.95,
+      "threshold": 1,
+      "boost": 0,
+      "line": [
+        -7.7,
+        11.7,
+        -6.55,
+        11.7
+      ]
+    },
+    {
+      "component": 300,
+      "class": "5TWall",
+      "mask": 1,
+      "active": 1,
+      "elasticity": 0.65,
+      "smoothness": 0.95,
+      "threshold": 1,
+      "boost": 0,
+      "line": [
+        2.5854719536740625,
+        11.422721572052993,
+        7.185471953674062,
+        9.522721572052994
+      ]
+    },
+    {
+      "component": 301,
+      "class": "5TWall",
+      "mask": 1,
+      "active": 1,
+      "elasticity": 0.65,
+      "smoothness": 0.95,
+      "threshold": 1,
+      "boost": 0,
+      "line": [
+        -5.6950520489289875,
+        9.543112607434901,
+        -2.545052048928988,
+        11.4431126074349
+      ]
+    },
+    {
+      "component": 310,
+      "class": "5TWall",
+      "mask": 1,
+      "active": 1,
+      "elasticity": 0.65,
+      "smoothness": 0.95,
+      "threshold": 1,
+      "boost": 7,
+      "line": [
+        -5.6,
+        9.8,
+        -5.6,
+        6.6
+      ]
+    },
+    {
+      "component": 311,
+      "class": "5TWall",
+      "mask": 1,
+      "active": 1,
+      "elasticity": 0.65,
+      "smoothness": 0.95,
+      "threshold": 1,
+      "boost": 7,
+      "line": [
+        -5.0521317971577355,
+        6.430998952607546,
+        -3.5521317971577355,
+        8.630998952607548
+      ]
+    },
+    {
+      "component": 312,
+      "class": "5TWall",
+      "mask": 1,
+      "active": 1,
+      "elasticity": 0.65,
+      "smoothness": 0.95,
+      "threshold": 1,
+      "boost": 7,
+      "line": [
+        -3.6335899411324313,
+        9.049615088301353,
+        -5.133589941132431,
+        10.049615088301353
+      ]
+    },
+    {
+      "component": 313,
+      "class": "5TWall",
+      "mask": 1,
+      "active": 1,
+      "elasticity": 0.65,
+      "smoothness": 0.95,
+      "threshold": 1,
+      "boost": 7,
+      "line": [
+        3.5521317971577355,
+        8.630998952607548,
+        5.0521317971577355,
+        6.430998952607546
+      ]
+    },
+    {
+      "component": 314,
+      "class": "5TWall",
+      "mask": 1,
+      "active": 1,
+      "elasticity": 0.65,
+      "smoothness": 0.95,
+      "threshold": 1,
+      "boost": 7,
+      "line": [
+        5.6,
+        6.6,
+        5.6,
+        9.8
+      ]
+    },
+    {
+      "component": 315,
+      "class": "5TWall",
+      "mask": 1,
+      "active": 1,
+      "elasticity": 0.65,
+      "smoothness": 0.95,
+      "threshold": 1,
+      "boost": 7,
+      "line": [
+        5.133589941132431,
+        10.049615088301353,
+        3.6335899411324313,
+        9.049615088301353
+      ]
+    },
+    {
+      "component": 380,
+      "class": "7TBumper",
+      "mask": 1,
+      "active": 1,
+      "elasticity": 0.7,
+      "smoothness": 0.95,
+      "threshold": 1,
+      "boost": 9,
+      "circle": [
+        0,
+        -9.2,
+        0.48999999999999994
+      ]
+    },
+    {
+      "component": 381,
+      "class": "7TBumper",
+      "mask": 1,
+      "active": 1,
+      "elasticity": 0.7,
+      "smoothness": 0.95,
+      "threshold": 1,
+      "boost": 9,
+      "circle": [
+        3,
+        -6.5,
+        0.48999999999999994
+      ]
+    },
+    {
+      "component": 382,
+      "class": "7TBumper",
+      "mask": 1,
+      "active": 1,
+      "elasticity": 0.7,
+      "smoothness": 0.95,
+      "threshold": 1,
+      "boost": 9,
+      "circle": [
+        -2.5,
+        -6.4,
+        0.48999999999999994
+      ]
+    },
+    {
+      "component": 383,
+      "class": "7TBumper",
+      "mask": 1,
+      "active": 1,
+      "elasticity": 0.7,
+      "smoothness": 0.95,
+      "threshold": 1,
+      "boost": 9,
+      "circle": [
+        1.2,
+        -3.4,
+        0.48999999999999994
+      ]
+    },
+    {
+      "component": 384,
+      "class": "7TBumper",
+      "mask": 1,
+      "active": 1,
+      "elasticity": 0.7,
+      "smoothness": 0.95,
+      "threshold": 1,
+      "boost": 9,
+      "circle": [
+        -1.2,
+        -0.5,
+        0.48999999999999994
+      ]
+    },
+    {
+      "component": 432,
+      "class": "12TPopupTarget",
+      "mask": 1,
+      "active": 1,
+      "elasticity": 0.65,
+      "smoothness": 0.95,
+      "threshold": 1,
+      "boost": 2,
+      "line": [
+        4.3,
+        -10.399999999999999,
+        3.8,
+        -10.399999999999999
+      ]
+    },
+    {
+      "component": 433,
+      "class": "12TPopupTarget",
+      "mask": 1,
+      "active": 1,
+      "elasticity": 0.65,
+      "smoothness": 0.95,
+      "threshold": 1,
+      "boost": 2,
+      "line": [
+        3.65,
+        -10.399999999999999,
+        3.15,
+        -10.399999999999999
+      ]
+    },
+    {
+      "component": 434,
+      "class": "12TPopupTarget",
+      "mask": 1,
+      "active": 1,
+      "elasticity": 0.65,
+      "smoothness": 0.95,
+      "threshold": 1,
+      "boost": 2,
+      "line": [
+        3.0,
+        -10.399999999999999,
+        2.5,
+        -10.399999999999999
+      ]
+    },
+    {
+      "component": 435,
+      "class": "12TPopupTarget",
+      "mask": 1,
+      "active": 1,
+      "elasticity": 0.65,
+      "smoothness": 0.95,
+      "threshold": 1,
+      "boost": 2,
+      "line": [
+        7.0,
+        -4.5,
+        7.0,
+        -3.95
+      ]
+    },
+    {
+      "component": 436,
+      "class": "12TPopupTarget",
+      "mask": 1,
+      "active": 1,
+      "elasticity": 0.65,
+      "smoothness": 0.95,
+      "threshold": 1,
+      "boost": 2,
+      "line": [
+        7.0,
+        -3.75,
+        7.0,
+        -3.2
+      ]
+    },
+    {
+      "component": 437,
+      "class": "12TPopupTarget",
+      "mask": 1,
+      "active": 1,
+      "elasticity": 0.65,
+      "smoothness": 0.95,
+      "threshold": 1,
+      "boost": 2,
+      "line": [
+        7.0,
+        -3.0,
+        7.0,
+        -2.45
+      ]
+    },
+    {
+      "component": 438,
+      "class": "12TPopupTarget",
+      "mask": 1,
+      "active": 1,
+      "elasticity": 0.65,
+      "smoothness": 0.95,
+      "threshold": 1,
+      "boost": 2,
+      "line": [
+        7.0,
+        1.8,
+        7.0,
+        2.35
+      ]
+    },
+    {
+      "component": 439,
+      "class": "12TPopupTarget",
+      "mask": 1,
+      "active": 1,
+      "elasticity": 0.65,
+      "smoothness": 0.95,
+      "threshold": 1,
+      "boost": 2,
+      "line": [
+        7.0,
+        2.55,
+        7.0,
+        3.0999999999999996
+      ]
+    },
+    {
+      "component": 440,
+      "class": "12TPopupTarget",
+      "mask": 1,
+      "active": 1,
+      "elasticity": 0.65,
+      "smoothness": 0.95,
+      "threshold": 1,
+      "boost": 2,
+      "line": [
+        7.0,
+        3.3,
+        7.0,
+        3.8499999999999996
+      ]
+    },
+    {
+      "component": 458,
+      "class": "11TSoloTarget",
+      "mask": 1,
+      "active": 1,
+      "elasticity": 0.65,
+      "smoothness": 0.95,
+      "threshold": 1,
+      "boost": 4,
+      "line": [
+        -4.3,
+        2.0,
+        -4.3,
+        3.0
+      ]
+    },
+    {
+      "component": 520,
+      "class": "12TFlagSpinner",
+      "mask": 1,
+      "active": 1,
+      "elasticity": 0.65,
+      "smoothness": 0.95,
+      "threshold": 1,
+      "boost": 0,
+      "line": [
+        -2.3,
+        4,
+        -0.7,
+        4
+      ]
+    },
+    {
+      "component": 521,
+      "class": "14TLightRollover",
+      "mask": 1,
+      "active": 1,
+      "elasticity": 0.65,
+      "smoothness": 0.95,
+      "threshold": 1,
+      "boost": 0,
+      "line": [
+        -3.5,
+        -11,
+        -4.5,
+        -11
+      ]
+    },
+    {
+      "component": 522,
+      "class": "14TLightRollover",
+      "mask": 1,
+      "active": 1,
+      "elasticity": 0.65,
+      "smoothness": 0.95,
+      "threshold": 1,
+      "boost": 0,
+      "line": [
+        1.5,
+        -11,
+        0.5,
+        -11
+      ]
+    },
+    {
+      "component": 523,
+      "class": "14TLightRollover",
+      "mask": 1,
+      "active": 1,
+      "elasticity": 0.65,
+      "smoothness": 0.95,
+      "threshold": 1,
+      "boost": 0,
+      "line": [
+        5.0,
+        3.5,
+        4.0,
+        3.5
+      ]
+    },
+    {
+      "component": 473,
+      "class": "5TGate",
+      "mask": 1,
+      "active": 1,
+      "elasticity": 0.65,
+      "smoothness": 0.95,
+      "threshold": 1,
+      "boost": 0,
+      "line": [
+        4.9,
+        -1.3,
+        6.8,
+        -1.3
+      ]
+    },
+    {
+      "component": 345,
+      "class": "5TRamp",
+      "mask": 1,
+      "active": 1,
+      "elasticity": 0.65,
+      "smoothness": 0.95,
+      "threshold": 1,
+      "boost": 0,
+      "line": [
+        -3.5,
+        -3.6,
+        -5.4,
+        -3.6
+      ],
+      "ramp": {
+        "action": 1,
+        "force": [
+          0,
+          4
+        ],
+        "plane": [
+          0,
+          -0.25,
+          -0.9
+        ],
+        "z": 0,
+        "mask": 2,
+        "zflag": 0
+      }
+    },
+    {
+      "component": 345,
+      "class": "5TRamp",
+      "mask": 2,
+      "active": 1,
+      "elasticity": 0.65,
+      "smoothness": 0.95,
+      "threshold": 1,
+      "boost": 0,
+      "line": [
+        -3.5,
+        -10,
+        -5.4,
+        -10
+      ],
+      "ramp": {
+        "action": 2,
+        "force": [
+          0,
+          0
+        ],
+        "plane": [
+          0,
+          0,
+          0
+        ],
+        "z": 0,
+        "mask": 1,
+        "zflag": 1
+      }
+    },
+    {
+      "component": 345,
+      "class": "5TRamp",
+      "mask": 2,
+      "active": 1,
+      "elasticity": 0.65,
+      "smoothness": 0.95,
+      "threshold": 1,
+      "boost": 0,
+      "line": [
+        -5.4,
+        -3.6,
+        -3.5,
+        -3.6
+      ],
+      "ramp": {
+        "action": 2,
+        "force": [
+          0,
+          0
+        ],
+        "plane": [
+          0,
+          0,
+          0
+        ],
+        "z": 0,
+        "mask": 1,
+        "zflag": 1
+      }
+    },
+    {
+      "component": 346,
+      "class": "5TWall",
+      "mask": 2,
+      "active": 1,
+      "elasticity": 0.65,
+      "smoothness": 0.95,
+      "threshold": 1,
+      "boost": 0,
+      "line": [
+        -5.1000000000000005,
+        -10.0,
+        -5.1000000000000005,
+        -3.6
+      ]
+    },
+    {
+      "component": 347,
+      "class": "5TWall",
+      "mask": 2,
+      "active": 1,
+      "elasticity": 0.65,
+      "smoothness": 0.95,
+      "threshold": 1,
+      "boost": 0,
+      "line": [
+        -3.8,
+        -3.6,
+        -3.8,
+        -10.0
+      ]
+    },
+    {
+      "component": 505,
+      "class": "5TSink",
+      "mask": 1,
+      "active": 1,
+      "elasticity": 0.65,
+      "smoothness": 0.95,
+      "threshold": 1,
+      "boost": 0,
+      "line": [
+        5.4,
+        -0.25,
+        6.7,
+        -0.25
+      ],
+      "capture": {
+        "type": 1,
+        "position": [
+          5.5,
+          -1.5
+        ],
+        "direction": [
+          -0.5,
+          -0.8660254
+        ],
+        "speed": 18,
+        "delay": 0.75
+      }
+    },
+    {
+      "component": 510,
+      "class": "8TKickout",
+      "mask": 1,
+      "active": 1,
+      "elasticity": 0.7,
+      "smoothness": 0.95,
+      "threshold": 1,
+      "boost": 0,
+      "circle": [
+        0,
+        2.5,
+        0.0225
+      ],
+      "capture": {
+        "type": 2,
+        "position": [
+          0,
+          2.5
+        ],
+        "direction": [
+          0,
+          -1
+        ],
+        "speed": 20,
+        "delay": 0.8,
+        "field_radius_sq": 1.2100000000000002
+      }
+    },
+    {
+      "component": 469,
+      "class": "9TKickback",
+      "mask": 1,
+      "active": 1,
+      "elasticity": 0.65,
+      "smoothness": 0.95,
+      "threshold": 1,
+      "boost": 0,
+      "line": [
+        6.7,
+        12.2,
+        7.7,
+        12.2
+      ]
+    },
+    {
+      "component": 470,
+      "class": "9TKickback",
+      "mask": 1,
+      "active": 1,
+      "elasticity": 0.65,
+      "smoothness": 0.95,
+      "threshold": 1,
+      "boost": 0,
+      "line": [
+        -5.9,
+        12.2,
+        -4.9,
+        12.2
+      ]
+    }
+  ],
+  "gravity": [
+    3.76248931e-06,
+    11.9856386,
+    0.200000003
+  ],
+  "flippers": [
+    {
+      "CollisionGroup": 1,
+      "Elasticity": 0.75,
+      "Smoothness": 0.5,
+      "CirclebaseRadius": 0.610980988,
+      "CircleT1Radius": 0.493308008,
+      "CirclebaseRadiusSq": 0.373297781,
+      "CircleT1RadiusSq": 0.243352786,
+      "CirclebaseRadiusMSq": 0.380801082,
+      "CircleT1RadiusMSq": 0.248244196,
+      "AngleMax": 1.21522939,
+      "CollisionMult": 0.899999976,
+      "DistanceDiv": 2.35708475,
+      "DistanceDivSq": 5.5558486,
+      "ExtendSpeed": 30.3807354,
+      "RetractSpeed": -15.1903677,
+      "InvT1Radius": 3.04069662,
+      "YMin": 10.1843901,
+      "YMax": 13.9531384,
+      "XMin": 0.139134973,
+      "XMax": 3.42866802,
+      "RotOrigin": [
+        2.48881507,
+        12.0630598
+      ],
+      "A1Src": [
+        0.678661466,
+        12.7266569
+      ],
+      "A2Src": [
+        2.13873792,
+        11.5623169
+      ],
+      "B1Src": [
+        2.83889222,
+        12.5638027
+      ],
+      "B2Src": [
+        1.24396849,
+        13.5352602
+      ],
+      "T1Src": [
+        0.961314976,
+        13.1309586
+      ],
+      "T2Src": [
+        0.961314976,
+        11.0065699
+      ]
+    },
+    {
+      "CollisionGroup": 1,
+      "Elasticity": 0.75,
+      "Smoothness": 0.5,
+      "CirclebaseRadius": 0.610980988,
+      "CircleT1Radius": 0.493308008,
+      "CirclebaseRadiusSq": 0.373297781,
+      "CircleT1RadiusSq": 0.243352786,
+      "CirclebaseRadiusMSq": 0.380801082,
+      "CircleT1RadiusMSq": 0.248244196,
+      "AngleMax": -1.21492267,
+      "CollisionMult": 0.899999976,
+      "DistanceDiv": 2.35749483,
+      "DistanceDivSq": 5.5577817,
+      "ExtendSpeed": -30.3730679,
+      "RetractSpeed": 15.1865339,
+      "InvT1Radius": 3.04069662,
+      "YMin": 10.1843901,
+      "YMax": 13.9531384,
+      "XMin": -3.42885303,
+      "XMax": -0.138820022,
+      "RotOrigin": [
+        -2.48900008,
+        12.0630598
+      ],
+      "A1Src": [
+        -2.13899994,
+        11.5622625
+      ],
+      "A2Src": [
+        -0.678408742,
+        12.726613
+      ],
+      "B1Src": [
+        -1.24359131,
+        13.5353041
+      ],
+      "B2Src": [
+        -2.83900023,
+        12.5638571
+      ],
+      "T1Src": [
+        -0.961000025,
+        13.1309586
+      ],
+      "T2Src": [
+        -0.961000025,
+        11.0065699
+      ]
+    }
+  ],
+  "plunger_params": {
+    "MaxPullback": 100,
+    "PullbackIncrement": 1,
+    "PullbackDelay": 0.0250000004,
+    "Elasticity": 0.5,
+    "Smoothness": 0.5,
+    "bitmap_count": 8
+  },
+  "layout": "Original CmdrX wireframe practice table, version 0.1"
+}
