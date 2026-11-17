@@ -13,14 +13,14 @@ done
 "$sdk/mos-cx16-clang++" -std=c++11 -Os -mcpu=mosw65816 -I"$src" direct/integer/cpu816/fastmul.s direct/integer/arithmetic_probe.cpp -o "$out/arithmetic.prg"
 cp direct/build/integer/preview/*.BIN "$out/preview/"
 for kind in normal test; do
- flag=""; optimization=-Os
+ flag=""; optimization=-Oz
  if [ "$kind" = test ]; then flag=-DPREVIEW_TEST; optimization=-Oz; fi
- "$sdk/mos-cx16-clang++" -std=c++11 "$optimization" -mcpu=mosw65816 -I"$src" $flag direct/integer/cpu816/fastmul.s $common "$src/preview.cpp" -o "$out/preview/$kind.prg"
+ "$sdk/mos-cx16-clang++" -std=c++11 "$optimization" -mcpu=mosw65816 -I"$src" $flag -DCMDRX_AUDIO direct/integer/audio.s direct/integer/cpu816/fastmul.s $common "$src/preview.cpp" -o "$out/preview/$kind.prg"
  address=$("$sdk/llvm-nm" "$out/preview/$kind.prg.elf" | awk '$3=="ui_state" {print $1}')
  test -n "$address"
  printf 'ui_state = $%s\n' "$address" > "$out/preview/ui-address.inc"
  # Source stays in direct/src so the original relative include works.
- sed 's@../build/preview/@../build/integer/cpu816/preview/@g' direct/src/preview_ui.asm > direct/src/cpu816-ui-generated.asm
+ python3 direct/integer/make_ui.py cpu816
  cp direct/build/integer/preview/sprites-init.bin direct/build/integer/preview/status.bin "$out/preview/"
  64tass -b -o "$out/preview/$kind-ui.bin" direct/src/cpu816-ui-generated.asm
  rm direct/src/cpu816-ui-generated.asm

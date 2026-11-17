@@ -7,13 +7,13 @@ build=root/'direct/build/integer/cpu816'
 out=root/'evidence/integer-preview-816';out.mkdir(parents=True,exist_ok=True)
 runner=build/'run_x16.pl'
 runner.write_text((root/'t/run_x16.pl').read_text().replace("'-testbench'","'-c816','-testbench'"))
-def rows(text):return re.findall(r'^# (?:WORLD|MECHANISMS|FLIPPER) .+$',text,re.M)
+def rows(text):return re.findall(r'^# (?:WORLD|MECHANISMS|FLIPPER|BUMPER|PADDLE|RAMP) .+$',text,re.M)
 for ram in (512,2048):
- for kind in ('world','mechanisms','flipper','arithmetic'):
+ for kind in ('world','mechanisms','flipper','arithmetic','contacts','controls'):
   p=sp.run(['perl',str(runner),str(build/f'{kind}.prg'),'direct/build/integer'],env=dict(os.environ,X16_RAM_KB=str(ram)),capture_output=True,text=True,timeout=90)
   (out/f'{kind}-{ram}.tap').write_text(p.stdout+p.stderr)
   assert p.returncode==0 and not re.search(r'^not ok',p.stdout,re.M),(ram,kind,p.stdout[-1000:],p.stderr)
-  if kind!='arithmetic':assert rows(p.stdout)==rows((root/f'direct/build/integer/{kind}-host.tap').read_text()),(ram,kind)
+  if kind not in ('arithmetic','controls'):assert rows(p.stdout)==rows((root/f'direct/build/integer/{kind}-host.tap').read_text()),(ram,kind)
   print(f'65816 {kind}: PASS, {ram} KB',flush=True)
 for name in ('preview_native.py','preview_boot.py','preview_screens.py','frame_budget.py'):
  source=(root/'direct/integer'/name).read_text()

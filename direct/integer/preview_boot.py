@@ -8,7 +8,7 @@ out=root/'evidence/integer-preview';out.mkdir(parents=True,exist_ok=True)
 log=out/f'normal-{ram}.log'
 with log.open('w') as stream:
  p=sp.Popen(['/opt/x16emu-r49/x16emu','-rom','/opt/x16emu-r49/rom.bin',
-  '-ram',ram,'-mhz','8','-sound','none','-scale','1','-echo','raw',
+  '-ram',ram,'-mhz','8','-scale','1','-echo','raw',
   '-fsroot',str(root/'direct/build/integer/preview'),'-prg',str(root/'direct/build/integer/preview/CMDRX.PRG'),'-run'],
   stdout=stream,stderr=stream,env=dict(os.environ,SDL_AUDIODRIVER='dummy'))
  try:

@@ -1,43 +1,59 @@
-# Integer performance preview 2 validation — 2026-11-16
+# Collision and audio preview 3 validation — 2026-11-16
 
-Checked using r49 plus its matching ROM, at 512 KB and 2048 KB RAM.
+Tested with emulator/ROM r49 on Linux at 8 MHz, both 512 KB and 2048 KB RAM,
+and both 65C02 and experimental 65816 CPU variants.
 
-- Native multiply: all 65536 byte-operand pairs checked against repeated
-  addition, plus 4096 wide products against a shift/add oracle. Carry extremes,
-  signed fixed multiply/divide and integer square-root endpoints also pass.
-- World, integrated plunger/flipper and 96 flipper records are bit-identical
-  between the integer host implementation and native 65C02 at both RAM sizes.
-- The 96 flipper records preserve all 40 contact scenarios. Compared with the
-  retained float reference, maximum angle error is 0.000639 radians; maximum
-  tip-coordinate error is 0.003493 world units, below a tenth of a display pixel.
-  Maximum normal-component error is 0.001803; maximum speed error is 0.053776.
-  Fixed-point bounds are separate from the unchanged float test tolerances.
-- All 40 full-charge release timings clear the chute at the 120 Hz cadence.
-- Normal-ROM instrumented boots pass charge, launch/chute, both flippers,
-  short command taps, pause/resume and clean return to BASIC on both RAM sizes.
-- Actual distribution CMDRX.PRG passes real SDL keyboard input at stock 8 MHz
-  on both RAM sizes. Captures verify status changes, full charge and both
-  moving flipper sprites. Both builds contain no soft-float arithmetic helpers.
-- The retained floating-point suite still passes all 736 tests. Its original
-  files and vendor sources have not changed.
+- 33 targeted contact checks: all seven bumpers hit from all four cardinal
+  directions (28 rebounds/boosts/flashes), wrong-layer rejection, six resting
+  and six swept contact positions on each paddle, and seven ramp transitions.
+- Eight short key press/release sequences through the actual keyboard handler
+  remain latched, including both flipper key aliases and the S sound toggle.
+- World, mechanisms, flipper and targeted contact traces match the integer host
+  exactly on both CPU/RAM combinations. Restoring the four-record cache changes
+  no host trace. All 40 full-charge release holds still clear the chute.
+- Arithmetic oracle covers 65536 byte products and 4096 wide products; all 96
+  flipper differential records and 40 contacts remain within existing explicit
+  fixed-point bounds. Original float/vendor method files remain unchanged.
+- Normal-ROM instrumented checks and real SDL keyboard/screenshot checks pass
+  feed, charge, launch, flippers, pause and clean return to BASIC on all four
+  configurations. No runtime soft-float helpers are linked.
+- Seven actual VERA PCM recordings pass waveform comparison against their
+  source samples on all four configurations (minimum correlation
+  0.96162, required >0.95).
+  Full waveforms cover RAM-bank boundaries. IRQ tests stress multiplication
+  during playback and check bank preservation, mute, stop and vector cleanup.
+  The recorder stays active at exit because r49 does not finalize paused WAVs.
 
-The instrumented -Oz preview's 760-frame sequence measured **78764 cycles
-average (9.85 ms)** and **313156 cycles maximum (39.14 ms)** at 8 MHz; 44 frames
-exceeded 133333 cycles. These figures include feeding, charging, flight,
-flippers and pause; they are not an active-play-only average. The distribution
-uses -Os and was exercised separately through actual SDL keyboard input.
-The strict 60 Hz gameplay gate remains FAIL; this is an improved preview,
-not a performance-approved finished game. No accelerated CPU is required by
-the included launcher, and no 40 MHz launcher is included.
+## Current timing
 
-The normal PRG is 36809 bytes. UI.BIN is 6985 bytes, WORLD.BIN 193640 bytes,
-and FLIP.BIN 131072 bytes. The latter uses banks 8..23; bank 1 is presentation
-and banks 32..55 hold the world. Keep all files from the same package together.
+Both normal and instrumented builds use -Oz. These figures describe the
+instrumented 760-frame mixed sequence, not an exact cycle profile of the normal
+binary or an active-play-only average. The added layers/audio change the workload
+and trajectory, so historical preview-2 percentages are not current speed claims.
 
-The source checkpoint retains detailed native traces, differential error
-measurements, build hashes, real keyboard logs and representative captures.
+| CPU | Average cycles | Maximum cycles | Maximum ms | Over 133333 cycles |
+| --- | ---: | ---: | ---: | ---: |
+| 65c02 | 92739 | 451279 | 56.41 | 80 / 760 |
+| 65816 | 92370 | 449391 | 56.17 | 78 / 760 |
 
-The optional native 65816 multiplier build measures 310684 maximum cycles
-and 78636 average cycles, also with 44 over-budget frames. Its matching native
-and SDL tests pass at both RAM sizes. See PERFORMANCE.md for the controlled
-comparison, unchanged integer traces, and limits of this mixed-mode experiment.
+The strict 133333-cycle gate remains FAIL; this is an incomplete mechanics
+preview, not a stock-speed 60 Hz gameplay release. Launchers use neither warp
+nor overclocking. No physical hardware or Windows-host test was performed.
+
+## Assets and memory
+
+WORLD.BIN is 219824 bytes: 854 edges, including
+65 ramp edges and seven bumpers. Its CY signature differs
+from the earlier integer world. Banks 32..58 hold the model; flipper lookup data
+uses banks 8..23; UI is bank 1; PCM effects use banks 24..31 and 2.
+UI.BIN is 7039 bytes. Standard/native CMDRX.PRG sizes are
+34836 / 34836 bytes.
+Each variant must keep its paired UI.BIN. All nine BIN files are required.
+
+Other table mechanisms, rules/missions, scoring/saves, music and ramp/tunnel
+visual occlusion remain unfinished. The original sound effects use one
+priority-based PCM voice, not the complete original sound mixer.
+
+BUILD.json identifies the source commit and every shipped runtime hash. Source,
+exported ramp data, original converted SFX input, native traces and reproducible
+tests are included. This worktree has no GitHub remote; no push is claimed.

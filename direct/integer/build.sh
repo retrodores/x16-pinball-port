@@ -8,6 +8,7 @@ common="$src/geometry.cpp $src/original_math.cpp $src/original_flipper.cpp $src/
 for kind in world mechanisms flipper; do
  g++ -std=c++11 -O2 -I"$src" $common "$src/${kind}_probe.cpp" -o "direct/build/integer/$kind-host"
  "direct/build/integer/$kind-host" > "direct/build/integer/$kind-host.tap"
+ if grep -q '^not ok' "direct/build/integer/$kind-host.tap"; then cat "direct/build/integer/$kind-host.tap"; exit 1; fi
  "$sdk/mos-cx16-clang++" -std=c++11 -Oz -I"$src" direct/integer/fastmul.s $common "$src/${kind}_probe.cpp" -o "direct/build/integer/$kind.prg"
 done
 

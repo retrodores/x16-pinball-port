@@ -28,11 +28,11 @@ struct Fixed {
  Fixed& operator/=(Fixed b){return *this=*this/b;}
  friend Fixed operator+(Fixed a,Fixed b){return bits(a.raw+b.raw);}
  friend Fixed operator-(Fixed a,Fixed b){return bits(a.raw-b.raw);}
- friend Fixed operator*(Fixed a,Fixed b){PROFILE_SCOPE(0);
+ friend __attribute__((noinline)) Fixed operator*(Fixed a,Fixed b){PROFILE_SCOPE(0);
   uint32_t x=a.raw<0?-a.raw:a.raw,y=b.raw<0?-b.raw:b.raw;
   uint32_t q=fixed_multiply(x,y);return bits((a.raw<0)!=(b.raw<0)?-(int32_t)q:(int32_t)q);
  }
- friend Fixed operator/(Fixed a,Fixed b){PROFILE_SCOPE(1);
+ friend __attribute__((noinline)) Fixed operator/(Fixed a,Fixed b){PROFILE_SCOPE(1);
   if(!b.raw)return bits(a.raw<0?-INT32_MAX:INT32_MAX);
   uint32_t x=a.raw<0?-a.raw:a.raw,y=b.raw<0?-b.raw:b.raw;
   uint32_t q=fixed_divide(x,y);

@@ -1,3 +1,17 @@
+# 2026-11-16 — Collision and audio preview 3
+
+- Reject deeply backward wall-circle contacts that undo bumper rebounds; consume
+  each ball substep's remaining distance only once.
+- Include all seven bumpers and original ramp masks, transitions and field/height
+  planes. Animate bumper hits with the original 100 ms cooldown.
+- Latch short flipper taps alongside held input, so slow frames cannot lose them.
+- Connect seven original PCM effects with IRQ-driven refill, priority, S mute,
+  pause/exit cleanup and bank preservation, including the native 65816 multiplier.
+- Use 120 UPS for both integer simulation entry points; retain original methods
+  and float/vendor reference. Add targeted contact, short-tap and audio tests.
+- Both builds use -Oz and four cached edges to fit main RAM. This is still an
+  incomplete preview, with a failing strict stock-clock frame-budget gate.
+
 # 2026-11-16 — Performance preview 2 and 65816 experiment
 
 - Reuse four collision edge records, simplify exact raw-coordinate bounds and

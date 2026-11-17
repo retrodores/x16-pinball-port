@@ -1,4 +1,13 @@
-# CmdrX Cadet performance preview 2 — 2026-11-16
+# Preview 3 performance scope
+
+Preview 3 adds layered geometry, seven bumpers and interrupt-fed PCM. Its
+physics traces and workload differ from preview 2, so the historical speedup
+percentages below do not describe preview 3. Both current binaries use -Oz,
+the static-edge cache has four records, and the frame function stays separate
+to fit main RAM. Current measured timings are in VALIDATION.md. The strict
+133333-cycle gate is unchanged; neither CPU build is a finished 60 Hz game.
+
+# Historical preview 2 — CmdrX Cadet performance preview 2 — 2026-11-16
 
 The standard 65C02 build remains the recommended preview. Four cached static
 edge records now retain neighboring collision candidates between substeps.

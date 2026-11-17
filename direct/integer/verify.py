@@ -3,13 +3,13 @@ from pathlib import Path
 import os,re,struct,subprocess as sp,json
 root=Path(__file__).resolve().parents[2];os.chdir(root)
 out=root/'evidence/integer-preview';out.mkdir(exist_ok=True,parents=True)
-def rows(text):return re.findall(r'^# (?:WORLD|MECHANISMS|FLIPPER) .+$',text,re.M)
+def rows(text):return re.findall(r'^# (?:WORLD|MECHANISMS|FLIPPER|BUMPER|PADDLE|RAMP) .+$',text,re.M)
 for ram in (512,2048):
- for kind in ('world','mechanisms','flipper','arithmetic'):
+ for kind in ('world','mechanisms','flipper','arithmetic','contacts','controls'):
   result=sp.run(['perl','t/run_x16.pl',f'direct/build/integer/{kind}.prg','direct/build/integer'],env=dict(os.environ,X16_RAM_KB=str(ram)),capture_output=True,text=True,timeout=90)
   (out/f'{kind}-{ram}.tap').write_text(result.stdout+result.stderr)
   assert result.returncode==0 and not re.search(r'^not ok',result.stdout,re.M),(kind,ram,result.stdout[-2000:])
-  if kind!='arithmetic':
+  if kind not in ('arithmetic','controls'):
    host=Path(f'direct/build/integer/{kind}-host.tap').read_text()
    assert rows(host)==rows(result.stdout),(kind,ram,'native/host mismatch')
   print(f'{kind}: native PASS, {ram} KB',flush=True)

@@ -52,7 +52,7 @@ integer/preview_native.py and actual SDL tests on both RAM sizes. Fixed-point
 comparison bounds are explicit in verify.py. Keep normal/test UI addresses
 paired correctly. Float WORLD.BIN is incompatible with the integer loader.
 FLIP.BIN uses banks 8..23. Exact integer time division avoids dt quantization.
-Current normal build is -Os; instrumented build -Oz. Do not represent the latter
+Current normal and instrumented builds both use -Oz. Do not represent the latter
 as an exact timing profile of the former. Frame spikes still exceed 133333 cycles;
 only label this as a preview until the strict gameplay gate passes.
 
@@ -62,3 +62,15 @@ cpu816/build.sh replaces only multiplication with native 16-bit assembly;
 it is not a full native-mode core. Its PRG requires -c816 and its own paired
 UI.BIN. Both CPU variants still fail the strict frame gate. Consult
 integer/PERFORMANCE.md before making CPU speed claims.
+
+Collision/audio preview 3: integer world data now comes from data/layers.json,
+with signature CY, seven bumpers and original ramp layer/field transitions.
+Its banks are 32..58; the older 32..55 descriptions above apply to the retained
+float world. Audio uses banks 24..31 then 2; UI stays in 1 and flippers in 8..23.
+Both integer tick entry points use 120 UPS; the legacy 60 Hz diagnostic could
+miss the 25 ms plunger release window after correcting remaining ray travel.
+Run build-contact-tests.sh and verify_audio.py in addition to existing checks.
+Contacts tests compare all seven bumpers, both paddles and ramp transitions on
+host and both CPUs/RAM sizes. Real audio capture must verify all seven effects,
+IRQ banking/native arithmetic, mute/stop and vector restoration. Keep the strict
+frame gate unchanged, and do not call this a completed gameplay release.

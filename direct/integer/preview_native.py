@@ -11,9 +11,9 @@ for ram in (512,2048):
  log=out/f'instrumented-{ram}.log'
  with log.open('w') as stream:
   p=sp.Popen(['/opt/x16emu-r49/x16emu','-rom','/opt/x16emu-r49/rom.bin',
-   '-ram',str(ram),'-mhz','8','-warp','-sound','none','-echo','raw',
+   '-ram',str(ram),'-mhz','8','-warp','-echo','raw',
    '-fsroot',str(fs),'-prg',str(root/'direct/build/integer/preview/test.prg'),'-run',
-   '-gif',str(out/f'instrumented-{ram}.gif')+',wait'],stdout=stream,stderr=stream,
+   '-wav',str(out/f'audio-{ram}.wav')+',auto','-gif',str(out/f'instrumented-{ram}.gif')+',wait'],stdout=stream,stderr=stream,
    env=dict(os.environ,SDL_AUDIODRIVER='dummy',SDL_VIDEODRIVER='dummy'))
   try:
    deadline=time.monotonic()+60

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Generate a separate fixed-point adaptation; never edit reference methods."""
 from pathlib import Path
-import re,struct,json,math
+import re,struct,json,math,runpy
 r=Path(__file__).resolve().parents[1]
 out=r/'build/integer/src';out.mkdir(parents=True,exist_ok=True)
 names=['maths.h','world.h','world.cpp','world_params.h','edge_bounds.h','flipper.h','flipper.cpp','flipper_params.h','plunger.h','plunger.cpp','plunger_params.h','original_math.cpp','original_flipper.cpp','original_flipper_control.cpp','original_plunger.cpp','preview.cpp']
@@ -16,6 +16,21 @@ for n in names:
  s=(r/'src'/n).read_text();s=re.sub(r'\bfloat\b','Fixed',s)
  if n.startswith('original_'):s='// Generated fixed-point adaptation; original source remains under direct/src.\n'+s
  if n=='preview.cpp':
+  s=s.replace('CMDRX CADET - DIRECT ENGINE\\rLOADING TABLE AND MECHANICS...', 'CMDRX CADET\\rLOADING...')
+  s=s.replace('cpx #$33\\nbeq 4f', 'cpx #$2c\\nbeq 9f\\ncpx #$2e\\nbeq 9f\\ncpx #$37\\nbeq 10f\\ncpx #$39\\nbeq 10f\\ncpx #$33\\nbeq 4f')
+  s=s.replace('4: lda #1', '9: lda #16\\nbra 7f\\n10: lda #32\\nbra 7f\\n4: lda #1')
+  s=s.replace('world::input(raw_keys[0x2c]||raw_keys[0x2e],raw_keys[0x39]||raw_keys[0x37],pull);','world::input(raw_keys[0x2c]||raw_keys[0x2e]||(cmd&16),raw_keys[0x39]||raw_keys[0x37]||(cmd&32),pull);')
+  s='#include "audio.h"\n'+s
+  s=s.replace('uint8_t left,right,plunger,status,charge;', 'uint8_t left,right,plunger,status,charge,bumper[7];')
+  s=s.replace('ui_state.plunger=plunger::instance.sprite;', 'for(uint8_t i=0;i<7;++i)ui_state.bumper[i]=world::bumper_flash[i]!=0;\n ui_state.plunger=plunger::instance.sprite;')
+  s=s.replace('if(cmd&1){world::start();', 'if(cmd&1){audio_stop();world::start();')
+  s=s.replace('if((cmd&2)&&started)paused=!paused;', 'if((cmd&2)&&started){paused=!paused;if(paused)audio_stop();}\n  if(cmd&8)audio_toggle();')
+  s=s.replace('cpx #$6e\\nbeq 6f', 'cpx #$20\\nbeq 8f\\ncpx #$6e\\nbeq 6f')
+  s=s.replace('6: lda #4\\n7:', '6: lda #4\\nbra 7f\\n8: lda #8\\n7:')
+  s=s.replace('flippers::reset();plunger::reset(world::ball);', '*(volatile uint8_t*)0=24;bool audio_ok=load("SFXA.BIN",0,0xa000);*(volatile uint8_t*)0=2;audio_ok=load("SFXB.BIN",0,0xa000)&&audio_ok;*(volatile uint8_t*)0=0;\n if(!audio_ok){restore_screen();print("SFX FILES MISSING\\r");return 1;}audio_install();\n flippers::reset();plunger::reset(world::ball);')
+  s=s.replace('restore_screen();print("CMDRX CADET PREVIEW ENDED', 'audio_uninstall();restore_screen();print("CMDRX CADET PREVIEW ENDED')
+  s=s.replace('Fixed y=world::ball.Position.Y;', 'Fixed y=world::ball.Position.Y,zheight=world::ball.Position.Z;')
+  s=s.replace('*ball_radius','*zheight')
   s=s.replace('return (uint8_t)(e.CurrentAngle/e.AngleMax*7+.5f);', 'if(e.CurrentAngle==0)return 0;if(e.CurrentAngle==e.AngleMax)return 7;return (uint8_t)(e.CurrentAngle/e.AngleMax*7+.5f);')
   s=s.replace('int main(){','#ifdef __CX16__\n__attribute__((minsize))\n#endif\nint main(){').replace('static void project(){','__attribute__((noinline)) static void project(){')
   s=s.replace('static void inject(uint8_t code){', 'static void hexout(uint32_t n){for(int i=7;i>=0;--i)*(volatile uint8_t*)0x9fbb="0123456789abcdef"[(n>>(i*4))&15];}\nstatic void inject(uint8_t code){')
@@ -25,8 +40,32 @@ for n in names:
   s=s.replace('log("# EXIT\\n");', 'log("# CYCLES ");hexout(max_cycles);log(" ");hexout(total_cycles/760);log(" ");hexout(over_budget);log("\\n");log("# EXIT\\n");')
  if n=='maths.h':
   s=s.replace('#pragma once','#pragma once\n#include "fixed.h"').replace('vector2 RayIntersect;', 'vector2 RayIntersect;\n Fixed PlaneC;')
- if n=='world.h':s=s.replace('sizeof(Edge)==68','sizeof(Edge)==72')
+ if n=='world.h':s=s.replace('sizeof(Edge)==68','sizeof(Edge)==72').replace('extern uint16_t contacts;', 'extern uint16_t contacts;extern uint8_t bumper_flash[7];')
  if n=='world.cpp':
+  s='#include "audio.h"\n'+s
+  s=s.replace('uint16_t contacts=0;', 'uint16_t contacts=0;uint8_t bumper_flash[7]={};')
+  s=s.replace('void frame(Fixed dt) {', '__attribute__((noinline)) void frame(Fixed dt) {\n for(uint8_t i=0;i<7;++i)if(bumper_flash[i])--bumper_flash[i];')
+  # Both entry points represent one display frame at the original 120 UPS.
+  # A single 60 Hz update can miss the plunger's original 25 ms release window.
+  s=s.replace('void tick(){frame(1.0f/60.0f);if(mechanisms)plunger::advance_frame();}', 'void tick(){preview_tick();}')
+  s=s.replace('mechanisms=true;drained=false;', 'mechanisms=true;for(uint8_t i=0;i<7;++i)bumper_flash[i]=0;drained=false;')
+  s=s.replace('drained=true;ball.ActiveFlag=false;', 'audio_effect(Drain);drained=true;ball.ActiveFlag=false;')
+  old='else maths::basic_collision(&ball,&p,&n,best_edge.elasticity,best_edge.smoothness,best_edge.threshold,best_edge.boost);'
+  new='else {\n      uint8_t bumper=best_edge.kind>=3&&best_edge.kind<=9?best_edge.kind-3:255;\n      Fixed threshold=(bumper<7&&bumper_flash[bumper])?Fixed::bits(INT32_MAX):best_edge.threshold;\n      Fixed impact=maths::basic_collision(&ball,&p,&n,best_edge.elasticity,best_edge.smoothness,threshold,best_edge.boost);\n      if(bumper<7&&impact>threshold){bumper_flash[bumper]=12;audio_effect(Bumper);}\n      else if(impact>Fixed(.2))audio_effect(Wall);\n     }'
+  assert old in s;s=s.replace(old,new)
+  s=s.replace('model[200000]','model[262144]').replace('0x5843','0x5943')
+  s=s.replace('static Fixed nearest(ray_type& ray) {',(r/'integer/layers.inc').read_text()+'\nstatic Fixed nearest(ray_type& ray) {')
+  s=s.replace('Edge& candidate=cache;','Edge& candidate=cache;\n  if(!((candidate.type>>1)&ray.CollisionMask)||(candidate.kind==10&&already_crossed(id)))continue;')
+  s=s.replace('candidate.type?', '(candidate.type&1)?').replace('if(best_edge.type)', 'if(best_edge.type&1)')
+  s=s.replace('if(d<distance){distance=d;best_edge=candidate;}', 'if(d>=-ray.MinDistance&&d<distance){distance=d;best_edge=candidate;}')
+  s=s.replace('best_edge=candidate;', 'best_edge=candidate;best_id=id;')
+  s=s.replace('drained=false;contacts=0;last_cell=65535;', 'drained=false;contacts=0;last_cell=65535;ball.Position.Z=ball_radius;ball.on_ramp=false;')
+  s=s.replace('vector2 force{gravity_x-ball.Direction.X*ball.Speed*drag,gravity_y-ball.Direction.Y*ball.Speed*drag};','Fixed gx=ball.on_ramp?ball.ramp_force.X:gravity_x,gy=ball.on_ramp?ball.ramp_force.Y:gravity_y,friction=ball.on_ramp?ball.ramp_drag:drag;\n  vector2 force{gx-ball.Direction.X*ball.Speed*friction,gy-ball.Direction.Y*ball.Speed*friction};')
+  s=s.replace('Fixed sum=0;', 'Fixed sum=0;crossed_count=0;')
+  s=s.replace('ray.Origin=ball.Position;', 'ray.Origin=ball.Position;ray.CollisionMask=ball.CollisionMask;')
+  s=s.replace('ray.MaxDistance=step==steps-1?travel-step*half:half;', 'ray.MaxDistance=(step==steps-1?travel-step*half:half)-sum;if(ray.MaxDistance<=0)break;')
+  s=s.replace('if(best_edge.kind==2)', 'if(best_edge.kind==10){cross_ramp(best_id,p);if(distance>0)sum+=distance;continue;}\n     if(best_edge.kind==2)')
+  s=s.replace('if(mechanisms)for(uint8_t i=0;i<2;++i)if(step<flip_steps[i])flippers::advance(i,delta[i],ball);','if(mechanisms)for(uint8_t i=0;i<2;++i)if(step<flip_steps[i])flippers::advance(i,delta[i],ball);\n  if(ball.on_ramp)ball.Position.Z=ball.Position.X*ball.offset.X+ball.Position.Y*ball.offset.Y+ball_radius+ball.offset.Z;')
   # Q12 -> Q8.8 is an exact truncating division by 16. Avoid constructing
   # Fixed(256) and passing through the general fixed multiply for each ray.
   s=s.replace('(int16_t)(ray.Origin.X*256)', '(int16_t)(ray.Origin.X.raw/16)').replace('(int16_t)(ray.Origin.Y*256)', '(int16_t)(ray.Origin.Y.raw/16)')
@@ -59,7 +98,14 @@ for n in names:
 #endif
  best_flipper=255;
  if(mechanisms)''')
- if n=='plunger.cpp':s=s.replace('(uint32_t)(delay*1000)','(uint32_t)(delay*1000+Fixed(.5))')
+ if n=='flipper.cpp':
+  s='#include "audio.h"\n'+s
+  s=s.replace('auto& e=edges[i];','auto& e=edges[i];if(!(e.CollisionGroup&ray.CollisionMask))continue;')
+  s=s.replace('if(index>=2)return;', 'if(index>=2)return;audio_effect(pressed?FlipperUp:FlipperDown);')
+ if n=='plunger.cpp':
+  s='#include "audio.h"\n'+s
+  s=s.replace('(uint32_t)(delay*1000)','(uint32_t)(delay*1000+Fixed(.5))')
+  s=s.replace('void play_sound(int,void*,const char*){++plunger::sound_events;}', 'void play_sound(int,void*,const char*info){++plunger::sound_events;if(info[8]==49)audio_effect(Pullback);else if(info[8]==51)audio_effect(Launch);}')
  if n=='original_flipper.cpp':
   s=s.replace('MoveSpeed * timeDelta','time_product(MoveSpeed,timeDelta)')
   a=s.index('void TFlipperEdge::set_control_points(');b=s.index('Fixed TFlipperEdge::flipper_angle_delta',a)
@@ -71,11 +117,12 @@ for n in names:
   a=s.index('Fixed maths::ray_intersect_line(');b=s.index('void maths::cross(',a)
   s=s[:a]+(r/'integer/line.inc').read_text()+'\n'+s[b:]
  (out/n).write_text(literals(s))
+(out/'audio.h').write_bytes((r/'integer/audio.h').read_bytes())
 (out/'fixed.h').write_bytes((r/'integer/fixed.h').read_bytes())
 (out/'port_types.h').write_text('''#pragma once
 #include "fixed.h"
 #include "maths.h"
-class TBall {public: vector3 Position{},Direction{};Fixed Speed=0;uint16_t CollisionMask=1;bool ActiveFlag=true;};
+class TBall {public: vector3 Position{},Direction{};Fixed Speed=0;uint16_t CollisionMask=1;bool ActiveFlag=true;bool on_ramp=false;vector3 offset{};vector2 ramp_force{};Fixed ramp_drag=0;};
 ''')
 blob=bytearray((r/'build/WORLD.BIN').read_bytes())
 count=json.loads((r/'src/world_manifest.json').read_text())['included_edges']
@@ -129,3 +176,5 @@ for(int p=0;p<4;++p){text("# PROFILE ");hex(p);out(' ');hex(max_cycles[p]);out('
 #endif
 text("ok - original-world launch trace completed''')
  (out/f'{n}_probe.cpp').write_text(literals(s))
+
+runpy.run_path(str(r/'integer/pack_layers.py'),run_name='__main__')
