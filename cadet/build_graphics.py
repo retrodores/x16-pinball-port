@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 """Original-resolution 16x16/4bpp VERA tiles with 16 local color palettes."""
 from pathlib import Path
-import json,struct,math
+import json,struct,math,sys
 import numpy as np
 from scipy.cluster.vq import kmeans2
 from PIL import Image,ImageDraw,ImageFont
-R=Path(__file__).resolve().parents[1];O=R/'cadet/build';O.mkdir(exist_ok=True)
+R=Path(__file__).resolve().parents[1];O=Path(sys.argv[1]) if len(sys.argv)>1 else R/'cadet/build';O.mkdir(exist_ok=True)
 J=json.loads(Path('/opt/spacecadet-x16-analysis/evidence/inventory.json').read_text())
 D=Path('/opt/spacecadet-x16-analysis/input/game/PINBALL.DAT').read_bytes()
 pe=next(e for g in J['groups']for e in g['entries']if e['type']==5)
@@ -23,12 +23,13 @@ def paste(a,x,y,transparent=False):
  else:dest[:]=a
 table,tm=bitmap(107);paste(table,8,5)
 back,bm=bitmap(2);paste(back,386,12)
-for gid in [355,363,372,380,388,396,405,413,421,473]:
+for gid in ([372,380,388,396,405,413,421] if len(sys.argv)>1 else [355,363,372,380,388,396,405,413,421,473]):
  a,b=bitmap(gid);paste(a,b['x']-tm['x']+8,b['y']-tm['y']+5,True)
 source=Image.fromarray(rgb[screen],'RGB')
 # A bounded audition screen; no suggestion that this is already a playable port.
 d=ImageDraw.Draw(source);f=ImageFont.truetype('/usr/share/fonts/truetype/dejavu/DejaVuSansMono.ttf',10)
-for y,s in [(410,'X16 FIDELITY LAB - NOT GAMEPLAY'),(423,'LEFT/RIGHT: SELECT  SPACE: PLAY'),(436,'M: ORIGINAL THEME  S: STOP'),(449,'ESC: EXIT   65C02 / 8 MHZ')]:d.text((386,y),s,font=f,fill=(187,187,221))
+labels=[(410,'CMDRX CADET - TABLE TEST 0.2'),(423,'Z / SHIFT: LEFT   /: RIGHT'),(436,'SPACE: PLUNGER   F2: NEW GAME'),(449,'M: MUSIC   ESC: EXIT   8 MHZ')] if len(sys.argv)>1 else [(410,'X16 FIDELITY LAB - NOT GAMEPLAY'),(423,'LEFT/RIGHT: SELECT  SPACE: PLAY'),(436,'M: ORIGINAL THEME  S: STOP'),(449,'ESC: EXIT   65C02 / 8 MHZ')]
+for y,s in labels:d.text((386,y),s,font=f,fill=(187,187,221))
 source.save(O/'original-layout.png')
 # Reduce only colors to VERA 12-bit; retain every spatial pixel.
 pixels=np.asarray(source).astype(np.float64)

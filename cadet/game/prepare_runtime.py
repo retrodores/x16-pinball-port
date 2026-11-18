@@ -1,0 +1,55 @@
+from pathlib import Path
+import json,re,numpy as np
+from PIL import Image,ImageFont,ImageDraw
+r=Path(__file__).resolve().parents[2];o=r/'cadet/play-build';src=r/'cadet/build'
+j=json.loads((src/'audio-catalog.json').read_text())
+names=['SOUND104.WAV','SOUND105.WAV','SOUND12.WAV','SOUND49.WAV','SOUND5.WAV','SOUND4.WAV','SOUND22.WAV','SOUND57.WAV','SOUND26.WAV','SOUND131.WAV','SOUND55.WAV','SOUND8.WAV','SOUND25.WAV']
+data=bytearray();effects=[];indices={}
+for name in names:
+ a=next(a for a in j['assets'] if a['name']==name)
+ raw=(src/'PCM'/a['pcm']).read_bytes()
+ if len(data)+len(raw)>13*8192:print('DEFERRED (resident budget)',name);continue
+ indices[name]=len(effects);effects.append((19+len(data)//8192,0xa000+len(data)%8192,len(raw),name));data.extend(raw)
+for i,off in enumerate(range(0,len(data),65536)):(o/f'PCM{i}.BIN').write_bytes(data[off:off+65536])
+original=json.loads((r/'wireframe/recovered-table.json').read_text())
+groups=list(dict.fromkeys(e['component']for e in original['edges']if e['class']not in ('5TDemo','8TBlocker')))
+mapping=[]
+for group in groups:
+ c=next((c for c in j['component_references']if c['component_group']==group),None)
+ sounds=c['sounds']if c else {}
+ a=sounds.get('hard_hit',sounds.get('soft_hit',{})).get('wav')
+ mapping.append(indices.get(a,255))
+h=['#include <stdint.h>','typedef struct {uint8_t bank;uint16_t ptr,length;} Effect;',
+ 'static const Effect effects[]={'+','.join('{%d,%d,%d}'%x[:3]for x in effects)+'};',
+ 'static const uint8_t contact_sound[]={'+','.join(map(str,mapping))+'};',
+ '#define PCM_PARTS '+str((len(data)+65535)//65536)]
+for name,idx in indices.items():h.append('#define '+name.replace('.WAV','')+' '+str(idx))
+(o/'audio.h').write_text('\n'.join(h)+'\n')
+(o/'resident-audio.json').write_text(json.dumps({'bytes':len(data),'effects':effects,'contact_mapping':mapping},indent=2)+'\n')
+# Compact status text is provisional; the numeric display uses original glyphs.
+pal=(o/'PAL.BIN').read_bytes();colors=np.array([((pal[i+1]&15)*17,(pal[i]>>4)*17,(pal[i]&15)*17)for i in range(0,512,2)])
+i=int(np.argmin(((colors-(221,221,204))**2).sum(axis=1)));bank,pen=divmod(i,16);assert pen
+base=json.loads((o/'sprites.json').read_text())['end'];font=ImageFont.truetype('/usr/share/fonts/truetype/dejavu/DejaVuSansMono.ttf',9);data=bytearray()
+for code in range(32,128):
+ a=Image.new('1',(8,8));ImageDraw.Draw(a).text((0,-2),chr(code),font=font,fill=1)
+ p=np.asarray(a,np.uint8)*pen;data.extend(((p[:,::2]<<4)|p[:,1::2]).tobytes())
+assert base+len(data)<0x1f9c0
+(o/'FONT.BIN').write_bytes(data)
+inv=json.loads(Path('/opt/spacecadet-x16-analysis/evidence/inventory.json').read_text())
+depths=[]
+for gid in range(108,115):
+ p=next(e['values'][1:]for e in inv['groups'][gid]['entries']if e['type']==11 and e['values'][0]==501)
+ depths.append(round((24.675402-.406737*p[1]-.913545*p[2])*256))
+(o/'ui.h').write_text(f'#define FONT_BASE {base}UL\n#define FONT_BANK {bank}\nstatic const int16_t ball_depths[]={{'+','.join(map(str,depths))+'};\n')
+print('PCM resident',sum(x[2]for x in effects),'font end',hex(base+len(data) if False else base+3072),'ball depths',depths)
+
+(o/'projection.h').write_text('static const uint16_t projection_scale[]={'+','.join(str(round(400*4096/(2048+i*8)))for i in range(1024))+'};\n')
+
+# Initial-state awards, extracted by tag from the recovered original rule table.
+s=(r/'direct/vendor/SpaceCadetPinball/control.cpp').read_text()
+arrays={n:list(map(int,re.findall(r'\d+',v)))for n,v in re.findall(r'int (control_\w+)\[.*?\]\s*=\s*\{([^}]+)\}',s)}
+tags=dict(re.findall(r'component_tag<\w+> (control_\w+_tag) = \{"([^"]+)"\}',s))
+byname={g['name']:g['id']for g in inv['groups']if g['name']};base={}
+for tag,handler,arr in re.findall(r'component_info\{(control_\w+_tag), \{(\w+), \d+, (control_\w+)\}\}',s):
+ if tags.get(tag)in byname:base[byname[tags[tag]]]=arrays[arr][0]
+(o/'awards.h').write_text('static const uint16_t initial_award[]={'+','.join(str(base.get(g,0))for g in groups)+'};\n')

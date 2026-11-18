@@ -1,0 +1,11 @@
+{
+  "frames": 6000,
+  "max_cycles": 193253,
+  "mean_cycles": 36281,
+  "over_budget": 38,
+  "missed_frame_starts": 577,
+  "irq_max": 23974,
+  "music_errors": 0,
+  "ram": 512,
+  "mhz": 2
+}

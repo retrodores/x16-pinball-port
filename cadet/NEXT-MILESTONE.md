@@ -1,3 +1,10 @@
+# Current checkpoint: Original Table Test 0.2
+
+Playable integration is now in cadet/game. Read cadet/game/README.md and
+cadet/game/VALIDATION.md; current follow-up order is in RESUME.md.
+
+The original pre-integration plan follows for context.
+
 # Next playable Space Cadet milestone
 
 Brett's accepted feedback (2026-11-18): the artwork is visually very close; audio
