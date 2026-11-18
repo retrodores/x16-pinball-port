@@ -1,0 +1,21 @@
+{
+  "name": "2026-11-17 22-59-31.mp4",
+  "sha256": "732d9350f20403c1d5d173c41cf500d3448d63ca14676a5a42d68ba00ff85405",
+  "bytes": 8172512,
+  "duration": 83.816667,
+  "video": [
+    1920,
+    1080,
+    60
+  ],
+  "original_audio": "48000 Hz stereo AAC",
+  "analysis_audio": "signed 8-bit mono 11025 Hz",
+  "contact_times": [
+    0,
+    15,
+    30,
+    45,
+    60,
+    75
+  ]
+}
