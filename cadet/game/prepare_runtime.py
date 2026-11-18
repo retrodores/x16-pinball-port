@@ -1,5 +1,5 @@
 from pathlib import Path
-import json,re,numpy as np
+import json,re,struct,math,numpy as np
 from PIL import Image,ImageFont,ImageDraw
 r=Path(__file__).resolve().parents[2];o=r/'cadet/play-build';src=r/'cadet/build'
 j=json.loads((src/'audio-catalog.json').read_text())
@@ -30,7 +30,7 @@ for name,idx in indices.items():h.append('#define '+name.replace('.WAV','')+' '+
 pal=(o/'PAL.BIN').read_bytes();colors=np.array([((pal[i+1]&15)*17,(pal[i]>>4)*17,(pal[i]&15)*17)for i in range(0,512,2)])
 i=int(np.argmin(((colors-(221,221,204))**2).sum(axis=1)));bank,pen=divmod(i,16);assert pen
 base=json.loads((o/'sprites.json').read_text())['end'];font=ImageFont.truetype('/usr/share/fonts/truetype/dejavu/DejaVuSansMono.ttf',9);data=bytearray()
-for code in range(32,128):
+for code in range(32,96):
  a=Image.new('1',(8,8));ImageDraw.Draw(a).text((0,-2),chr(code),font=font,fill=1)
  p=np.asarray(a,np.uint8)*pen;data.extend(((p[:,::2]<<4)|p[:,1::2]).tobytes())
 assert base+len(data)<0x1f9c0
@@ -39,11 +39,12 @@ inv=json.loads(Path('/opt/spacecadet-x16-analysis/evidence/inventory.json').read
 depths=[]
 for gid in range(108,115):
  p=next(e['values'][1:]for e in inv['groups'][gid]['entries']if e['type']==11 and e['values'][0]==501)
- depths.append(round((24.675402-.406737*p[1]-.913545*p[2])*256))
+ depths.append(round(math.sqrt(p[0]**2+(-.913545*p[1]+.406737*p[2]+3.791398)**2+(24.675402-.406737*p[1]-.913545*p[2])**2)*256))
 (o/'ui.h').write_text(f'#define FONT_BASE {base}UL\n#define FONT_BANK {bank}\nstatic const int16_t ball_depths[]={{'+','.join(map(str,depths))+'};\n')
-print('PCM resident',sum(x[2]for x in effects),'font end',hex(base+len(data) if False else base+3072),'ball depths',depths)
+print('PCM resident',sum(x[2]for x in effects),'font end',hex(base+len(data)),'ball depths',depths)
 
-(o/'projection.h').write_text('static const uint16_t projection_scale[]={'+','.join(str(round(400*4096/(2048+i*8)))for i in range(1024))+'};\n')
+(o/'projection.h').write_text('#define projection_scale ((const uint16_t*)0xa800)\n')
+ui=bytearray((o/'UI-SPR.BIN').read_bytes());ui.extend(bytes(2048-len(ui)));ui.extend(struct.pack('<1024H',*[round(400*4096/(2048+i*8))for i in range(1024)]));(o/'UI.BIN').write_bytes(ui)
 
 # Initial-state awards, extracted by tag from the recovered original rule table.
 s=(r/'direct/vendor/SpaceCadetPinball/control.cpp').read_text()
@@ -53,3 +54,14 @@ byname={g['name']:g['id']for g in inv['groups']if g['name']};base={}
 for tag,handler,arr in re.findall(r'component_info\{(control_\w+_tag), \{(\w+), \d+, (control_\w+)\}\}',s):
  if tags.get(tag)in byname:base[byname[tags[tag]]]=arrays[arr][0]
 (o/'awards.h').write_text('static const uint16_t initial_award[]={'+','.join(str(base.get(g,0))for g in groups)+'};\n')
+
+with (o/'ui.h').open('a')as f:
+ f.write('static const uint8_t phase_pose[]={'+','.join(str((i*7+60)//120)for i in range(121))+'};\n')
+ f.write('static const uint8_t charge_pose[]={'+','.join(str(i*7//100)for i in range(101))+'};\n')
+
+# Exact transitions of the previous integer sqrt + linear quantizer.
+cuts=[0]+[(4992+(q*65536+1438+4303)//4304)**2 for q in range(1,256)]
+with (o/'UI.BIN').open('ab')as f:f.write(struct.pack('<256I',*cuts))
+with (o/'ui.h').open('a')as f:f.write('static const uint32_t ball_depth_squared[]={'+','.join(str(d*d)+'UL'for d in depths)+'};\n')
+
+with (o/'UI.BIN').open('ab')as f:f.write((o/'DEPTHROW.BIN').read_bytes())

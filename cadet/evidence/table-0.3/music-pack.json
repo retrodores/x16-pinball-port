@@ -1,0 +1,14 @@
+{
+  "source_bytes": 272155,
+  "bytes": 214255,
+  "original_writes": 117477,
+  "retained_writes": 88527,
+  "end_ticks": 31676,
+  "first_bank": 32,
+  "last_bank": 58,
+  "compressed_bytes": 102730,
+  "compressed_last_bank": 44,
+  "dictionary_bank": 31,
+  "dictionary_bytes": 4096,
+  "byte_exact_decompression": true
+}

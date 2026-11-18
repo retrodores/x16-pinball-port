@@ -1,5 +1,6 @@
 ; Original PCM + standard ZSM v1 player. No compiler or KERNAL zero page.
-; Music: banks 32..58; resident PCM effects: banks 19..31.
+; Compressed music: banks 32..44; dictionary/read-ahead: bank 31 A000..AFFF.
+; Resident PCM effects: banks 19..30. Decompression runs in bounded main-thread batches.
 .section .text.lab,"ax",@progbits
 .globl lab_install,lab_uninstall,pcm_start,pcm_stop,music_start,music_stop,lab_clock
 lab_install:
@@ -109,16 +110,16 @@ music_start:
  php
  sei
  jsr music_stop
- lda #32
- sta music_bank
- lda #$10
- sta music_read+1
- lda #$a0
- sta music_read+2
+ jsr music_reset
  stz music_delay
  stz music_phase
  lda #1
  sta music_enabled
+ ldy #32
+1:
+ jsr music_prefetch
+ dey
+ bne 1b
  plp
  rts
 music_stop:
@@ -306,7 +307,7 @@ music_service:
 2:
  lda $00
  pha
- lda music_bank
+ lda #31
  sta $00
  jsr save_address
 music_command:
@@ -372,12 +373,6 @@ music_wait:
  bra music_return
 music_eof:
  inc music_loops
- lda #32
- sta music_bank
- lda #$10
- sta music_read+1
- lda #$a0
- sta music_read+2
  ; Start the next loop on the next video tick.
  lda #1
  sta music_delay
@@ -386,30 +381,7 @@ music_return:
  pla
  sta $00
  rts
-music_byte:
-music_read:
- lda $a010
- inc music_read+1
- bne byte_done
- pha
- inc music_read+2
- lda music_read+2
- cmp #$c0
- bne byte_restore
- lda #$a0
- sta music_read+2
- inc music_bank
- lda music_bank
- cmp #64
- bcc 1f
- inc music_error
-1:
- sta $00
-byte_restore:
- pla
-byte_done:
- ora #0
- rts
+.include "cadet/game/music_lz.s.inc"
 .section .bss.lab,"aw",@nobits
 .globl pcm_remaining,music_enabled,music_loops,lab_ticks,music_error,irq_max,fm_writes,psg_writes
 old_irq: .zero 2
@@ -438,3 +410,11 @@ pcm_select_bank: .zero 1
 pcm_select_ptr: .zero 2
 
 .globl irq_start,irq_elapsed
+
+lz_flags: .zero 1
+lz_left: .zero 1
+lz_run: .zero 1
+lz_low: .zero 1
+lz_high: .zero 1
+music_buffered: .zero 2
+lz_remaining: .zero 3

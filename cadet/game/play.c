@@ -5,10 +5,15 @@
 #include "ui.h"
 #include "projection.h"
 extern int32_t signedmul(int16_t,int16_t);
+extern uint16_t fastsqrt(uint32_t),depth_mask(int16_t,int16_t,uint8_t);
+extern uint8_t depth_quant(uint32_t);
+extern void mask_pixels(uint16_t);
+extern void depth_masks(uint16_t,uint16_t,uint8_t,uint16_t*,uint8_t,uint8_t);
 extern uint32_t fastmul16(uint16_t,uint16_t);
 static int16_t projected(int16_t value,uint16_t scale){uint32_t p=fastmul16(value<0?-value:value,scale);return value<0?-(int16_t)(p>>12):(int16_t)(p>>12);}
 #include <cbm.h>
 #include <stdint.h>
+extern void music_prefetch(void);
 extern void lab_install(void),lab_uninstall(void),pcm_start(uint16_t),pcm_stop(void),music_start(void),music_stop(void);
 extern uint16_t lab_clock(void);
 extern volatile uint8_t pcm_select_bank,music_enabled,music_error,music_loops;
@@ -20,6 +25,7 @@ __attribute__((naked,used)) void keyboard(void){__asm__ volatile(
 static volatile uint8_t *const v=(volatile uint8_t*)0x9f20;
 static uint8_t priority,previous_state=255,phase_cache[2]={255,255},plunger_cache=255;
 static uint8_t score_cache[9],ball_cache=255,status_cache[40];
+static bool wide_score;
 static void addr(uint32_t a){v[5]=0;v[0]=a;v[1]=a>>8;v[2]=0x10|(a>>16);}
 static void word(uint16_t a){v[3]=a;v[3]=a>>8;}
 static void hide(uint8_t n){addr(0x1fc06UL+(uint16_t)n*8);v[3]=0;}
@@ -27,7 +33,7 @@ static void tile(uint8_t n,uint16_t a,int16_t x,int16_t y,uint8_t size){addr(0x1
 static void frame(uint8_t n,uint8_t f,int16_t x,int16_t y,uint8_t reserved){
  const SpriteFrame*s=&sprites[f];
  for(uint8_t i=0;i<reserved;++i){
-  if(i<s->count){const SpriteTile*t=s->tiles+i;tile(n+i,t->address,x+t->x,y+t->y,0x50|t->palette);}else hide(n+i);
+  if(i<s->count){const SpriteTile*t=s->tiles+i;tile(n+i,t->address,x+t->x,y+t->y,t->size|t->palette);}else hide(n+i);
  }
 }
 static uint8_t load(const char*n,uint8_t mode,uint16_t a){cbm_k_setnam(n);cbm_k_setlfs(1,8,2);return(uintptr_t)cbm_k_load(mode,(void*)a)>255;}
@@ -52,54 +58,88 @@ void audio_effect(uint8_t id){
 }
 static void status(const char*s){
  for(uint8_t i=0;i<40;++i){uint8_t c=*s?*s++:32;if(status_cache[i]==c)continue;status_cache[i]=c;
-  tile(50+i,FONT_BASE/32+c-32,405+(i%20)*8,248+(i/20)*8,FONT_BANK);
+  tile(33+i,FONT_BASE/32+c-32,405+(i%20)*8,248+(i/20)*8,FONT_BANK);
  }
 }
-static void display(void){
+#ifdef PROFILE_DISPLAY
+static uint32_t mask_cycles,copy_cycles,prefetch_cycles;
+#endif
+static void ball(uint8_t f,int16_t x,int16_t y,uint32_t distance_squared){
+ const SpriteTile*t=sprites[24+f].tiles;
+ uint16_t masks[16]={0},all=65535,any=0;
+ uint8_t width=sprites[24+f].width,height=sprites[24+f].height;
+ uint8_t depth=depth_quant(distance_squared);
+#ifdef PROFILE_DISPLAY
+ uint32_t mask_start=cycles();mask_cycles=copy_cycles=0;
+#endif
+ if(x>=8&&x<=357&&y>=5&&y<=459)depth_masks(x-8,y-5,depth,masks,sprites[24+f].width,sprites[24+f].height);
+ else for(uint8_t row=0;row<height;++row)masks[row]=depth_mask(x-8,y-5+row,depth);
+ for(uint8_t row=0;row<height;++row){all&=masks[row];any|=masks[row];}
+#ifdef PROFILE_DISPLAY
+ mask_cycles=cycles()-mask_start;
+#endif
+ if((all&((1u<<width)-1))==((1u<<width)-1)){frame(0,24+f,x,y,1);return;}
+ if(!any){hide(0);return;}
+#ifdef PROFILE_DISPLAY
+ uint32_t copy_start=cycles();
+#endif
+ uint32_t src=(uint32_t)t->address<<5;
+ v[5]=1;v[0]=src;v[1]=src>>8;v[2]=0x10|(src>>16);v[5]=0;
+ addr(FONT_BASE+2048);
+ mask_pixels((uint16_t)(uintptr_t)masks);
+ tile(0,(FONT_BASE+2048)/32,x,y,0x50|t->palette);
+#ifdef PROFILE_DISPLAY
+ copy_cycles=cycles()-copy_start;
+#endif
+}
+static void display(bool update_panel){
  /* Camera matrix from PINBALL.DAT, Q8. Products retain 16 fractional bits. */
  int16_t depth=6317-(signedmul(game.y,104)+signedmul(game.z,234))/256;
  int16_t camera_y=(signedmul(game.y,-234)+signedmul(game.z,104))/256+971;
  if(depth<2048)depth=2048;if(depth>10232)depth=10232;
  uint16_t scale=projection_scale[(depth-2048+4)>>3];
  int16_t x=191-projected(game.x,scale),y=243-projected(camera_y,scale);
- uint8_t f=0;while(f<6&&ball_depths[f]>depth)++f;
+ uint32_t distance_squared=signedmul(game.x,game.x)+signedmul(camera_y,camera_y)+signedmul(depth,depth);
+ uint8_t f=0;while(f<6&&ball_depth_squared[f]>distance_squared)++f;
  const SpriteFrame*b=sprites+24+f;
- if(game.state==Serving||game.state==InPlay)frame(0,24+f,x-b->width/2,y-b->height/2,1);else hide(0);
- for(uint8_t i=0;i<2;++i){uint8_t pose=((uint16_t)game.phase[i]*7+60)/120;
-  if(pose!=phase_cache[i]){f=i*8+pose;frame(1+i*12,f,sprites[f].x,sprites[f].y,12);phase_cache[i]=pose;}
+ if(game.state==Serving||game.state==InPlay)ball(f,x-b->width/2,y-b->height/2,distance_squared);else hide(0);
+ for(uint8_t i=0;i<2;++i){uint8_t pose=phase_pose[game.phase[i]];
+  if(pose!=phase_cache[i]){f=i*8+pose;frame(1+i*9,f,sprites[f].x,sprites[f].y,9);phase_cache[i]=pose;}
  }
- uint8_t pose=game.state==Serving?(uint16_t)game.charge*7/100:0;
- if(pose!=plunger_cache){f=16+pose;frame(25,f,sprites[f].x,sprites[f].y,6);plunger_cache=pose;}
- if(game.score_dirty){uint8_t hi=39;while(hi&&!game.digits[hi])--hi;
+ uint8_t pose=game.state==Serving?charge_pose[game.charge]:0;
+ if(pose!=plunger_cache){f=16+pose;frame(19,f,sprites[f].x,sprites[f].y,3);plunger_cache=pose;}
+ if(game.score_dirty&&update_panel){uint8_t hi=39;while(hi&&!game.digits[hi])--hi;
   for(uint8_t i=0;i<9;++i){uint8_t digit=i<=hi?game.digits[i]:255;if(digit==score_cache[i])continue;score_cache[i]=digit;
-   if(digit==255){hide(31+i*2);hide(32+i*2);}else frame(31+i*2,31+digit,553-i*15,197,2);
+   if(digit==255){hide(22+i);}else frame(22+i,31+digit,553-i*15,197,1);
   }
+  wide_score=hi>=9;
   if(hi>=9){echo("# EXACT SCORE ");for(int8_t i=hi;i>=0;--i)*(volatile uint8_t*)0x9fbb=48+game.digits[i];echo("\n");}
   game.score_dirty=false;
  }
- uint8_t number=game.ball_number;if(number!=ball_cache){frame(90,31+number,553,152,2);ball_cache=number;}
- if(previous_state!=game.state){
+ uint8_t number=game.ball_number;if(update_panel&&number!=ball_cache){frame(32,31+number,553,152,1);ball_cache=number;}
+ if(update_panel&&previous_state!=game.state){
   static const char*const labels[]={"F2: NEW GAME","HOLD SPACE TO LAUNCHRELEASE TO FIRE","BALL IN PLAY","CAPTURE / RETURN","NEXT BALL","GAME OVER           F2: NEW GAME"};
   status(labels[game.state]);previous_state=game.state;
   if(game.state==Serving)effect(SOUND4,3);
  }
  /* 128-bit score remains exact. Flag a panel overflow instead of silently truncating. */
- for(uint8_t i=9;i<40;++i)if(game.digits[i]){status("SCORE EXCEEDS PANEL  SEE EXACT SCORE LOG");break;}
+ if(update_panel&&wide_score)status("SCORE EXCEEDS PANEL  SEE EXACT SCORE LOG");
 }
 int main(void){
  uint8_t oldbank=*(volatile uint8_t*)0;uint16_t oldkey=*(volatile uint16_t*)0x032e;
  print("\x93" "CMDRX CADET - ORIGINAL TABLE\rLOADING...\r");v[5]=0;v[9]=1;
  if(!game_load()||!load("MAP.BIN",2,0)||!load("TILES.BIN",2,0x1000)||!load("PAL.BIN",3,0xfa00)||
  !load("SPRITES.BIN",3,SPRITE_BASE&65535)||!load("FONT.BIN",3,FONT_BASE&65535))goto fail;
- for(uint8_t i=0;i<4;++i){char n[]="MUSIC0.BIN";n[5]+=i;*(volatile uint8_t*)0=32+i*8;if(!load(n,0,0xa000))goto fail;}
+ for(uint8_t i=0;i<2;++i){char n[]="MUSIC0.BIN";n[5]+=i;*(volatile uint8_t*)0=32+i*8;if(!load(n,0,0xa000))goto fail;}
  for(uint8_t i=0;i<PCM_PARTS;++i){char n[]="PCM0.BIN";n[3]+=i;*(volatile uint8_t*)0=19+i*8;if(!load(n,0,0xa000))goto fail;}
- *(volatile uint8_t*)0=oldbank;
+ for(uint8_t i=0;i<22;++i){char n[]="DEPTH00.BIN";n[5]+=i/10;n[6]+=i%10;*(volatile uint8_t*)0=i==0?10:i<3?16+i:i+42;if(!load(n,0,0xa000))goto fail;}
+ *(volatile uint8_t*)0=11;if(!load("UI.BIN",0,0xa000))goto fail;
  for(uint8_t i=0;i<128;++i)hide(i);
  for(uint8_t i=0;i<9;++i)score_cache[i]=254;
  v[5]=0;v[9]=0x51;v[10]=v[11]=128;v[12]=0;
  v[13]=0x12;v[14]=0;v[15]=0x0b;v[16]=v[17]=v[18]=v[19]=0;
  __asm__ volatile("sei");*(volatile uint16_t*)0x032e=(uint16_t)(uintptr_t)keyboard;__asm__ volatile("cli");
- lab_install();game_start();frame(92,32,403,197,2);display();
+ lab_install();game_start();frame(31,32,403,197,1);display(true);
 #ifndef NO_MUSIC
  music_start();
 #endif
@@ -122,12 +162,30 @@ int main(void){
   old_new=keys[113];old_m=keys[52];
   game_frame(keys[44]||keys[46],keys[55]||keys[57],keys[61],keys[83]);
 #endif
-  display();++count;
+
+#ifdef PROFILE_DISPLAY
+  uint32_t physics_end=cycles();
+#endif
+  display(cycles()-before<80000UL);++count;
+#ifdef PROFILE_DISPLAY
+  uint32_t prefetch_start=cycles();
+#endif
+  if(cycles()-before<100000UL)music_prefetch();
+#ifdef PROFILE_DISPLAY
+  prefetch_cycles=cycles()-prefetch_start;
+#endif
   uint32_t elapsed=cycles()-before;total+=elapsed;
+
+#ifdef PROFILE_DISPLAY
+  if(elapsed>120000){echo("# COST ");hex(count);echo(" ");hex(physics_end-before);echo(" ");hex(cycles()-physics_end);echo(" ");hex(game.x);echo(" ");hex(game.y);echo(" ");hex(mask_cycles);echo(" ");hex(copy_cycles);echo(" ");hex(prefetch_cycles);echo("\n");}
+#endif
   if(elapsed>maximum){maximum=elapsed;echo("# WORST ");hex(count);echo(" ");hex(elapsed);echo("\n");}
   if(elapsed>133333)++over;
 #ifdef GAME_TEST
-  if(count>=6000)break;
+#ifndef TEST_FRAMES
+#define TEST_FRAMES 6000
+#endif
+  if(count>=TEST_FRAMES)break;
 #endif
  }
  echo("# RESULT ");hex(count);echo(" ");hex(maximum);echo(" ");hex(total/count);echo(" ");hex(over);echo(" ");hex(gaps);echo(" ");hex(irq_max);echo(" ");hex(music_error);echo("\n# DONE\n");

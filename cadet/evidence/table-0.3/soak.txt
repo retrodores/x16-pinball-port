@@ -1,0 +1,5 @@
+run 0 frames 4405 state 5 pos -128,3618 mask 0 drains 3 bumps 13 flips 21 ramps 0 escapes 0 guards 0
+run 1 frames 2721 state 5 pos 41,3619 mask 0 drains 3 bumps 6 flips 7 ramps 0 escapes 0 guards 0
+run 2 frames 1831 state 5 pos 102,3618 mask 0 drains 3 bumps 7 flips 3 ramps 0 escapes 0 guards 0
+STATE HASH 91cbf84c
+SUMMARY runs=40 drains=120 escapes=0 stalls=0 bumpers=378 flippers=532 ramp_entries=137 guards=1 returns=68

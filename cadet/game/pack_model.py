@@ -99,7 +99,7 @@ for i,e in enumerate(src):
  x,y,_=e['circle'];radius=math.sqrt(e.get('hole',e.get('capture',{})).get('radius_sq',e.get('capture',{}).get('field_radius_sq',.1)))
  wells.append([q(x),q(y),q(radius),e['mask'],records[i][28],groups[e['component']],classes[e['class']]])
 lines+=['typedef struct {int16_t x,y,r;uint8_t mask,param,group,kind;} Well;','static const Well wells[]={'+','.join('{'+','.join(map(str,w))+'}'for w in wells)+'};',f'#define center_group {groups[510]}','static const uint8_t drop_groups[]={'+','.join(str(groups[i])for i in range(432,441))+'};','static const uint8_t gate_groups[]={'+','.join(str(groups[e['component']])for e in src if e['class']=='5TGate')+'};']
-lines+=['static const Vec pivots[2]={'+','.join('{%d,%d}'%tuple(v) for v in pivots)+'};','static const Vec tips[2][121]={'+','.join('{'+','.join('{%d,%d}'%tuple(v) for v in a)+'}' for a in tips)+'};','static const int16_t flipper_omega[2]={%d,%d};'%tuple(omega),f'#define flipper_length2 {sum(length2)//2}L']
+lines+=['static const Vec pivots[2]={'+','.join('{%d,%d}'%tuple(v) for v in pivots)+'};','static const Vec tips[2][121]={'+','.join('{'+','.join('{%d,%d}'%tuple(v) for v in a)+'}' for a in tips)+'};','static const int16_t flipper_omega[2]={%d,%d};'%tuple(omega),f'#define flipper_length2 {sum(length2)//2}L',f'#define flipper_length {math.isqrt(sum(length2)//2)}']
 lines+=['static const uint16_t original_groups[]={'+','.join(map(str,ids))+'};']
 (o/'model.h').write_text('\n'.join(lines)+'\n')
 manifest={'subpixel_facets':facets,'arc_bounds':len(arcs),'edges':len(src),'components':len(ids),'component_ids':ids,'max_candidates':max(map(len,grid)),'bytes':len(blob),'banks':f'1..{occupancy_bank-1}','metadata':len(metas),'classes':{c:sum(e['class']==c for e in src) for c in classes}}

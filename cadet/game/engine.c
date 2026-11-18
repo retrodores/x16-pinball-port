@@ -61,7 +61,12 @@ uint16_t fraction8(uint16_t,uint16_t);
 #else
 __attribute__((noinline)) static uint16_t fraction(uint16_t n,uint16_t d){if(!n)return 0;if(n>=d)return 256;uint16_t q=0;for(uint8_t i=0;i<8;++i){n<<=1;q<<=1;if(n>=d){n-=d;++q;}}return q;}
 #endif
+#ifdef __CX16__
+uint16_t fraction32(uint32_t,uint32_t);
+static uint16_t fraction_wide(uint32_t n,uint32_t d){return n<32768&&d<32768?fraction(n,d):fraction32(n,d);}
+#else
 static uint16_t fraction_wide(uint32_t n,uint32_t d){if(n<32768&&d<32768)return fraction(n,d);if(n>=d)return 256;uint16_t q=0;for(uint8_t i=0;i<8;++i){n<<=1;q<<=1;if(n>=d){n-=d;++q;}}return q;}
+#endif
 static int16_t normal(int16_t n,uint16_t d){int16_t q=fraction(ax(n),d);return n<0?-q:q;}
 static uint16_t isqrt(uint32_t n){
 #ifdef __CX16__
@@ -94,18 +99,32 @@ void sound(uint8_t id){game.last_sound=id;
  if(id==255)audio_stop();else audio_effect(id);
 #endif
 }
-void add_score(uint16_t n){if(game.overflow)return;game.score_dirty=true;uint16_t carry=n;for(uint8_t i=0;i<16&&carry;++i){uint16_t sum=game.score[i]+(carry&255);carry=(carry>>8)+(sum>>8);}if(carry){game.overflow=true;return;}carry=n;for(uint8_t i=0;i<16&&carry;++i){uint16_t sum=game.score[i]+(carry&255);game.score[i]=sum;carry=(carry>>8)+(sum>>8);}if(carry){game.overflow=true;return;}carry=n;for(uint8_t i=0;i<40&&carry;++i){uint8_t add=carry%10;carry/=10;uint8_t d=game.digits[i]+add;if(d>=10){d-=10;++carry;}game.digits[i]=d;}}
+void add_score(uint16_t n){if(game.overflow)return;game.score_dirty=true;uint16_t carry=n;for(uint8_t i=0;i<16&&carry;++i){uint16_t sum=game.score[i]+(carry&255);carry=(carry>>8)+(sum>>8);}if(carry){game.overflow=true;return;}carry=n;for(uint8_t i=0;i<16&&carry;++i){uint16_t sum=game.score[i]+(carry&255);game.score[i]=sum;carry=(carry>>8)+(sum>>8);}if(carry){game.overflow=true;return;}carry=n;uint8_t digit=0;
+ /* Known table awards have trailing zeros. Skip them without division; the
+    generic path still accepts every uint16_t value and all 128 score bits. */
+ switch(n){case 500:carry=5;digit=2;break;case 750:carry=75;digit=1;break;
+ case 1000:carry=1;digit=3;break;case 1500:carry=15;digit=2;break;
+ case 2000:carry=2;digit=3;break;case 2500:carry=25;digit=2;break;
+ case 5000:carry=5;digit=3;break;case 10000:carry=1;digit=4;break;
+ case 15000:carry=15;digit=3;break;case 20000:carry=2;digit=4;break;
+ case 50000:carry=5;digit=4;break;default:break;}
+ for(uint8_t i=digit;i<40&&carry;++i){uint8_t add;
+ if(carry<10){add=carry;carry=0;}else{add=carry%10;carry/=10;}uint8_t d=game.digits[i]+add;if(d>=10){d-=10;++carry;}game.digits[i]=d;}}
 static void serve(){sound(255);game.ball_number=4-game.balls;game.state=Serving;game.x=serve_x;game.y=plunger_y-2;game.z=77;game.vx=game.vy=game.remx=game.remy=game.accx=game.accy=0;game.mask=1;game.ramp=false;game.charge=0;game.charge_clock=0;game.flags=0;game.nudges=0;}
 void game_start(void){active_count=0;memset(active_flags,0,sizeof active_flags);memset(&game,0,sizeof game);game.balls=3;game.multiplier=1;game.score_dirty=true;serve();}
 static void drain(){if(game.state!=InPlay)return;game.state=Between;game.wait=120;game.vx=game.vy=0;game.mask=0;game.ramp=false;++game.drains;if(game.balls)--game.balls;sound(5);}
 static void limit(){const int16_t cap=15360;int16_t m=ax(game.vx)>ax(game.vy)?ax(game.vx):ax(game.vy);if(m>cap){game.vx=(int32_t)game.vx*cap/m;game.vy=(int32_t)game.vy*cap/m;}}
 /* maths::basic_collision expressed in velocity coordinates, Q8. */
+#ifdef __CX16__
+uint16_t ratio12(uint16_t,uint16_t);
+#else
 static uint16_t ratio12(uint16_t n,uint16_t d){
  uint16_t whole=0,q=0;if(!d)return 0;
  while(n>=d){n-=d;whole+=4096;}
  for(uint8_t i=0;i<12;++i){n<<=1;q<<=1;if(n>=d){n-=d;++q;}}
  return whole+q;
 }
+#endif
 static int16_t rebound_core(int16_t nx,int16_t ny,uint8_t e,uint8_t smooth,uint8_t boost,int16_t inward){
  if(inward<=0)return 0;
  uint16_t speed=isqrt(mul(game.vx,game.vx)+mul(game.vy,game.vy));
@@ -138,6 +157,12 @@ static const Edge* edge(uint16_t id){
 #endif
 }
 
+int16_t bound_query[4];
+#ifdef __CX16__
+extern const Edge* bounded_edge(uint16_t);
+#else
+static const Edge* bounded_edge(uint16_t id){const Edge*e=edge(id);return bound_query[1]<e->xlo||bound_query[3]<e->ylo||bound_query[0]>e->xhi||bound_query[2]>e->yhi?0:e;}
+#endif
 static uint32_t ray_a,ray_r2,ray_ar;static uint16_t circle_ids[24];static int16_t circle_distance[24];
 __attribute__((noinline)) static bool circle_hit(uint16_t id,int16_t dx,int16_t dy,Hit*hit){const Edge*e=edge(id);int16_t t,nx,ny,px,py;
    int16_t sx=game.x-e->x,sy=game.y-e->y;
@@ -178,19 +203,15 @@ __attribute__((noinline)) static bool nearest_core(int16_t dx,int16_t dy,Hit*hit
 #else
  if(ci!=cell_id){uint16_t offset;read(1+(ci>>12),(ci&4095)*2,&offset,2);uint8_t bank=4+(offset>>13);offset&=8191;uint16_t count;read(bank,offset,&count,2);read(bank,offset,cell,(count+1)*2);cell_id=ci;}
 #endif
- const int16_t xl=game.x+(dx<0?dx:0)-4,xh=game.x+(dx>0?dx:0)+4,yl=game.y+(dy<0?dy:0)-4,yh=game.y+(dy>0?dy:0)+4;const uint8_t layer=game.mask;
+ const int16_t xl=game.x+(dx<0?dx:0)-5,xh=game.x+(dx>0?dx:0)+5,yl=game.y+(dy<0?dy:0)-5,yh=game.y+(dy>0?dy:0)+5;const uint8_t layer=game.mask;
+ bound_query[0]=xl;bound_query[1]=xh;bound_query[2]=yl;bound_query[3]=yh;
  bool found=false;hit->t=257;uint8_t circle_count=0;ray_a=mul(dx,dx)+mul(dy,dy);ray_r2=0;
 #ifdef __CX16__
  uint8_t saved=*(volatile uint8_t*)0;
 #endif
  for(CandidateIndex i=0;i<cell[0];++i){uint16_t id=cell[i+1];
-#ifdef __CX16__
- *(volatile uint8_t*)0=bounds_bank+(id>>10);__asm__ volatile("":::"memory");const int16_t*b=(const int16_t*)(0xa000+(id&1023)*8);
-#else
- int16_t buf[4];read(bounds_bank+(id>>10),(id&1023)*8,buf,8);const int16_t*b=buf;
-#endif
-  if(xh<b[0]||yh<b[1]||xl>b[2]||yl>b[3])continue;
-  const Edge*e=edge(id);uint8_t mask=e->mask,kind=e->kind,group=e->group;
+const Edge*e=bounded_edge(id);if(!e)continue;
+  uint8_t mask=e->mask,kind=e->kind,group=e->group;
   if(!(e->flags&2))continue;
   if(!(mask&layer)||game.disabled[group])continue;
   if(kind==Ramp){bool ignored=false;for(uint8_t k=0;k<ramp_ignore_count;++k)if(ramp_ignored[k]==id)ignored=true;if(ignored)continue;}
@@ -223,14 +244,10 @@ __attribute__((noinline)) static bool nearest_core(int16_t dx,int16_t dy,Hit*hit
  for(uint8_t i=0;i<circle_count;++i){
 #ifndef PIN_REFERENCE
   if(clip_t!=hit->t){clip_t=hit->t;uint16_t t=hit->t<255?hit->t+1:256;int16_t ex=mul(dx,t)/256,ey=mul(dy,t)/256;
-   cxl=game.x+(ex<0?ex:0)-4;cxh=game.x+(ex>0?ex:0)+4;cyl=game.y+(ey<0?ey:0)-4;cyh=game.y+(ey>0?ey:0)+4;}
+   cxl=game.x+(ex<0?ex:0)-5;cxh=game.x+(ex>0?ex:0)+5;cyl=game.y+(ey<0?ey:0)-5;cyh=game.y+(ey>0?ey:0)+5;
+   bound_query[0]=cxl;bound_query[1]=cxh;bound_query[2]=cyl;bound_query[3]=cyh;}
   uint16_t id=circle_ids[i];
-#ifdef __CX16__
-  *(volatile uint8_t*)0=bounds_bank+(id>>10);__asm__ volatile("":::"memory");const int16_t*b=(const int16_t*)(0xa000+(id&1023)*8);
-#else
-  int16_t buf[4];read(bounds_bank+(id>>10),(id&1023)*8,buf,8);const int16_t*b=buf;
-#endif
-  if(cxh<b[0]||cyh<b[1]||cxl>b[2]||cyl>b[3])continue;
+if(!bounded_edge(id))continue;
 #endif
   if(circle_hit(circle_ids[i],dx,dy,hit))found=true;
  }
@@ -290,7 +307,7 @@ static void paddle(uint8_t side,uint8_t old){
 #endif
  int16_t bx=game.x-p->x,by=game.y-p->y;if(ax(bx)>800||ax(by)>800)return;
  int16_t ux=t->x-p->x,uy=t->y-p->y;
- int32_t projection=mul(bx,ux)+mul(by,uy);int16_t f=projection<=0?0:projection>=flipper_length2?256:(projection*256)/flipper_length2;
+ int32_t projection=mul(bx,ux)+mul(by,uy);int16_t f=projection<=0?0:projection>=flipper_length2?256:fraction_wide(projection,flipper_length2);
  int16_t cx=p->x+mul(ux,f)/256,cy=p->y+mul(uy,f)/256,dx=game.x-cx,dy=game.y-cy;
  int16_t radius=156-((30*f)>>8);uint32_t sq=mul(dx,dx)+mul(dy,dy);if(sq>=(uint32_t)radius*radius)return;
  uint16_t len=isqrt(sq);int16_t nx=len?normal(dx,len):0,ny=len?normal(dy,len):-256;
@@ -302,7 +319,7 @@ static void paddle(uint8_t side,uint8_t old){
   bool front=side==0?cross<=0:cross>0;if(phase_delta<0)front=!front;
   uint16_t distance=isqrt(mul(game.x-p->x,game.x-p->x)+mul(game.y-p->y,game.y-p->y));
   if(distance>157){
-   if(front){int16_t fnx=normal(side==0?-uy:uy,isqrt(flipper_length2)),fny=normal(side==0?ux:-ux,isqrt(flipper_length2));
+   if(front){int16_t fnx=normal(side==0?-uy:uy,flipper_length),fny=normal(side==0?ux:-ux,flipper_length);
     if(phase_delta<0){fnx=-fnx;fny=-fny;}int16_t alignment=dot(fnx,fny,nx,ny);
     if(alignment>0){uint32_t power=umul(ax(phase_delta*flipper_omega[side]),distance)/603;
      power=power*230/256;power=power*alignment/256;boost=power/256;}

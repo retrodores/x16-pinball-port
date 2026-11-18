@@ -8,13 +8,14 @@ if [ "${1:-}" = assets ]; then
  python3 cadet/game/pack_model.py
  python3 cadet/game/pack_music.py
  python3 cadet/game/pack_sprites.py
+ python3 cadet/game/pack_depth.py
  python3 cadet/game/prepare_runtime.py
 fi
 for variant in CADET TEST; do
  defs="-DPIN_AUDIO"
  if [ "$variant" = TEST ]; then defs="$defs -DGAME_TEST"; fi
  "$CC" -Os $defs -Icadet/play-build wireframe/widemul.s wireframe/sqrt.s \
- wireframe/narrowmul_shared.s cadet/game/signedmul.s cadet/game/fraction.s cadet/game/audio.s \
- cadet/game/engine.c cadet/game/play.c -Wl,-Map,cadet/play-build/$variant.map \
+ wireframe/narrowmul_shared.s cadet/game/signedmul.s cadet/game/fraction.s cadet/game/ratio.s cadet/game/bounds.s cadet/game/audio.s \
+ cadet/game/engine.c cadet/game/depth_quant.s cadet/game/mask_pixels.s cadet/game/depth_rect.s cadet/game/depth.c cadet/game/play.c -Wl,-Map,cadet/play-build/$variant.map \
  -o cadet/play-build/$variant.PRG
 done
