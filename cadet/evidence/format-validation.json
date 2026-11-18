@@ -1,0 +1,9 @@
+{
+  "zsm_end_ticks": 31676,
+  "fm_register_writes": 66525,
+  "psg_register_writes": 50952,
+  "decoded_melodic_attacks": 7263,
+  "decoded_percussion_onsets": 6876,
+  "ledger_order_and_tick_match": true,
+  "pcm_sha256_checked": 60
+}

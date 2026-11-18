@@ -1,0 +1,14 @@
+original directed-line fixtures 538
+lab assets ready
+# ROUTE CHECKS 0eb6 FAILED 0000
+# TAP BEGIN
+ok - attack bumper levels from original control.cpp
+ok - launch bumper levels from original control.cpp
+ok - original rebounder award
+ok - carry beyond 32 bits
+ok - 128-bit overflow saturates explicitly
+# SCORE 000000e80000000d0000002800000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+# CYCLES 00000000
+ok - 1000 original bumper/rebounder pairs total 2625000
+1..6
+Built cadet/build/LAB.PRG and native test probes.

@@ -1,0 +1,2109 @@
+{
+  "format": "signed 8-bit mono, no header",
+  "rate_register": 29,
+  "actual_rate": 11062.6220703125,
+  "resource_sounds": 48,
+  "wav_files": 60,
+  "assets": [
+    {
+      "name": "SOUND1.WAV",
+      "source_rate": 11025,
+      "source_frames": 55350,
+      "source_seconds": 5.020408163265306,
+      "source_sha256": "6b2b9e2bdd1ca7854c44d93f86167b6f54fbd0cd702aee47a46b5807a74d4571",
+      "pcm": "SOUND1.PCM",
+      "bytes": 55539,
+      "pcm_sha256": "02bdc4434b19c1790849c988010f46862675f11541451e3d60d2b0794e5ec60d",
+      "rate_register": 29,
+      "actual_rate": 11062.6220703125,
+      "pcm_seconds": 5.020419177931035,
+      "peak": 128,
+      "referenced_groups": [
+        18
+      ]
+    },
+    {
+      "name": "SOUND3.WAV",
+      "source_rate": 11025,
+      "source_frames": 22718,
+      "source_seconds": 2.0605895691609977,
+      "source_sha256": "81832bc5b34359bc87173dc234cbb30ea23aa541814809ad16eb1ba9bd7335af",
+      "pcm": "SOUND3.PCM",
+      "bytes": 22796,
+      "pcm_sha256": "cf1fd439eff93e35e1e9cd03e819e011d4f826165b61624f0bbe05e62f7d9262",
+      "rate_register": 29,
+      "actual_rate": 11062.6220703125,
+      "pcm_seconds": 2.060632628965517,
+      "peak": 128,
+      "referenced_groups": [
+        20
+      ]
+    },
+    {
+      "name": "SOUND4.WAV",
+      "source_rate": 11025,
+      "source_frames": 16370,
+      "source_seconds": 1.4848072562358277,
+      "source_sha256": "83ef8fa7563a5ef1e2d138e7f4878ce0cac0bf74e17251910c2237e355115df0",
+      "pcm": "SOUND4.PCM",
+      "bytes": 16426,
+      "pcm_sha256": "0f030a7a7542ae96724703a27792c03a75bd6136b56ec2d548ee05d9678d5025",
+      "rate_register": 29,
+      "actual_rate": 11062.6220703125,
+      "pcm_seconds": 1.4848197737931035,
+      "peak": 128,
+      "referenced_groups": [
+        21
+      ]
+    },
+    {
+      "name": "SOUND5.WAV",
+      "source_rate": 11025,
+      "source_frames": 2924,
+      "source_seconds": 0.2652154195011338,
+      "source_sha256": "e0d2932bdf94581ccb0b5c38421755299db01d0f594f59c5696c1f466ac86d06",
+      "pcm": "SOUND5.PCM",
+      "bytes": 2934,
+      "pcm_sha256": "416ebb24ecba68155b6c56f26c7420d39ee6d8a2133c3503d5e9abfbd503d065",
+      "rate_register": 29,
+      "actual_rate": 11062.6220703125,
+      "pcm_seconds": 0.2652174124137931,
+      "peak": 123,
+      "referenced_groups": [
+        22
+      ]
+    },
+    {
+      "name": "SOUND6.WAV",
+      "source_rate": 11025,
+      "source_frames": 4191,
+      "source_seconds": 0.38013605442176873,
+      "source_sha256": "75302e43a7c17ad28c2453921b205f3f5f33d51ab2c2d591b562b878ac77ae6b",
+      "pcm": "SOUND6.PCM",
+      "bytes": 4205,
+      "pcm_sha256": "0a774c07c316dc7fbca8e7f9eee404b91228d43fe37af2502483ec907fe892be",
+      "rate_register": 29,
+      "actual_rate": 11062.6220703125,
+      "pcm_seconds": 0.3801088,
+      "peak": 108,
+      "referenced_groups": []
+    },
+    {
+      "name": "SOUND7.WAV",
+      "source_rate": 11025,
+      "source_frames": 26302,
+      "source_seconds": 2.3856689342403627,
+      "source_sha256": "7a9ecebe58055fe42c4af7f9b3b319439f85c3cd745d1e245ad4db19c0e34783",
+      "pcm": "SOUND7.PCM",
+      "bytes": 26392,
+      "pcm_sha256": "ae120f6f96f2d24e370b1afa8024e9cc35c3d6a130fb3163333b3b7b299e0b40",
+      "rate_register": 29,
+      "actual_rate": 11062.6220703125,
+      "pcm_seconds": 2.3856911889655175,
+      "peak": 128,
+      "referenced_groups": [
+        23
+      ]
+    },
+    {
+      "name": "SOUND8.WAV",
+      "source_rate": 11025,
+      "source_frames": 1961,
+      "source_seconds": 0.17786848072562358,
+      "source_sha256": "1c457b41c4b5f7a35e6b539caec28520515b297eb1e23069173e7cdc5c0ae61c",
+      "pcm": "SOUND8.PCM",
+      "bytes": 1968,
+      "pcm_sha256": "ce3c4c972e4af734288fd5e2a911b331c99fe287d64603a024dc4bad8fc96c5f",
+      "rate_register": 29,
+      "actual_rate": 11062.6220703125,
+      "pcm_seconds": 0.1778963420689655,
+      "peak": 127,
+      "referenced_groups": [
+        24
+      ]
+    },
+    {
+      "name": "SOUND9.WAV",
+      "source_rate": 11025,
+      "source_frames": 19958,
+      "source_seconds": 1.810249433106576,
+      "source_sha256": "2b48a5c3ba88b0af5b8abc2a833e2d36d63ee4ceae893b396481884eed931aa1",
+      "pcm": "SOUND9.PCM",
+      "bytes": 20026,
+      "pcm_sha256": "f543849a477c84d2ea0a4a85cf3a060a78eed65bff7e537f63720f4555bd4b73",
+      "rate_register": 29,
+      "actual_rate": 11062.6220703125,
+      "pcm_seconds": 1.810239911724138,
+      "peak": 128,
+      "referenced_groups": [
+        25
+      ]
+    },
+    {
+      "name": "SOUND12.WAV",
+      "source_rate": 11025,
+      "source_frames": 4156,
+      "source_seconds": 0.3769614512471655,
+      "source_sha256": "9902227bb6cedede8636c99688391d1a0a77428193e3a12dd7fb12401a598d5a",
+      "pcm": "SOUND12.PCM",
+      "bytes": 4170,
+      "pcm_sha256": "9bb6b7ddc2c66c4b0e6ca8aecfc6fcff51b2cfea9798ffe3cb9efa415274902a",
+      "rate_register": 29,
+      "actual_rate": 11062.6220703125,
+      "pcm_seconds": 0.37694499310344826,
+      "peak": 128,
+      "referenced_groups": [
+        26
+      ]
+    },
+    {
+      "name": "SOUND13.WAV",
+      "source_rate": 11025,
+      "source_frames": 7850,
+      "source_seconds": 0.7120181405895691,
+      "source_sha256": "0f537e4c5c1b5c48185c9c02cfa101dafad9111d20bfbfc3ad4bfefe82978818",
+      "pcm": "SOUND13.PCM",
+      "bytes": 7877,
+      "pcm_sha256": "cb25b9ede2bf64df9960643fc4ec76960d53564ac531df29de3736d80b688f31",
+      "rate_register": 29,
+      "actual_rate": 11062.6220703125,
+      "pcm_seconds": 0.7120373406896552,
+      "peak": 121,
+      "referenced_groups": []
+    },
+    {
+      "name": "SOUND14.WAV",
+      "source_rate": 11025,
+      "source_frames": 2862,
+      "source_seconds": 0.2595918367346939,
+      "source_sha256": "f6bd098350ad28571427ae7535da76ec13def5a0d24cd33a4259fc93177861bf",
+      "pcm": "SOUND14.PCM",
+      "bytes": 2872,
+      "pcm_sha256": "cd77bc9e88d3db1b28674098765f718cb5e23d932366f4624340d64fdf345353",
+      "rate_register": 29,
+      "actual_rate": 11062.6220703125,
+      "pcm_seconds": 0.2596129544827586,
+      "peak": 128,
+      "referenced_groups": [
+        27
+      ]
+    },
+    {
+      "name": "SOUND16.WAV",
+      "source_rate": 11025,
+      "source_frames": 906,
+      "source_seconds": 0.08217687074829932,
+      "source_sha256": "4552eada8e87c3c6dc448f61749ab10e218d786addf62d3abc6df982bdb4b17e",
+      "pcm": "SOUND16.PCM",
+      "bytes": 909,
+      "pcm_sha256": "8078722f6501109cee2c4fe19f16076858e0cdce4dfc5c2bf4dea15dc9c921d4",
+      "rate_register": 29,
+      "actual_rate": 11062.6220703125,
+      "pcm_seconds": 0.08216858482758621,
+      "peak": 128,
+      "referenced_groups": [
+        28
+      ]
+    },
+    {
+      "name": "SOUND17.WAV",
+      "source_rate": 11025,
+      "source_frames": 1950,
+      "source_seconds": 0.17687074829931973,
+      "source_sha256": "6e3be18204f5ab9874e86b70896012d416057b4c14dda492929539f11d31c990",
+      "pcm": "SOUND17.PCM",
+      "bytes": 1957,
+      "pcm_sha256": "dca1b9471bd941e01c3797703952c21b729a5d2c992b6e00f80678ef093a8460",
+      "rate_register": 29,
+      "actual_rate": 11062.6220703125,
+      "pcm_seconds": 0.1769020027586207,
+      "peak": 127,
+      "referenced_groups": [
+        29
+      ]
+    },
+    {
+      "name": "SOUND18.WAV",
+      "source_rate": 11025,
+      "source_frames": 3845,
+      "source_seconds": 0.3487528344671202,
+      "source_sha256": "12c46563839b43ea562d7ed581b0ee20e8069f3109435ef33a72e24f429e6336",
+      "pcm": "SOUND18.PCM",
+      "bytes": 3858,
+      "pcm_sha256": "645d27bd9a4e80b4440d7fa7072fe17ee8dd92bc2ea35b88bba5851475cecc4d",
+      "rate_register": 29,
+      "actual_rate": 11062.6220703125,
+      "pcm_seconds": 0.3487419144827586,
+      "peak": 128,
+      "referenced_groups": [
+        30
+      ]
+    },
+    {
+      "name": "SOUND19.WAV",
+      "source_rate": 11025,
+      "source_frames": 5089,
+      "source_seconds": 0.4615873015873016,
+      "source_sha256": "297892c4fc6a854675e2243863a7b3f9be9b7ba17cfdf6932deeb6e5a9b78977",
+      "pcm": "SOUND19.PCM",
+      "bytes": 5106,
+      "pcm_sha256": "51b6c016946eaf2e262b797ad7ae5cdd30a623da5c78472739625f5a70333314",
+      "rate_register": 29,
+      "actual_rate": 11062.6220703125,
+      "pcm_seconds": 0.46155422896551723,
+      "peak": 128,
+      "referenced_groups": [
+        31
+      ]
+    },
+    {
+      "name": "SOUND20.WAV",
+      "source_rate": 11025,
+      "source_frames": 8509,
+      "source_seconds": 0.7717913832199547,
+      "source_sha256": "d9967a5ec4104c9e470e02163e07e0f34b313578d302c9a849972f81f328ecfe",
+      "pcm": "SOUND20.PCM",
+      "bytes": 8538,
+      "pcm_sha256": "c6af9ca82b24592327d14ca6f13481709ef8d301071b9393ef6d84ba52617d53",
+      "rate_register": 29,
+      "actual_rate": 11062.6220703125,
+      "pcm_seconds": 0.7717880937931034,
+      "peak": 128,
+      "referenced_groups": [
+        32
+      ]
+    },
+    {
+      "name": "SOUND21.WAV",
+      "source_rate": 11025,
+      "source_frames": 9054,
+      "source_seconds": 0.8212244897959183,
+      "source_sha256": "2029fdff1153308e251d9c12c4eed3904147e3940fd01549814cd9672b849c42",
+      "pcm": "SOUND21.PCM",
+      "bytes": 9085,
+      "pcm_sha256": "dacfcba84d875db4f9f08dec6288179c07ad8fca3648e8cdef3ea3dcdff8e923",
+      "rate_register": 29,
+      "actual_rate": 11062.6220703125,
+      "pcm_seconds": 0.821233875862069,
+      "peak": 128,
+      "referenced_groups": [
+        33
+      ]
+    },
+    {
+      "name": "SOUND22.WAV",
+      "source_rate": 11025,
+      "source_frames": 7235,
+      "source_seconds": 0.6562358276643991,
+      "source_sha256": "1b5b2e369409d2fab0f2bcc38de99b340f6c7f6dc8f40b4103afe57a0dbebb2a",
+      "pcm": "SOUND22.PCM",
+      "bytes": 7260,
+      "pcm_sha256": "48d78d616380a1da9d1a003bd792c99990cdc8a09086e501eaee3baf81bb269f",
+      "rate_register": 29,
+      "actual_rate": 11062.6220703125,
+      "pcm_seconds": 0.6562639448275862,
+      "peak": 128,
+      "referenced_groups": [
+        34
+      ]
+    },
+    {
+      "name": "SOUND24.WAV",
+      "source_rate": 11025,
+      "source_frames": 11966,
+      "source_seconds": 1.0853514739229024,
+      "source_sha256": "501c4ad9d6a8600c3b206c5bbefe5fc0e27eb15cc3f14b767ae57c0bf04a0339",
+      "pcm": "SOUND24.PCM",
+      "bytes": 12007,
+      "pcm_sha256": "35604c07ab08c9b0aacf777aea545383decfbdfab27feac7deb0b860375009ea",
+      "rate_register": 29,
+      "actual_rate": 11062.6220703125,
+      "pcm_seconds": 1.0853665544827586,
+      "peak": 128,
+      "referenced_groups": [
+        35
+      ]
+    },
+    {
+      "name": "SOUND25.WAV",
+      "source_rate": 11025,
+      "source_frames": 25564,
+      "source_seconds": 2.3187301587301588,
+      "source_sha256": "89b018e05246cad3ec1ebd8ce0b33619e45049244f255fa1a9786c3000522d5f",
+      "pcm": "SOUND25.PCM",
+      "bytes": 25651,
+      "pcm_sha256": "6960ef08434c853fa252cec175da910a0b905ef33d5694d3f904889a27c6076f",
+      "rate_register": 29,
+      "actual_rate": 11062.6220703125,
+      "pcm_seconds": 2.3187088772413795,
+      "peak": 128,
+      "referenced_groups": [
+        36
+      ]
+    },
+    {
+      "name": "SOUND26.WAV",
+      "source_rate": 11025,
+      "source_frames": 7166,
+      "source_seconds": 0.6499773242630386,
+      "source_sha256": "1a6fbd0dd59a2a1b60617d6359ba2270e55b0b6b806b16b3997d902edb342091",
+      "pcm": "SOUND26.PCM",
+      "bytes": 7190,
+      "pcm_sha256": "56cff21326eca30ec48f4a4577c1c1f8a8f189b978ccda9900f61d3b540b0963",
+      "rate_register": 29,
+      "actual_rate": 11062.6220703125,
+      "pcm_seconds": 0.6499363310344828,
+      "peak": 94,
+      "referenced_groups": [
+        37
+      ]
+    },
+    {
+      "name": "SOUND27.WAV",
+      "source_rate": 11025,
+      "source_frames": 20102,
+      "source_seconds": 1.8233106575963718,
+      "source_sha256": "a56953cf0ff543930fe3d32787b330ff7339e2f8e93b2fff9389cd6a799439e2",
+      "pcm": "SOUND27.PCM",
+      "bytes": 20171,
+      "pcm_sha256": "90ecad41e30058934a3f548c7a05304211abe2e0d774a46ed49e698c190281ac",
+      "rate_register": 29,
+      "actual_rate": 11062.6220703125,
+      "pcm_seconds": 1.823347111724138,
+      "peak": 128,
+      "referenced_groups": [
+        38
+      ]
+    },
+    {
+      "name": "SOUND28.WAV",
+      "source_rate": 11025,
+      "source_frames": 8510,
+      "source_seconds": 0.7718820861678004,
+      "source_sha256": "75df525487b896b9b54e34280dedaab92de9db32645911efe49fc0d5d2e60c3a",
+      "pcm": "SOUND28.PCM",
+      "bytes": 8539,
+      "pcm_sha256": "ec99e410b871746ca14396c2e4692957fcf26da1de28a1269805ac7592fdcac5",
+      "rate_register": 29,
+      "actual_rate": 11062.6220703125,
+      "pcm_seconds": 0.771878488275862,
+      "peak": 128,
+      "referenced_groups": [
+        39
+      ]
+    },
+    {
+      "name": "SOUND29.WAV",
+      "source_rate": 11025,
+      "source_frames": 10224,
+      "source_seconds": 0.9273469387755102,
+      "source_sha256": "82752afe3c0ff97a44a14537a04dc2b4a3268029c870aa3d6b7c99bd75f4e09e",
+      "pcm": "SOUND29.PCM",
+      "bytes": 10259,
+      "pcm_sha256": "6ffd3f753f5d0a066f534844519ea58ab02e1166b4da144c97bbc3c4f10cc0e1",
+      "rate_register": 29,
+      "actual_rate": 11062.6220703125,
+      "pcm_seconds": 0.9273569986206897,
+      "peak": 128,
+      "referenced_groups": [
+        40
+      ]
+    },
+    {
+      "name": "SOUND30.WAV",
+      "source_rate": 11025,
+      "source_frames": 22430,
+      "source_seconds": 2.034467120181406,
+      "source_sha256": "2dc3ed509cb16722208e430c74aa7aaae5dd9eeab78b8e07ff3d85feec87d2fc",
+      "pcm": "SOUND30.PCM",
+      "bytes": 22507,
+      "pcm_sha256": "a732b38bebc2b309ba23c83c97e167f9469a5679ab7b3c8cd081ffa1af5bde37",
+      "rate_register": 29,
+      "actual_rate": 11062.6220703125,
+      "pcm_seconds": 2.034508623448276,
+      "peak": 128,
+      "referenced_groups": [
+        41
+      ]
+    },
+    {
+      "name": "SOUND34.WAV",
+      "source_rate": 11025,
+      "source_frames": 1380,
+      "source_seconds": 0.1251700680272109,
+      "source_sha256": "7d840d49e32c8d4338ddfafff85f0cc05abc9824f56279a3bbcad1d91dadd73b",
+      "pcm": "SOUND34.PCM",
+      "bytes": 1385,
+      "pcm_sha256": "d8a0f601557228e78fc33b49c4516b54b3d86cc19b55e79bb7f68ab2f70a1d9b",
+      "rate_register": 29,
+      "actual_rate": 11062.6220703125,
+      "pcm_seconds": 0.12519635862068965,
+      "peak": 128,
+      "referenced_groups": [
+        42
+      ]
+    },
+    {
+      "name": "SOUND35.WAV",
+      "source_rate": 11025,
+      "source_frames": 19358,
+      "source_seconds": 1.7558276643990929,
+      "source_sha256": "53d3a97f9f0fe2573dab3dfb5d8272d8c4479c1a2b08ab3d228fdfc0bc0c67ec",
+      "pcm": "SOUND35.PCM",
+      "bytes": 19424,
+      "pcm_sha256": "f5d1aefc07501b2677d15aacb1a13bca7ab5540b9698b56b24db1e343c05b129",
+      "rate_register": 29,
+      "actual_rate": 11062.6220703125,
+      "pcm_seconds": 1.7558224331034482,
+      "peak": 128,
+      "referenced_groups": [
+        43
+      ]
+    },
+    {
+      "name": "SOUND36.WAV",
+      "source_rate": 11025,
+      "source_frames": 33707,
+      "source_seconds": 3.0573242630385487,
+      "source_sha256": "95b24b62d7e99e92227a41808b9d4489e82cad0a13d93d1d89458aea837fa81f",
+      "pcm": "SOUND36.PCM",
+      "bytes": 33822,
+      "pcm_sha256": "a1f3a106985602aab993350243ac8e4f0aa592f5bee4c1ee9dbdf2173f0ebe1b",
+      "rate_register": 29,
+      "actual_rate": 11062.6220703125,
+      "pcm_seconds": 3.057322195862069,
+      "peak": 128,
+      "referenced_groups": [
+        44
+      ]
+    },
+    {
+      "name": "SOUND38.WAV",
+      "source_rate": 11025,
+      "source_frames": 12884,
+      "source_seconds": 1.1686167800453515,
+      "source_sha256": "ee9b2af62332f4c3cee322305a71514f4d1fb9e27934c59fe14f1df02d9c5cae",
+      "pcm": "SOUND38.PCM",
+      "bytes": 12928,
+      "pcm_sha256": "802ff21c554cb90e1b5a75215485af085bc23e5c4cac715d7dc39da600658f43",
+      "rate_register": 29,
+      "actual_rate": 11062.6220703125,
+      "pcm_seconds": 1.1686198731034483,
+      "peak": 128,
+      "referenced_groups": [
+        46
+      ]
+    },
+    {
+      "name": "SOUND39.WAV",
+      "source_rate": 11025,
+      "source_frames": 28141,
+      "source_seconds": 2.552471655328798,
+      "source_sha256": "f179ef987a8f1046e039853a70736a321b99806d9313ca1eb9545be8600fe140",
+      "pcm": "SOUND39.PCM",
+      "bytes": 28237,
+      "pcm_sha256": "6026231611fc993a8bd1be508feab5dac9f0dfe3f72c0252d87596843729bcde",
+      "rate_register": 29,
+      "actual_rate": 11062.6220703125,
+      "pcm_seconds": 2.5524690096551725,
+      "peak": 127,
+      "referenced_groups": [
+        47
+      ]
+    },
+    {
+      "name": "SOUND42.WAV",
+      "source_rate": 11025,
+      "source_frames": 28999,
+      "source_seconds": 2.630294784580499,
+      "source_sha256": "7c4b053ed4b725d1ac4cf4e78fcc196a00d759f1cfb9fbb77d321e9e9c208ff9",
+      "pcm": "SOUND42.PCM",
+      "bytes": 29098,
+      "pcm_sha256": "ca13333b217cdcb9b0241a2c6fd2d113fb94170b3dda7230b0eda2f695ef009c",
+      "rate_register": 29,
+      "actual_rate": 11062.6220703125,
+      "pcm_seconds": 2.630298659310345,
+      "peak": 128,
+      "referenced_groups": []
+    },
+    {
+      "name": "SOUND43.WAV",
+      "source_rate": 11025,
+      "source_frames": 22656,
+      "source_seconds": 2.0549659863945577,
+      "source_sha256": "1c194db61e7d19febf3f714cdfed0253d5f5d10ebca43c6d6afc974d33e5f8e4",
+      "pcm": "SOUND43.PCM",
+      "bytes": 22733,
+      "pcm_sha256": "ec8a81a23c5074a51f8a87eef85e810807bb52aebf088ae0fb04c313ae92cd96",
+      "rate_register": 29,
+      "actual_rate": 11062.6220703125,
+      "pcm_seconds": 2.054937776551724,
+      "peak": 128,
+      "referenced_groups": [
+        48
+      ]
+    },
+    {
+      "name": "SOUND45.WAV",
+      "source_rate": 11025,
+      "source_frames": 9630,
+      "source_seconds": 0.8734693877551021,
+      "source_sha256": "260bb8f813f271f4b1dbc0abbe20b8a23fbc8d710047609e94ef9d3665591aac",
+      "pcm": "SOUND45.PCM",
+      "bytes": 9663,
+      "pcm_sha256": "9ca90703705e71a9cf53c5f017d7a78f1bd55f7d4ec44ba022d4c8bfd4ed8ded",
+      "rate_register": 29,
+      "actual_rate": 11062.6220703125,
+      "pcm_seconds": 0.8734818868965517,
+      "peak": 128,
+      "referenced_groups": [
+        50
+      ]
+    },
+    {
+      "name": "SOUND49.WAV",
+      "source_rate": 11025,
+      "source_frames": 1736,
+      "source_seconds": 0.15746031746031747,
+      "source_sha256": "45e9471c6bee296f231de1645c5c538b58493110c9aa9a28c7ffe01ca3f95019",
+      "pcm": "SOUND49.PCM",
+      "bytes": 1742,
+      "pcm_sha256": "2caaba5e935b82a8e9167d6192d554e998f50e1c8bf39b1505afeb0485799940",
+      "rate_register": 29,
+      "actual_rate": 11062.6220703125,
+      "pcm_seconds": 0.15746718896551723,
+      "peak": 127,
+      "referenced_groups": [
+        51
+      ]
+    },
+    {
+      "name": "SOUND49D.WAV",
+      "source_rate": 11025,
+      "source_frames": 3189,
+      "source_seconds": 0.2892517006802721,
+      "source_sha256": "0d43ac8a5991e426b3cbb7b95893bd05e59b2df8054d16cab0530b26195302a8",
+      "pcm": "SOUND49D.PCM",
+      "bytes": 3200,
+      "pcm_sha256": "299311329b6c9ae7e38502e3cc96a469205a9432b43f57ba8039945c0eda56f0",
+      "rate_register": 29,
+      "actual_rate": 11062.6220703125,
+      "pcm_seconds": 0.2892623448275862,
+      "peak": 128,
+      "referenced_groups": [
+        52
+      ]
+    },
+    {
+      "name": "SOUND50.WAV",
+      "source_rate": 11025,
+      "source_frames": 11934,
+      "source_seconds": 1.0824489795918368,
+      "source_sha256": "4f20e2a9926e0422e970d080bb87631d961993e8080e725d47cb561679191ac9",
+      "pcm": "SOUND50.PCM",
+      "bytes": 11975,
+      "pcm_sha256": "35570d66ed8452afcc92614f903d64dec85e9656538db082e53f05937d33ff92",
+      "rate_register": 29,
+      "actual_rate": 11062.6220703125,
+      "pcm_seconds": 1.0824739310344829,
+      "peak": 128,
+      "referenced_groups": [
+        53
+      ]
+    },
+    {
+      "name": "SOUND53.WAV",
+      "source_rate": 11025,
+      "source_frames": 8838,
+      "source_seconds": 0.8016326530612244,
+      "source_sha256": "d6ec9cf630b991d4a8b5a4065d6bf6688f051db0365d41d7598c1089a37ba26b",
+      "pcm": "SOUND53.PCM",
+      "bytes": 8868,
+      "pcm_sha256": "50346f9b3be4e3ea10cf3338760281125273569e0a34ab93adfb402724eb66a9",
+      "rate_register": 29,
+      "actual_rate": 11062.6220703125,
+      "pcm_seconds": 0.8016182731034482,
+      "peak": 102,
+      "referenced_groups": []
+    },
+    {
+      "name": "SOUND54.WAV",
+      "source_rate": 11025,
+      "source_frames": 18110,
+      "source_seconds": 1.6426303854875284,
+      "source_sha256": "e622e340fc0e41e1d05223e06cc59765aa1ccaf0956eb9c320a4f43d07d75965",
+      "pcm": "SOUND54.PCM",
+      "bytes": 18172,
+      "pcm_sha256": "7e09c17e9e1d6ed21f88cae6fe423502fb3f294919a637c87c1c72c2ee6c15da",
+      "rate_register": 29,
+      "actual_rate": 11062.6220703125,
+      "pcm_seconds": 1.6426485406896552,
+      "peak": 128,
+      "referenced_groups": [
+        55
+      ]
+    },
+    {
+      "name": "SOUND55.WAV",
+      "source_rate": 11025,
+      "source_frames": 21749,
+      "source_seconds": 1.9726984126984126,
+      "source_sha256": "5e88cbd94dc5089703b76fddb5fbfe5dae9a01f353f73e7cc942486733c27414",
+      "pcm": "SOUND55.PCM",
+      "bytes": 21823,
+      "pcm_sha256": "ef29f0713f382c7b703c11e053194d3a4bd4ac9292cd9e0c1dcddd073adb51a9",
+      "rate_register": 29,
+      "actual_rate": 11062.6220703125,
+      "pcm_seconds": 1.9726787972413793,
+      "peak": 128,
+      "referenced_groups": [
+        56
+      ]
+    },
+    {
+      "name": "SOUND57.WAV",
+      "source_rate": 11025,
+      "source_frames": 30361,
+      "source_seconds": 2.753832199546485,
+      "source_sha256": "39ea0686bab814af4a5948a324d572510cfa44e6cad0864ad8f2b8374cd811b4",
+      "pcm": "SOUND57.PCM",
+      "bytes": 30465,
+      "pcm_sha256": "98db356ef54e822e2e33e98506270fd4b25c83793024154c8b1191f04079d8ea",
+      "rate_register": 29,
+      "actual_rate": 11062.6220703125,
+      "pcm_seconds": 2.7538679172413794,
+      "peak": 128,
+      "referenced_groups": [
+        57
+      ]
+    },
+    {
+      "name": "SOUND58.WAV",
+      "source_rate": 11025,
+      "source_frames": 3194,
+      "source_seconds": 0.2897052154195011,
+      "source_sha256": "0bfe131b571e699e3664ca1e81041d6034a99526e1b7a1b6295ced21345c16e3",
+      "pcm": "SOUND58.PCM",
+      "bytes": 3205,
+      "pcm_sha256": "88a440f2f39f690f1eee11f855dbbc1290435000765659cc9dcdee7f70685bbb",
+      "rate_register": 29,
+      "actual_rate": 11062.6220703125,
+      "pcm_seconds": 0.2897143172413793,
+      "peak": 103,
+      "referenced_groups": []
+    },
+    {
+      "name": "SOUND65.WAV",
+      "source_rate": 11025,
+      "source_frames": 17491,
+      "source_seconds": 1.586485260770975,
+      "source_sha256": "3e99e9254694893ae78728c6a8a55c5f435600480ed402c82240f67881f6443a",
+      "pcm": "SOUND65.PCM",
+      "bytes": 17551,
+      "pcm_sha256": "51605d99e6f25d2b4f1f64b080afcad061602ba3ceb5df942a010187544de516",
+      "rate_register": 29,
+      "actual_rate": 11062.6220703125,
+      "pcm_seconds": 1.5865135668965518,
+      "peak": 105,
+      "referenced_groups": []
+    },
+    {
+      "name": "SOUND68.WAV",
+      "source_rate": 11025,
+      "source_frames": 32238,
+      "source_seconds": 2.924081632653061,
+      "source_sha256": "a2e556a065b7a6ec4ff18d78cc750c1bf043678d4e0afe184033472c5598f146",
+      "pcm": "SOUND68.PCM",
+      "bytes": 32348,
+      "pcm_sha256": "b8ce449ecc70a9f0f348c6d0e0cdfd72435c9130a5e42c79c863587702e9d14e",
+      "rate_register": 29,
+      "actual_rate": 11062.6220703125,
+      "pcm_seconds": 2.924080728275862,
+      "peak": 85,
+      "referenced_groups": []
+    },
+    {
+      "name": "SOUND104.WAV",
+      "source_rate": 11025,
+      "source_frames": 1086,
+      "source_seconds": 0.09850340136054422,
+      "source_sha256": "f38173fe132752208196194c4a37390f7ba0024ca0e69e38c49b3f1546550c06",
+      "pcm": "SOUND104.PCM",
+      "bytes": 1090,
+      "pcm_sha256": "de0103228a182b1974f6cf0f619d0c98c08f5aad774cb891a10de04cb1e6b9fa",
+      "rate_register": 29,
+      "actual_rate": 11062.6220703125,
+      "pcm_seconds": 0.09852998620689656,
+      "peak": 121,
+      "referenced_groups": [
+        60
+      ]
+    },
+    {
+      "name": "SOUND105.WAV",
+      "source_rate": 11025,
+      "source_frames": 1828,
+      "source_seconds": 0.16580498866213153,
+      "source_sha256": "61f8dcdba2b0313b078db1982cbc2f7763c5c5287a796341644d87fb5515a051",
+      "pcm": "SOUND105.PCM",
+      "bytes": 1834,
+      "pcm_sha256": "5f0e42c9e52a2c5e59987f76ac4ca9e69f2777da898d15a1fb7c173db1426d21",
+      "rate_register": 29,
+      "actual_rate": 11062.6220703125,
+      "pcm_seconds": 0.16578348137931034,
+      "peak": 128,
+      "referenced_groups": [
+        61
+      ]
+    },
+    {
+      "name": "SOUND108.WAV",
+      "source_rate": 11025,
+      "source_frames": 7498,
+      "source_seconds": 0.6800907029478458,
+      "source_sha256": "b5c15daa4ddb807c193fdd3c52e8d0a14afdbcaf51a6e7bafa999f76df027d76",
+      "pcm": "SOUND108.PCM",
+      "bytes": 7524,
+      "pcm_sha256": "d2c9cece7c35047b8e86711f5abf1b056d9d54aa47acee5baf3b1e56782e6fe8",
+      "rate_register": 29,
+      "actual_rate": 11062.6220703125,
+      "pcm_seconds": 0.680128088275862,
+      "peak": 120,
+      "referenced_groups": [
+        62
+      ]
+    },
+    {
+      "name": "SOUND111.WAV",
+      "source_rate": 11025,
+      "source_frames": 705,
+      "source_seconds": 0.06394557823129252,
+      "source_sha256": "0fb48d73a1dd8070388f11410d8844eb570507f19d0c5d6108176664844f1cb2",
+      "pcm": "SOUND111.PCM",
+      "bytes": 707,
+      "pcm_sha256": "86d2f9b7352e326df6f41f708cf8c72e5937994d979ec2f6adb4d1df34444c17",
+      "rate_register": 29,
+      "actual_rate": 11062.6220703125,
+      "pcm_seconds": 0.06390889931034482,
+      "peak": 29,
+      "referenced_groups": [
+        63
+      ]
+    },
+    {
+      "name": "SOUND112.WAV",
+      "source_rate": 11025,
+      "source_frames": 640,
+      "source_seconds": 0.058049886621315196,
+      "source_sha256": "0ebb658081295dd5421fbcb9d8418786bf0566a0393e1dc78a0cf82205bb0af3",
+      "pcm": "SOUND112.PCM",
+      "bytes": 642,
+      "pcm_sha256": "f8377548dcf055baf4b82a49cb7d79f5a2f1365f1494e4503c58670cf49c0343",
+      "rate_register": 29,
+      "actual_rate": 11062.6220703125,
+      "pcm_seconds": 0.05803325793103448,
+      "peak": 18,
+      "referenced_groups": []
+    },
+    {
+      "name": "SOUND131.WAV",
+      "source_rate": 11025,
+      "source_frames": 1150,
+      "source_seconds": 0.10430839002267574,
+      "source_sha256": "74b86b262c3dbb8e366d859786f434eb603ae20a3c5098187effb03a41c5e6de",
+      "pcm": "SOUND131.PCM",
+      "bytes": 1154,
+      "pcm_sha256": "a8278e27c327e8c789708bc828109022cfb6c28584ce2962c743877b93891609",
+      "rate_register": 29,
+      "actual_rate": 11062.6220703125,
+      "pcm_seconds": 0.10431523310344827,
+      "peak": 128,
+      "referenced_groups": [
+        64
+      ]
+    },
+    {
+      "name": "SOUND136.WAV",
+      "source_rate": 11025,
+      "source_frames": 19098,
+      "source_seconds": 1.7322448979591836,
+      "source_sha256": "b734733533d4b0179d9c3cc2d14449d33576e9ef11ca419391a9c44dee6d5c20",
+      "pcm": "SOUND136.PCM",
+      "bytes": 19163,
+      "pcm_sha256": "5dfccfae85c2732eacab7ab32e6ce2f36f3f19040b8eb4e1c5f1d7db8a6bcd86",
+      "rate_register": 29,
+      "actual_rate": 11062.6220703125,
+      "pcm_seconds": 1.7322294731034482,
+      "peak": 114,
+      "referenced_groups": []
+    },
+    {
+      "name": "SOUND181.WAV",
+      "source_rate": 11025,
+      "source_frames": 27262,
+      "source_seconds": 2.4727437641723355,
+      "source_sha256": "26fec6a697974a63d7c61afb56a9f5fdbdb416e100e093d9c344c17f6299345e",
+      "pcm": "SOUND181.PCM",
+      "bytes": 27355,
+      "pcm_sha256": "6cc61426b0778cfc78064ca15972a97e28097943e48ebdf603f9d0356183d781",
+      "rate_register": 29,
+      "actual_rate": 11062.6220703125,
+      "pcm_seconds": 2.472741075862069,
+      "peak": 123,
+      "referenced_groups": []
+    },
+    {
+      "name": "SOUND240.WAV",
+      "source_rate": 11025,
+      "source_frames": 14415,
+      "source_seconds": 1.307482993197279,
+      "source_sha256": "9f23780634d86c4e5d4fa24a369c1ad674112a55013c705a540350f3b70d36f9",
+      "pcm": "SOUND240.PCM",
+      "bytes": 14464,
+      "pcm_sha256": "a67d320168860e3c1ad927032418185dc776407e727424eeb92aeab69950eda0",
+      "rate_register": 29,
+      "actual_rate": 11062.6220703125,
+      "pcm_seconds": 1.3074657986206897,
+      "peak": 113,
+      "referenced_groups": []
+    },
+    {
+      "name": "SOUND243.WAV",
+      "source_rate": 11025,
+      "source_frames": 20528,
+      "source_seconds": 1.8619501133786849,
+      "source_sha256": "49998ec981bb7c20d2b299cfc99af3f43113d3464d6b9245091bee3b69528d4e",
+      "pcm": "SOUND243.PCM",
+      "bytes": 20598,
+      "pcm_sha256": "005a5dfb099efd47c4687f618635c536b29a485f7821a806f788d8b2fa734ddc",
+      "rate_register": 29,
+      "actual_rate": 11062.6220703125,
+      "pcm_seconds": 1.861945555862069,
+      "peak": 64,
+      "referenced_groups": []
+    },
+    {
+      "name": "SOUND528.WAV",
+      "source_rate": 11025,
+      "source_frames": 8748,
+      "source_seconds": 0.793469387755102,
+      "source_sha256": "047f84940741466d7e322651a73dc237a82bd15df99a5dca11bb5394c5dea138",
+      "pcm": "SOUND528.PCM",
+      "bytes": 8778,
+      "pcm_sha256": "1446d79d26032c8c768946497c29806973d2a489a2b6688f48c4c47a7478e428",
+      "rate_register": 29,
+      "actual_rate": 11062.6220703125,
+      "pcm_seconds": 0.7934827696551724,
+      "peak": 118,
+      "referenced_groups": []
+    },
+    {
+      "name": "SOUND560.WAV",
+      "source_rate": 11025,
+      "source_frames": 28806,
+      "source_seconds": 2.6127891156462586,
+      "source_sha256": "b58eb770edd2d79984cb2969a5de8e5c06a3b743c7da5b7ce0a30ba88679f157",
+      "pcm": "SOUND560.PCM",
+      "bytes": 28904,
+      "pcm_sha256": "27222279fe8146d9616529c2c601866fda3d31c0778371672c6d36f5abf64522",
+      "rate_register": 29,
+      "actual_rate": 11062.6220703125,
+      "pcm_seconds": 2.6127621296551724,
+      "peak": 115,
+      "referenced_groups": []
+    },
+    {
+      "name": "SOUND563.WAV",
+      "source_rate": 11025,
+      "source_frames": 23993,
+      "source_seconds": 2.176235827664399,
+      "source_sha256": "19cd370a9f58fa01761ca1e45fae4901055c62ad9d7563642df5c483a2872a9a",
+      "pcm": "SOUND563.PCM",
+      "bytes": 24075,
+      "pcm_sha256": "5f1b146e2b99b64ddbd523be1aed5734fe76be5e2092c58187eba1b43f8359a1",
+      "rate_register": 29,
+      "actual_rate": 11062.6220703125,
+      "pcm_seconds": 2.176247172413793,
+      "peak": 107,
+      "referenced_groups": []
+    },
+    {
+      "name": "SOUND713.WAV",
+      "source_rate": 11025,
+      "source_frames": 14394,
+      "source_seconds": 1.305578231292517,
+      "source_sha256": "292605cfdf32af50de7179aca4ca3b89ba7d576278b22ebd7b43b38d372bc81c",
+      "pcm": "SOUND713.PCM",
+      "bytes": 14443,
+      "pcm_sha256": "9ec1b98a5314c54646820784685bcd79d0bdcbecc5a44bd39ea107b23182135b",
+      "rate_register": 29,
+      "actual_rate": 11062.6220703125,
+      "pcm_seconds": 1.3055675144827585,
+      "peak": 126,
+      "referenced_groups": []
+    },
+    {
+      "name": "SOUND735.WAV",
+      "source_rate": 11025,
+      "source_frames": 27074,
+      "source_seconds": 2.455691609977324,
+      "source_sha256": "818a768c131235701b66c73f7c18bad23f5ae67e66adfe1b3d39818d6107ba4e",
+      "pcm": "SOUND735.PCM",
+      "bytes": 27166,
+      "pcm_sha256": "9bef44495bfd731ba86814d56b97a20b1587541bf98e9b0ed1ce3e8a63aa4d1a",
+      "rate_register": 29,
+      "actual_rate": 11062.6220703125,
+      "pcm_seconds": 2.45565651862069,
+      "peak": 87,
+      "referenced_groups": []
+    },
+    {
+      "name": "SOUND827.WAV",
+      "source_rate": 11025,
+      "source_frames": 47046,
+      "source_seconds": 4.267210884353742,
+      "source_sha256": "551b9e899cd45c0ad8401e48c714bf2ab749a733b2964e9a701b613e6694aa95",
+      "pcm": "SOUND827.PCM",
+      "bytes": 47207,
+      "pcm_sha256": "63147e2fe2fa5a94ba75c7f5b15470c6a156766df907aca3bc9574db9a7a76da",
+      "rate_register": 29,
+      "actual_rate": 11062.6220703125,
+      "pcm_seconds": 4.267252347586207,
+      "peak": 116,
+      "referenced_groups": []
+    },
+    {
+      "name": "SOUND999.WAV",
+      "source_rate": 11025,
+      "source_frames": 6653,
+      "source_seconds": 0.6034467120181406,
+      "source_sha256": "d8e4b015f88edff148d97e96887a2ebeb117ac6fb788e6fd896199379eed75a6",
+      "pcm": "SOUND999.PCM",
+      "bytes": 6676,
+      "pcm_sha256": "36826a167b7f63702c35cd49e2f80ae177e1d52afc7b19dd4d5eba0519732e08",
+      "rate_register": 29,
+      "actual_rate": 11062.6220703125,
+      "pcm_seconds": 0.6034735668965517,
+      "peak": 128,
+      "referenced_groups": []
+    }
+  ],
+  "component_references": [
+    {
+      "component_group": 65,
+      "name": "soundwave3",
+      "sounds": {
+        "sound4": {
+          "group": 20,
+          "wav": "SOUND3.WAV",
+          "source_group": 65,
+          "field": 1100
+        }
+      }
+    },
+    {
+      "component_group": 66,
+      "name": "soundwave7",
+      "sounds": {
+        "sound4": {
+          "group": 23,
+          "wav": "SOUND7.WAV",
+          "source_group": 66,
+          "field": 1100
+        }
+      }
+    },
+    {
+      "component_group": 67,
+      "name": "soundwave8",
+      "sounds": {
+        "sound4": {
+          "group": 24,
+          "wav": "SOUND8.WAV",
+          "source_group": 67,
+          "field": 1100
+        }
+      }
+    },
+    {
+      "component_group": 68,
+      "name": "soundwave9",
+      "sounds": {
+        "sound4": {
+          "group": 25,
+          "wav": "SOUND9.WAV",
+          "source_group": 68,
+          "field": 1100
+        }
+      }
+    },
+    {
+      "component_group": 69,
+      "name": "soundwave10",
+      "sounds": {
+        "sound4": {
+          "group": 55,
+          "wav": "SOUND54.WAV",
+          "source_group": 69,
+          "field": 1100
+        }
+      }
+    },
+    {
+      "component_group": 70,
+      "name": "soundwave14",
+      "sounds": {
+        "sound4": {
+          "group": 27,
+          "wav": "SOUND14.WAV",
+          "source_group": 70,
+          "field": 1100
+        }
+      }
+    },
+    {
+      "component_group": 71,
+      "name": "soundwave21",
+      "sounds": {
+        "sound4": {
+          "group": 33,
+          "wav": "SOUND21.WAV",
+          "source_group": 71,
+          "field": 1100
+        }
+      }
+    },
+    {
+      "component_group": 72,
+      "name": "soundwave23",
+      "sounds": {
+        "sound4": {
+          "group": 31,
+          "wav": "SOUND19.WAV",
+          "source_group": 72,
+          "field": 1100
+        }
+      }
+    },
+    {
+      "component_group": 73,
+      "name": "soundwave24",
+      "sounds": {
+        "sound4": {
+          "group": 35,
+          "wav": "SOUND24.WAV",
+          "source_group": 73,
+          "field": 1100
+        }
+      }
+    },
+    {
+      "component_group": 74,
+      "name": "soundwave25",
+      "sounds": {
+        "sound4": {
+          "group": 36,
+          "wav": "SOUND25.WAV",
+          "source_group": 74,
+          "field": 1100
+        }
+      }
+    },
+    {
+      "component_group": 75,
+      "name": "soundwave26",
+      "sounds": {
+        "sound4": {
+          "group": 37,
+          "wav": "SOUND26.WAV",
+          "source_group": 75,
+          "field": 1100
+        }
+      }
+    },
+    {
+      "component_group": 76,
+      "name": "soundwave27",
+      "sounds": {
+        "sound4": {
+          "group": 38,
+          "wav": "SOUND27.WAV",
+          "source_group": 76,
+          "field": 1100
+        }
+      }
+    },
+    {
+      "component_group": 77,
+      "name": "soundwave28",
+      "sounds": {
+        "sound4": {
+          "group": 39,
+          "wav": "SOUND28.WAV",
+          "source_group": 77,
+          "field": 1100
+        }
+      }
+    },
+    {
+      "component_group": 78,
+      "name": "soundwave30",
+      "sounds": {
+        "sound4": {
+          "group": 41,
+          "wav": "SOUND30.WAV",
+          "source_group": 78,
+          "field": 1100
+        }
+      }
+    },
+    {
+      "component_group": 79,
+      "name": "soundwave35",
+      "sounds": {
+        "sound4": {
+          "group": 43,
+          "wav": "SOUND35.WAV",
+          "source_group": 79,
+          "field": 1100
+        }
+      }
+    },
+    {
+      "component_group": 80,
+      "name": "soundwave36",
+      "sounds": {
+        "sound4": {
+          "group": 44,
+          "wav": "SOUND36.WAV",
+          "source_group": 80,
+          "field": 1100
+        }
+      }
+    },
+    {
+      "component_group": 81,
+      "name": "soundwave37",
+      "sounds": {
+        "sound4": {
+          "group": 45,
+          "wav": "SOUND37.WAV",
+          "source_group": 81,
+          "field": 1100
+        }
+      }
+    },
+    {
+      "component_group": 82,
+      "name": "soundwave38",
+      "sounds": {
+        "sound4": {
+          "group": 46,
+          "wav": "SOUND38.WAV",
+          "source_group": 82,
+          "field": 1100
+        }
+      }
+    },
+    {
+      "component_group": 83,
+      "name": "soundwave39",
+      "sounds": {
+        "sound4": {
+          "group": 47,
+          "wav": "SOUND39.WAV",
+          "source_group": 83,
+          "field": 1100
+        }
+      }
+    },
+    {
+      "component_group": 84,
+      "name": "soundwave40",
+      "sounds": {
+        "sound4": {
+          "group": 32,
+          "wav": "SOUND20.WAV",
+          "source_group": 84,
+          "field": 1100
+        }
+      }
+    },
+    {
+      "component_group": 85,
+      "name": "soundwave41",
+      "sounds": {
+        "sound4": {
+          "group": 40,
+          "wav": "SOUND29.WAV",
+          "source_group": 85,
+          "field": 1100
+        }
+      }
+    },
+    {
+      "component_group": 86,
+      "name": "soundwave44",
+      "sounds": {
+        "sound4": {
+          "group": 49,
+          "wav": "SOUND44.WAV",
+          "source_group": 86,
+          "field": 1100
+        }
+      }
+    },
+    {
+      "component_group": 87,
+      "name": "soundwave45",
+      "sounds": {
+        "sound4": {
+          "group": 50,
+          "wav": "SOUND45.WAV",
+          "source_group": 87,
+          "field": 1100
+        }
+      }
+    },
+    {
+      "component_group": 88,
+      "name": "soundwave46",
+      "sounds": {
+        "sound4": {
+          "group": 50,
+          "wav": "SOUND45.WAV",
+          "source_group": 88,
+          "field": 1100
+        }
+      }
+    },
+    {
+      "component_group": 89,
+      "name": "soundwave47",
+      "sounds": {
+        "sound4": {
+          "group": 50,
+          "wav": "SOUND45.WAV",
+          "source_group": 89,
+          "field": 1100
+        }
+      }
+    },
+    {
+      "component_group": 90,
+      "name": "soundwave48",
+      "sounds": {
+        "sound4": {
+          "group": 50,
+          "wav": "SOUND45.WAV",
+          "source_group": 90,
+          "field": 1100
+        }
+      }
+    },
+    {
+      "component_group": 91,
+      "name": "soundwave49D",
+      "sounds": {
+        "sound4": {
+          "group": 52,
+          "wav": "SOUND49D.WAV",
+          "source_group": 91,
+          "field": 1100
+        }
+      }
+    },
+    {
+      "component_group": 92,
+      "name": "soundwave50",
+      "sounds": {
+        "sound4": {
+          "group": 53,
+          "wav": "SOUND50.WAV",
+          "source_group": 92,
+          "field": 1100
+        }
+      }
+    },
+    {
+      "component_group": 93,
+      "name": "soundwave59",
+      "sounds": {
+        "sound4": {
+          "group": 58,
+          "wav": "SOUND59.WAV",
+          "source_group": 93,
+          "field": 1100
+        }
+      }
+    },
+    {
+      "component_group": 94,
+      "name": "soundwave52",
+      "sounds": {
+        "sound4": {
+          "group": 54,
+          "wav": "SOUND52.WAV",
+          "source_group": 94,
+          "field": 1100
+        }
+      }
+    },
+    {
+      "component_group": 107,
+      "name": "table",
+      "sounds": {
+        "sound4": {
+          "group": 18,
+          "wav": "SOUND1.WAV",
+          "source_group": 107,
+          "field": 1100
+        },
+        "sound3": {
+          "group": 19,
+          "wav": "SOUND2.WAV",
+          "source_group": 107,
+          "field": 1101
+        },
+        "hard_hit": {
+          "group": 62,
+          "wav": "SOUND108.WAV",
+          "source_group": 107,
+          "field": 406
+        }
+      }
+    },
+    {
+      "component_group": 338,
+      "name": "v_sink1",
+      "sounds": {
+        "sound4": {
+          "group": 48,
+          "wav": "SOUND43.WAV",
+          "source_group": 338,
+          "field": 1100
+        },
+        "sound3": {
+          "group": 48,
+          "wav": "SOUND43.WAV",
+          "source_group": 338,
+          "field": 1101
+        }
+      }
+    },
+    {
+      "component_group": 340,
+      "name": "v_sink2",
+      "sounds": {
+        "sound4": {
+          "group": 48,
+          "wav": "SOUND43.WAV",
+          "source_group": 340,
+          "field": 1100
+        },
+        "sound3": {
+          "group": 48,
+          "wav": "SOUND43.WAV",
+          "source_group": 340,
+          "field": 1101
+        }
+      }
+    },
+    {
+      "component_group": 342,
+      "name": "v_sink3",
+      "sounds": {
+        "sound4": {
+          "group": 48,
+          "wav": "SOUND43.WAV",
+          "source_group": 342,
+          "field": 1100
+        },
+        "sound3": {
+          "group": 48,
+          "wav": "SOUND43.WAV",
+          "source_group": 342,
+          "field": 1101
+        }
+      }
+    },
+    {
+      "component_group": 344,
+      "name": "v_sink7",
+      "sounds": {
+        "sound4": {
+          "group": 48,
+          "wav": "SOUND43.WAV",
+          "source_group": 344,
+          "field": 1100
+        },
+        "sound3": {
+          "group": 48,
+          "wav": "SOUND43.WAV",
+          "source_group": 344,
+          "field": 1101
+        }
+      }
+    },
+    {
+      "component_group": 349,
+      "name": "s_onewy9",
+      "sounds": {
+        "soft_hit": {
+          "group": 63,
+          "wav": "SOUND111.WAV",
+          "source_group": 349,
+          "field": 304
+        }
+      }
+    },
+    {
+      "component_group": 350,
+      "name": "s_onewy10",
+      "sounds": {
+        "soft_hit": {
+          "group": 63,
+          "wav": "SOUND111.WAV",
+          "source_group": 350,
+          "field": 304
+        }
+      }
+    },
+    {
+      "component_group": 355,
+      "name": "a_flip1",
+      "sounds": {
+        "sound4": {
+          "group": 60,
+          "wav": "SOUND104.WAV",
+          "source_group": 355,
+          "field": 1100
+        },
+        "sound3": {
+          "group": 61,
+          "wav": "SOUND105.WAV",
+          "source_group": 355,
+          "field": 1101
+        }
+      }
+    },
+    {
+      "component_group": 363,
+      "name": "a_flip2",
+      "sounds": {
+        "sound4": {
+          "group": 60,
+          "wav": "SOUND104.WAV",
+          "source_group": 363,
+          "field": 1100
+        },
+        "sound3": {
+          "group": 61,
+          "wav": "SOUND105.WAV",
+          "source_group": 363,
+          "field": 1101
+        }
+      }
+    },
+    {
+      "component_group": 372,
+      "name": "a_bump1",
+      "sounds": {
+        "hard_hit": {
+          "group": 26,
+          "wav": "SOUND12.WAV",
+          "source_group": 371,
+          "field": 406
+        },
+        "sound4": {
+          "group": 26,
+          "wav": "SOUND12.WAV",
+          "source_group": 372,
+          "field": 1100
+        },
+        "sound3": {
+          "group": 26,
+          "wav": "SOUND12.WAV",
+          "source_group": 372,
+          "field": 1101
+        }
+      }
+    },
+    {
+      "component_group": 380,
+      "name": "a_bump2",
+      "sounds": {
+        "hard_hit": {
+          "group": 26,
+          "wav": "SOUND12.WAV",
+          "source_group": 371,
+          "field": 406
+        }
+      }
+    },
+    {
+      "component_group": 388,
+      "name": "a_bump3",
+      "sounds": {
+        "hard_hit": {
+          "group": 26,
+          "wav": "SOUND12.WAV",
+          "source_group": 371,
+          "field": 406
+        }
+      }
+    },
+    {
+      "component_group": 396,
+      "name": "a_bump4",
+      "sounds": {
+        "hard_hit": {
+          "group": 26,
+          "wav": "SOUND12.WAV",
+          "source_group": 371,
+          "field": 406
+        }
+      }
+    },
+    {
+      "component_group": 405,
+      "name": "a_bump5",
+      "sounds": {
+        "hard_hit": {
+          "group": 26,
+          "wav": "SOUND12.WAV",
+          "source_group": 404,
+          "field": 406
+        },
+        "sound4": {
+          "group": 26,
+          "wav": "SOUND12.WAV",
+          "source_group": 405,
+          "field": 1100
+        },
+        "sound3": {
+          "group": 26,
+          "wav": "SOUND12.WAV",
+          "source_group": 405,
+          "field": 1101
+        }
+      }
+    },
+    {
+      "component_group": 413,
+      "name": "a_bump6",
+      "sounds": {
+        "hard_hit": {
+          "group": 26,
+          "wav": "SOUND12.WAV",
+          "source_group": 404,
+          "field": 406
+        }
+      }
+    },
+    {
+      "component_group": 421,
+      "name": "a_bump7",
+      "sounds": {
+        "hard_hit": {
+          "group": 26,
+          "wav": "SOUND12.WAV",
+          "source_group": 404,
+          "field": 406
+        }
+      }
+    },
+    {
+      "component_group": 432,
+      "name": "a_targ1",
+      "sounds": {
+        "hard_hit": {
+          "group": 51,
+          "wav": "SOUND49.WAV",
+          "source_group": 431,
+          "field": 406
+        }
+      }
+    },
+    {
+      "component_group": 433,
+      "name": "a_targ2",
+      "sounds": {
+        "hard_hit": {
+          "group": 51,
+          "wav": "SOUND49.WAV",
+          "source_group": 431,
+          "field": 406
+        }
+      }
+    },
+    {
+      "component_group": 434,
+      "name": "a_targ3",
+      "sounds": {
+        "hard_hit": {
+          "group": 51,
+          "wav": "SOUND49.WAV",
+          "source_group": 431,
+          "field": 406
+        }
+      }
+    },
+    {
+      "component_group": 435,
+      "name": "a_targ4",
+      "sounds": {
+        "hard_hit": {
+          "group": 51,
+          "wav": "SOUND49.WAV",
+          "source_group": 431,
+          "field": 406
+        },
+        "soft_hit": {
+          "group": 53,
+          "wav": "SOUND50.WAV",
+          "source_group": 435,
+          "field": 304
+        }
+      }
+    },
+    {
+      "component_group": 436,
+      "name": "a_targ5",
+      "sounds": {
+        "hard_hit": {
+          "group": 51,
+          "wav": "SOUND49.WAV",
+          "source_group": 431,
+          "field": 406
+        }
+      }
+    },
+    {
+      "component_group": 437,
+      "name": "a_targ6",
+      "sounds": {
+        "hard_hit": {
+          "group": 51,
+          "wav": "SOUND49.WAV",
+          "source_group": 431,
+          "field": 406
+        }
+      }
+    },
+    {
+      "component_group": 438,
+      "name": "a_targ7",
+      "sounds": {
+        "hard_hit": {
+          "group": 51,
+          "wav": "SOUND49.WAV",
+          "source_group": 431,
+          "field": 406
+        },
+        "soft_hit": {
+          "group": 30,
+          "wav": "SOUND18.WAV",
+          "source_group": 438,
+          "field": 304
+        }
+      }
+    },
+    {
+      "component_group": 439,
+      "name": "a_targ8",
+      "sounds": {
+        "hard_hit": {
+          "group": 51,
+          "wav": "SOUND49.WAV",
+          "source_group": 431,
+          "field": 406
+        }
+      }
+    },
+    {
+      "component_group": 440,
+      "name": "a_targ9",
+      "sounds": {
+        "hard_hit": {
+          "group": 51,
+          "wav": "SOUND49.WAV",
+          "source_group": 431,
+          "field": 406
+        }
+      }
+    },
+    {
+      "component_group": 466,
+      "name": "a_targ22",
+      "sounds": {
+        "hard_hit": {
+          "group": 56,
+          "wav": "SOUND55.WAV",
+          "source_group": 466,
+          "field": 406
+        }
+      }
+    },
+    {
+      "component_group": 469,
+      "name": "v_rebo1",
+      "sounds": {
+        "hard_hit": {
+          "group": 22,
+          "wav": "SOUND5.WAV",
+          "source_group": 468,
+          "field": 406
+        }
+      }
+    },
+    {
+      "component_group": 470,
+      "name": "v_rebo2",
+      "sounds": {
+        "hard_hit": {
+          "group": 22,
+          "wav": "SOUND5.WAV",
+          "source_group": 468,
+          "field": 406
+        }
+      }
+    },
+    {
+      "component_group": 471,
+      "name": "v_rebo3",
+      "sounds": {
+        "hard_hit": {
+          "group": 22,
+          "wav": "SOUND5.WAV",
+          "source_group": 468,
+          "field": 406
+        }
+      }
+    },
+    {
+      "component_group": 472,
+      "name": "v_rebo4",
+      "sounds": {
+        "hard_hit": {
+          "group": 22,
+          "wav": "SOUND5.WAV",
+          "source_group": 468,
+          "field": 406
+        }
+      }
+    },
+    {
+      "component_group": 473,
+      "name": "plunger",
+      "sounds": {
+        "hard_hit": {
+          "group": 59,
+          "wav": "SOUND62.WAV",
+          "source_group": 473,
+          "field": 406
+        },
+        "sound4": {
+          "group": 21,
+          "wav": "SOUND4.WAV",
+          "source_group": 473,
+          "field": 1100
+        },
+        "sound3": {
+          "group": 34,
+          "wav": "SOUND22.WAV",
+          "source_group": 473,
+          "field": 1101
+        }
+      }
+    },
+    {
+      "component_group": 481,
+      "name": "a_flag1",
+      "sounds": {
+        "soft_hit": {
+          "group": 64,
+          "wav": "SOUND131.WAV",
+          "source_group": 481,
+          "field": 304
+        }
+      }
+    },
+    {
+      "component_group": 489,
+      "name": "a_flag2",
+      "sounds": {
+        "soft_hit": {
+          "group": 64,
+          "wav": "SOUND131.WAV",
+          "source_group": 489,
+          "field": 304
+        }
+      }
+    },
+    {
+      "component_group": 500,
+      "name": "v_bloc1",
+      "sounds": {
+        "soft_hit": {
+          "group": 42,
+          "wav": "SOUND34.WAV",
+          "source_group": 500,
+          "field": 304
+        },
+        "sound4": {
+          "group": 28,
+          "wav": "SOUND16.WAV",
+          "source_group": 500,
+          "field": 1100
+        },
+        "sound3": {
+          "group": 28,
+          "wav": "SOUND16.WAV",
+          "source_group": 500,
+          "field": 1101
+        }
+      }
+    },
+    {
+      "component_group": 505,
+      "name": "a_kick1",
+      "sounds": {
+        "hard_hit": {
+          "group": 29,
+          "wav": "SOUND17.WAV",
+          "source_group": 504,
+          "field": 406
+        }
+      }
+    },
+    {
+      "component_group": 507,
+      "name": "a_kick2",
+      "sounds": {
+        "hard_hit": {
+          "group": 29,
+          "wav": "SOUND17.WAV",
+          "source_group": 504,
+          "field": 406
+        }
+      }
+    },
+    {
+      "component_group": 510,
+      "name": "a_kout1",
+      "sounds": {
+        "hard_hit": {
+          "group": 57,
+          "wav": "SOUND57.WAV",
+          "source_group": 509,
+          "field": 406
+        }
+      }
+    },
+    {
+      "component_group": 512,
+      "name": "a_kout2",
+      "sounds": {
+        "hard_hit": {
+          "group": 57,
+          "wav": "SOUND57.WAV",
+          "source_group": 511,
+          "field": 406
+        }
+      }
+    },
+    {
+      "component_group": 514,
+      "name": "a_kout3",
+      "sounds": {
+        "soft_hit": {
+          "group": 57,
+          "wav": "SOUND57.WAV",
+          "source_group": 514,
+          "field": 304
+        }
+      }
+    },
+    {
+      "component_group": 520,
+      "name": "a_roll1",
+      "sounds": {
+        "soft_hit": {
+          "group": 37,
+          "wav": "SOUND26.WAV",
+          "source_group": 520,
+          "field": 304
+        }
+      }
+    },
+    {
+      "component_group": 521,
+      "name": "a_roll2",
+      "sounds": {
+        "soft_hit": {
+          "group": 37,
+          "wav": "SOUND26.WAV",
+          "source_group": 521,
+          "field": 304
+        }
+      }
+    },
+    {
+      "component_group": 522,
+      "name": "a_roll3",
+      "sounds": {
+        "soft_hit": {
+          "group": 37,
+          "wav": "SOUND26.WAV",
+          "source_group": 522,
+          "field": 304
+        }
+      }
+    },
+    {
+      "component_group": 525,
+      "name": "a_roll6",
+      "sounds": {
+        "soft_hit": {
+          "group": 37,
+          "wav": "SOUND26.WAV",
+          "source_group": 525,
+          "field": 304
+        }
+      }
+    },
+    {
+      "component_group": 526,
+      "name": "a_roll7",
+      "sounds": {
+        "soft_hit": {
+          "group": 37,
+          "wav": "SOUND26.WAV",
+          "source_group": 526,
+          "field": 304
+        }
+      }
+    },
+    {
+      "component_group": 528,
+      "name": "a_roll110",
+      "sounds": {
+        "soft_hit": {
+          "group": 37,
+          "wav": "SOUND26.WAV",
+          "source_group": 528,
+          "field": 304
+        }
+      }
+    },
+    {
+      "component_group": 529,
+      "name": "a_roll111",
+      "sounds": {
+        "soft_hit": {
+          "group": 37,
+          "wav": "SOUND26.WAV",
+          "source_group": 529,
+          "field": 304
+        }
+      }
+    },
+    {
+      "component_group": 530,
+      "name": "a_roll112",
+      "sounds": {
+        "soft_hit": {
+          "group": 37,
+          "wav": "SOUND26.WAV",
+          "source_group": 530,
+          "field": 304
+        }
+      }
+    },
+    {
+      "component_group": 531,
+      "name": "a_roll179",
+      "sounds": {
+        "soft_hit": {
+          "group": 24,
+          "wav": "SOUND8.WAV",
+          "source_group": 531,
+          "field": 304
+        }
+      }
+    },
+    {
+      "component_group": 532,
+      "name": "a_roll180",
+      "sounds": {
+        "soft_hit": {
+          "group": 24,
+          "wav": "SOUND8.WAV",
+          "source_group": 532,
+          "field": 304
+        }
+      }
+    },
+    {
+      "component_group": 533,
+      "name": "a_roll181",
+      "sounds": {
+        "soft_hit": {
+          "group": 24,
+          "wav": "SOUND8.WAV",
+          "source_group": 533,
+          "field": 304
+        }
+      }
+    },
+    {
+      "component_group": 534,
+      "name": "a_roll182",
+      "sounds": {
+        "soft_hit": {
+          "group": 24,
+          "wav": "SOUND8.WAV",
+          "source_group": 534,
+          "field": 304
+        }
+      }
+    },
+    {
+      "component_group": 535,
+      "name": "a_roll183",
+      "sounds": {
+        "soft_hit": {
+          "group": 24,
+          "wav": "SOUND8.WAV",
+          "source_group": 535,
+          "field": 304
+        }
+      }
+    },
+    {
+      "component_group": 536,
+      "name": "a_roll184",
+      "sounds": {
+        "soft_hit": {
+          "group": 36,
+          "wav": "SOUND25.WAV",
+          "source_group": 536,
+          "field": 304
+        }
+      }
+    },
+    {
+      "component_group": 537,
+      "name": "a_roll9",
+      "sounds": {
+        "soft_hit": {
+          "group": 56,
+          "wav": "SOUND55.WAV",
+          "source_group": 537,
+          "field": 304
+        }
+      }
+    }
+  ]
+}

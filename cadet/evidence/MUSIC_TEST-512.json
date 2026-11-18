@@ -1,0 +1,12 @@
+{
+  "mode": "MUSIC_TEST",
+  "ram": 512,
+  "irq_max_cycles": 23468,
+  "fm_writes": 66525,
+  "psg_writes": 50952,
+  "loops": 1,
+  "stream_errors": 0,
+  "recorded_seconds": 528.2191775210945,
+  "peak": 3252.0,
+  "loop_seconds": 527.95524
+}

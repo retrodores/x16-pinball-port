@@ -1,0 +1,596 @@
+{
+  "method": "normalized correlation after 250\u20132200 Hz bandpass; first up to 0.25 s of each source WAV",
+  "threshold": 0.5,
+  "capture_seconds": 83.79736961451248,
+  "matches": [
+    {
+      "wav": "SOUND105.WAV",
+      "seconds": 1.58086,
+      "correlation": 0.53761,
+      "template_seconds": 0.1658,
+      "confidence": "candidate waveform match"
+    },
+    {
+      "wav": "SOUND105.WAV",
+      "seconds": 6.31791,
+      "correlation": 0.60553,
+      "template_seconds": 0.1658,
+      "confidence": "candidate waveform match"
+    },
+    {
+      "wav": "SOUND105.WAV",
+      "seconds": 7.31646,
+      "correlation": 0.56512,
+      "template_seconds": 0.1658,
+      "confidence": "candidate waveform match"
+    },
+    {
+      "wav": "SOUND12.WAV",
+      "seconds": 9.15093,
+      "correlation": 0.54158,
+      "template_seconds": 0.24998,
+      "confidence": "candidate waveform match"
+    },
+    {
+      "wav": "SOUND12.WAV",
+      "seconds": 10.14939,
+      "correlation": 0.5673,
+      "template_seconds": 0.24998,
+      "confidence": "candidate waveform match"
+    },
+    {
+      "wav": "SOUND105.WAV",
+      "seconds": 13.33061,
+      "correlation": 0.60559,
+      "template_seconds": 0.1658,
+      "confidence": "candidate waveform match"
+    },
+    {
+      "wav": "SOUND12.WAV",
+      "seconds": 14.00408,
+      "correlation": 0.56066,
+      "template_seconds": 0.24998,
+      "confidence": "candidate waveform match"
+    },
+    {
+      "wav": "SOUND12.WAV",
+      "seconds": 15.88499,
+      "correlation": 0.55646,
+      "template_seconds": 0.24998,
+      "confidence": "candidate waveform match"
+    },
+    {
+      "wav": "SOUND16.WAV",
+      "seconds": 17.68717,
+      "correlation": 0.50509,
+      "template_seconds": 0.08218,
+      "confidence": "candidate waveform match"
+    },
+    {
+      "wav": "SOUND12.WAV",
+      "seconds": 25.66086,
+      "correlation": 0.51258,
+      "template_seconds": 0.24998,
+      "confidence": "candidate waveform match"
+    },
+    {
+      "wav": "SOUND12.WAV",
+      "seconds": 26.19501,
+      "correlation": 0.55694,
+      "template_seconds": 0.24998,
+      "confidence": "candidate waveform match"
+    },
+    {
+      "wav": "SOUND105.WAV",
+      "seconds": 30.8624,
+      "correlation": 0.5693,
+      "template_seconds": 0.1658,
+      "confidence": "candidate waveform match"
+    },
+    {
+      "wav": "SOUND105.WAV",
+      "seconds": 31.00163,
+      "correlation": 0.55415,
+      "template_seconds": 0.1658,
+      "confidence": "candidate waveform match"
+    },
+    {
+      "wav": "SOUND12.WAV",
+      "seconds": 33.23093,
+      "correlation": 0.5255,
+      "template_seconds": 0.24998,
+      "confidence": "candidate waveform match"
+    },
+    {
+      "wav": "SOUND12.WAV",
+      "seconds": 35.34395,
+      "correlation": 0.56006,
+      "template_seconds": 0.24998,
+      "confidence": "candidate waveform match"
+    },
+    {
+      "wav": "SOUND12.WAV",
+      "seconds": 39.68635,
+      "correlation": 0.55386,
+      "template_seconds": 0.24998,
+      "confidence": "candidate waveform match"
+    },
+    {
+      "wav": "SOUND5.WAV",
+      "seconds": 41.61088,
+      "correlation": 0.51322,
+      "template_seconds": 0.24998,
+      "confidence": "candidate waveform match"
+    },
+    {
+      "wav": "SOUND5.WAV",
+      "seconds": 44.42068,
+      "correlation": 0.51061,
+      "template_seconds": 0.24998,
+      "confidence": "candidate waveform match"
+    },
+    {
+      "wav": "SOUND104.WAV",
+      "seconds": 44.42077,
+      "correlation": 0.50665,
+      "template_seconds": 0.0985,
+      "confidence": "candidate waveform match"
+    },
+    {
+      "wav": "SOUND105.WAV",
+      "seconds": 45.07347,
+      "correlation": 0.52534,
+      "template_seconds": 0.1658,
+      "confidence": "candidate waveform match"
+    },
+    {
+      "wav": "SOUND5.WAV",
+      "seconds": 48.62358,
+      "correlation": 0.52005,
+      "template_seconds": 0.24998,
+      "confidence": "candidate waveform match"
+    },
+    {
+      "wav": "SOUND5.WAV",
+      "seconds": 48.90222,
+      "correlation": 0.52699,
+      "template_seconds": 0.24998,
+      "confidence": "candidate waveform match"
+    },
+    {
+      "wav": "SOUND104.WAV",
+      "seconds": 48.90231,
+      "correlation": 0.50313,
+      "template_seconds": 0.0985,
+      "confidence": "candidate waveform match"
+    },
+    {
+      "wav": "SOUND105.WAV",
+      "seconds": 51.90041,
+      "correlation": 0.54311,
+      "template_seconds": 0.1658,
+      "confidence": "candidate waveform match"
+    },
+    {
+      "wav": "SOUND105.WAV",
+      "seconds": 52.15583,
+      "correlation": 0.5598,
+      "template_seconds": 0.1658,
+      "confidence": "candidate waveform match"
+    },
+    {
+      "wav": "SOUND105.WAV",
+      "seconds": 52.43447,
+      "correlation": 0.61418,
+      "template_seconds": 0.1658,
+      "confidence": "candidate waveform match"
+    },
+    {
+      "wav": "SOUND49.WAV",
+      "seconds": 52.66667,
+      "correlation": 0.55401,
+      "template_seconds": 0.15746,
+      "confidence": "candidate waveform match"
+    },
+    {
+      "wav": "SOUND50.WAV",
+      "seconds": 52.92209,
+      "correlation": 0.5493,
+      "template_seconds": 0.24998,
+      "confidence": "candidate waveform match"
+    },
+    {
+      "wav": "SOUND104.WAV",
+      "seconds": 61.97569,
+      "correlation": 0.51683,
+      "template_seconds": 0.0985,
+      "confidence": "candidate waveform match"
+    },
+    {
+      "wav": "SOUND49.WAV",
+      "seconds": 62.23365,
+      "correlation": 0.54966,
+      "template_seconds": 0.15746,
+      "confidence": "candidate waveform match"
+    },
+    {
+      "wav": "SOUND104.WAV",
+      "seconds": 64.6693,
+      "correlation": 0.52369,
+      "template_seconds": 0.0985,
+      "confidence": "candidate waveform match"
+    },
+    {
+      "wav": "SOUND105.WAV",
+      "seconds": 64.97379,
+      "correlation": 0.61039,
+      "template_seconds": 0.1658,
+      "confidence": "candidate waveform match"
+    },
+    {
+      "wav": "SOUND105.WAV",
+      "seconds": 65.22921,
+      "correlation": 0.62201,
+      "template_seconds": 0.1658,
+      "confidence": "candidate waveform match"
+    },
+    {
+      "wav": "SOUND8.WAV",
+      "seconds": 65.41488,
+      "correlation": 0.70065,
+      "template_seconds": 0.17787,
+      "confidence": "strong waveform match"
+    },
+    {
+      "wav": "SOUND8.WAV",
+      "seconds": 65.57751,
+      "correlation": 0.61844,
+      "template_seconds": 0.17787,
+      "confidence": "candidate waveform match"
+    },
+    {
+      "wav": "SOUND5.WAV",
+      "seconds": 70.45116,
+      "correlation": 0.52579,
+      "template_seconds": 0.24998,
+      "confidence": "candidate waveform match"
+    },
+    {
+      "wav": "SOUND105.WAV",
+      "seconds": 70.87184,
+      "correlation": 0.62731,
+      "template_seconds": 0.1658,
+      "confidence": "candidate waveform match"
+    },
+    {
+      "wav": "SOUND49.WAV",
+      "seconds": 71.2898,
+      "correlation": 0.56608,
+      "template_seconds": 0.15746,
+      "confidence": "candidate waveform match"
+    },
+    {
+      "wav": "SOUND5.WAV",
+      "seconds": 73.42349,
+      "correlation": 0.51874,
+      "template_seconds": 0.24998,
+      "confidence": "candidate waveform match"
+    },
+    {
+      "wav": "SOUND105.WAV",
+      "seconds": 73.9834,
+      "correlation": 0.50334,
+      "template_seconds": 0.1658,
+      "confidence": "candidate waveform match"
+    },
+    {
+      "wav": "SOUND27.WAV",
+      "seconds": 82.64472,
+      "correlation": 0.50939,
+      "template_seconds": 0.24998,
+      "confidence": "candidate waveform match"
+    }
+  ],
+  "best_per_asset": [
+    {
+      "wav": "SOUND8.WAV",
+      "correlation": 0.7006487263231006,
+      "seconds": 65.41487528344672
+    },
+    {
+      "wav": "SOUND105.WAV",
+      "correlation": 0.6273090095712649,
+      "seconds": 70.87183673469387
+    },
+    {
+      "wav": "SOUND12.WAV",
+      "correlation": 0.5672978462443852,
+      "seconds": 10.14938775510204
+    },
+    {
+      "wav": "SOUND49.WAV",
+      "correlation": 0.5660766361586992,
+      "seconds": 71.28979591836735
+    },
+    {
+      "wav": "SOUND50.WAV",
+      "correlation": 0.5492985998621895,
+      "seconds": 52.92208616780045
+    },
+    {
+      "wav": "SOUND5.WAV",
+      "correlation": 0.5269916757576114,
+      "seconds": 48.90222222222222
+    },
+    {
+      "wav": "SOUND104.WAV",
+      "correlation": 0.5236927007324919,
+      "seconds": 64.66929705215419
+    },
+    {
+      "wav": "SOUND27.WAV",
+      "correlation": 0.5093919472665266,
+      "seconds": 82.64471655328798
+    },
+    {
+      "wav": "SOUND16.WAV",
+      "correlation": 0.5050882449944929,
+      "seconds": 17.687165532879817
+    },
+    {
+      "wav": "SOUND34.WAV",
+      "correlation": 0.4947376711974098,
+      "seconds": 5.198095238095238
+    },
+    {
+      "wav": "SOUND14.WAV",
+      "correlation": 0.48819360214140317,
+      "seconds": 46.88235827664399
+    },
+    {
+      "wav": "SOUND22.WAV",
+      "correlation": 0.4711965133911926,
+      "seconds": 5.061043083900227
+    },
+    {
+      "wav": "SOUND49D.WAV",
+      "correlation": 0.4342953846110104,
+      "seconds": 76.18947845804989
+    },
+    {
+      "wav": "SOUND68.WAV",
+      "correlation": 0.4318931824090699,
+      "seconds": 51.51201814058957
+    },
+    {
+      "wav": "SOUND999.WAV",
+      "correlation": 0.4212046136109935,
+      "seconds": 71.16662131519274
+    },
+    {
+      "wav": "SOUND43.WAV",
+      "correlation": 0.4208309340415252,
+      "seconds": 20.343401360544217
+    },
+    {
+      "wav": "SOUND58.WAV",
+      "correlation": 0.41752428846107936,
+      "seconds": 76.18947845804989
+    },
+    {
+      "wav": "SOUND713.WAV",
+      "correlation": 0.41566435416518976,
+      "seconds": 29.77986394557823
+    },
+    {
+      "wav": "SOUND17.WAV",
+      "correlation": 0.4014887392747708,
+      "seconds": 75.55936507936508
+    },
+    {
+      "wav": "SOUND26.WAV",
+      "correlation": 0.3963112192286689,
+      "seconds": 74.23891156462585
+    },
+    {
+      "wav": "SOUND42.WAV",
+      "correlation": 0.3879472608539647,
+      "seconds": 47.33251700680272
+    },
+    {
+      "wav": "SOUND57.WAV",
+      "correlation": 0.3692391293664864,
+      "seconds": 20.398820861678004
+    },
+    {
+      "wav": "SOUND55.WAV",
+      "correlation": 0.36282274388998215,
+      "seconds": 59.83954648526077
+    },
+    {
+      "wav": "SOUND243.WAV",
+      "correlation": 0.35905456282648635,
+      "seconds": 17.09768707482993
+    },
+    {
+      "wav": "SOUND24.WAV",
+      "correlation": 0.3494594125179386,
+      "seconds": 31.141043083900225
+    },
+    {
+      "wav": "SOUND13.WAV",
+      "correlation": 0.3386679992537508,
+      "seconds": 5.279637188208617
+    },
+    {
+      "wav": "SOUND1.WAV",
+      "correlation": 0.3347845761598466,
+      "seconds": 75.5104761904762
+    },
+    {
+      "wav": "SOUND6.WAV",
+      "correlation": 0.3292477723537785,
+      "seconds": 10.19111111111111
+    },
+    {
+      "wav": "SOUND131.WAV",
+      "correlation": 0.32846303445962305,
+      "seconds": 76.42167800453515
+    },
+    {
+      "wav": "SOUND45.WAV",
+      "correlation": 0.32537808369301296,
+      "seconds": 59.58458049886622
+    },
+    {
+      "wav": "SOUND136.WAV",
+      "correlation": 0.3165333019562886,
+      "seconds": 12.8821768707483
+    },
+    {
+      "wav": "SOUND560.WAV",
+      "correlation": 0.3088952793634271,
+      "seconds": 79.4964172335601
+    },
+    {
+      "wav": "SOUND29.WAV",
+      "correlation": 0.30713960643926513,
+      "seconds": 29.254149659863945
+    },
+    {
+      "wav": "SOUND112.WAV",
+      "correlation": 0.29838243381162705,
+      "seconds": 3.528798185941043
+    },
+    {
+      "wav": "SOUND111.WAV",
+      "correlation": 0.27896709777547746,
+      "seconds": 3.5160997732426305
+    },
+    {
+      "wav": "SOUND7.WAV",
+      "correlation": 0.2652960810276838,
+      "seconds": 79.60780045351474
+    },
+    {
+      "wav": "SOUND38.WAV",
+      "correlation": 0.2622419047512197,
+      "seconds": 17.3384126984127
+    },
+    {
+      "wav": "SOUND827.WAV",
+      "correlation": 0.2554569153910819,
+      "seconds": 15.63219954648526
+    },
+    {
+      "wav": "SOUND28.WAV",
+      "correlation": 0.2504913496274768,
+      "seconds": 38.98757369614513
+    },
+    {
+      "wav": "SOUND30.WAV",
+      "correlation": 0.24719608271233337,
+      "seconds": 42.126167800453516
+    },
+    {
+      "wav": "SOUND108.WAV",
+      "correlation": 0.24575226091920604,
+      "seconds": 54.1609977324263
+    },
+    {
+      "wav": "SOUND19.WAV",
+      "correlation": 0.24262780042348248,
+      "seconds": 56.53424036281179
+    },
+    {
+      "wav": "SOUND4.WAV",
+      "correlation": 0.20143396729879992,
+      "seconds": 45.69532879818594
+    },
+    {
+      "wav": "SOUND18.WAV",
+      "correlation": 0.19390297107939847,
+      "seconds": 36.087165532879816
+    },
+    {
+      "wav": "SOUND53.WAV",
+      "correlation": 0.19143699531086675,
+      "seconds": 17.253061224489795
+    },
+    {
+      "wav": "SOUND25.WAV",
+      "correlation": 0.18987558125448986,
+      "seconds": 54.456054421768705
+    },
+    {
+      "wav": "SOUND36.WAV",
+      "correlation": 0.18713405828461993,
+      "seconds": 19.036643990929704
+    },
+    {
+      "wav": "SOUND563.WAV",
+      "correlation": 0.1816139641207947,
+      "seconds": 21.127256235827666
+    },
+    {
+      "wav": "SOUND528.WAV",
+      "correlation": 0.17922101045145838,
+      "seconds": 54.202448979591836
+    },
+    {
+      "wav": "SOUND65.WAV",
+      "correlation": 0.1774337507386324,
+      "seconds": 46.69714285714286
+    },
+    {
+      "wav": "SOUND21.WAV",
+      "correlation": 0.17386148439050936,
+      "seconds": 30.741859410430838
+    },
+    {
+      "wav": "SOUND240.WAV",
+      "correlation": 0.1736830930633097,
+      "seconds": 72.91374149659863
+    },
+    {
+      "wav": "SOUND54.WAV",
+      "correlation": 0.1735375126437017,
+      "seconds": 46.66839002267574
+    },
+    {
+      "wav": "SOUND181.WAV",
+      "correlation": 0.17292190962189377,
+      "seconds": 32.17024943310658
+    },
+    {
+      "wav": "SOUND9.WAV",
+      "correlation": 0.1617096150719785,
+      "seconds": 54.41160997732426
+    },
+    {
+      "wav": "SOUND20.WAV",
+      "correlation": 0.15823257611653843,
+      "seconds": 37.364716553287984
+    },
+    {
+      "wav": "SOUND35.WAV",
+      "correlation": 0.1536090136101224,
+      "seconds": 37.39419501133787
+    },
+    {
+      "wav": "SOUND39.WAV",
+      "correlation": 0.1517657328591141,
+      "seconds": 30.372063492063493
+    },
+    {
+      "wav": "SOUND3.WAV",
+      "correlation": 0.14782120139951122,
+      "seconds": 46.74657596371882
+    },
+    {
+      "wav": "SOUND735.WAV",
+      "correlation": 0.12504123628209055,
+      "seconds": 63.63401360544218
+    }
+  ]
+}

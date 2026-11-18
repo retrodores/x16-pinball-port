@@ -1,0 +1,373 @@
+{
+  "mode": "PCM_TEST",
+  "ram": 2048,
+  "irq_max_cycles": 5853,
+  "fm_writes": 0,
+  "psg_writes": 0,
+  "loops": 0,
+  "stream_errors": 0,
+  "recorded_seconds": 90.49723519292209,
+  "peak": 23552.0,
+  "effects": [
+    {
+      "asset": "SOUND1.WAV",
+      "exact_amplitude_sequence": true,
+      "amplitude_runs": 51026,
+      "max_hold_error_mix_samples": 0.9653816496551713
+    },
+    {
+      "asset": "SOUND3.WAV",
+      "exact_amplitude_sequence": true,
+      "amplitude_runs": 22421,
+      "max_hold_error_mix_samples": 1.4398609655181644
+    },
+    {
+      "asset": "SOUND4.WAV",
+      "exact_amplitude_sequence": true,
+      "amplitude_runs": 14829,
+      "max_hold_error_mix_samples": 1.8592328386207555
+    },
+    {
+      "asset": "SOUND5.WAV",
+      "exact_amplitude_sequence": true,
+      "amplitude_runs": 2398,
+      "max_hold_error_mix_samples": 0.9650539696551732
+    },
+    {
+      "asset": "SOUND6.WAV",
+      "exact_amplitude_sequence": true,
+      "amplitude_runs": 3529,
+      "max_hold_error_mix_samples": 0.9439862289655139
+    },
+    {
+      "asset": "SOUND7.WAV",
+      "exact_amplitude_sequence": true,
+      "amplitude_runs": 25308,
+      "max_hold_error_mix_samples": 1.02893206068984
+    },
+    {
+      "asset": "SOUND8.WAV",
+      "exact_amplitude_sequence": true,
+      "amplitude_runs": 1680,
+      "max_hold_error_mix_samples": 0.7583269075862091
+    },
+    {
+      "asset": "SOUND9.WAV",
+      "exact_amplitude_sequence": true,
+      "amplitude_runs": 19422,
+      "max_hold_error_mix_samples": 1.1222441489662742
+    },
+    {
+      "asset": "SOUND12.WAV",
+      "exact_amplitude_sequence": true,
+      "amplitude_runs": 3180,
+      "max_hold_error_mix_samples": 0.9420201489665487
+    },
+    {
+      "asset": "SOUND13.WAV",
+      "exact_amplitude_sequence": true,
+      "amplitude_runs": 6680,
+      "max_hold_error_mix_samples": 0.7929452579310379
+    },
+    {
+      "asset": "SOUND14.WAV",
+      "exact_amplitude_sequence": true,
+      "amplitude_runs": 2692,
+      "max_hold_error_mix_samples": 0.9276022289650427
+    },
+    {
+      "asset": "SOUND16.WAV",
+      "exact_amplitude_sequence": true,
+      "amplitude_runs": 875,
+      "max_hold_error_mix_samples": 0.6205088662068903
+    },
+    {
+      "asset": "SOUND17.WAV",
+      "exact_amplitude_sequence": true,
+      "amplitude_runs": 1786,
+      "max_hold_error_mix_samples": 0.9530455393105512
+    },
+    {
+      "asset": "SOUND18.WAV",
+      "exact_amplitude_sequence": true,
+      "amplitude_runs": 3671,
+      "max_hold_error_mix_samples": 0.9047803586217924
+    },
+    {
+      "asset": "SOUND19.WAV",
+      "exact_amplitude_sequence": true,
+      "amplitude_runs": 5021,
+      "max_hold_error_mix_samples": 0.8156709075847175
+    },
+    {
+      "asset": "SOUND20.WAV",
+      "exact_amplitude_sequence": true,
+      "amplitude_runs": 7264,
+      "max_hold_error_mix_samples": 1.6379721268967842
+    },
+    {
+      "asset": "SOUND21.WAV",
+      "exact_amplitude_sequence": true,
+      "amplitude_runs": 8647,
+      "max_hold_error_mix_samples": 0.722417346209113
+    },
+    {
+      "asset": "SOUND22.WAV",
+      "exact_amplitude_sequence": true,
+      "amplitude_runs": 5551,
+      "max_hold_error_mix_samples": 0.8735545379313407
+    },
+    {
+      "asset": "SOUND24.WAV",
+      "exact_amplitude_sequence": true,
+      "amplitude_runs": 11920,
+      "max_hold_error_mix_samples": 0.9307632993103425
+    },
+    {
+      "asset": "SOUND25.WAV",
+      "exact_amplitude_sequence": true,
+      "amplitude_runs": 22755,
+      "max_hold_error_mix_samples": 2.4447761655173963
+    },
+    {
+      "asset": "SOUND26.WAV",
+      "exact_amplitude_sequence": true,
+      "amplitude_runs": 6248,
+      "max_hold_error_mix_samples": 0.5858905158620757
+    },
+    {
+      "asset": "SOUND27.WAV",
+      "exact_amplitude_sequence": true,
+      "amplitude_runs": 14532,
+      "max_hold_error_mix_samples": 1.045470808268874
+    },
+    {
+      "asset": "SOUND28.WAV",
+      "exact_amplitude_sequence": true,
+      "amplitude_runs": 7905,
+      "max_hold_error_mix_samples": 0.8889554979323293
+    },
+    {
+      "asset": "SOUND29.WAV",
+      "exact_amplitude_sequence": true,
+      "amplitude_runs": 9604,
+      "max_hold_error_mix_samples": 0.8265805682758582
+    },
+    {
+      "asset": "SOUND30.WAV",
+      "exact_amplitude_sequence": true,
+      "amplitude_runs": 16337,
+      "max_hold_error_mix_samples": 1.0983612027630443
+    },
+    {
+      "asset": "SOUND34.WAV",
+      "exact_amplitude_sequence": true,
+      "amplitude_runs": 1239,
+      "max_hold_error_mix_samples": 0.9908249599998271
+    },
+    {
+      "asset": "SOUND35.WAV",
+      "exact_amplitude_sequence": true,
+      "amplitude_runs": 19224,
+      "max_hold_error_mix_samples": 0.8964726289655189
+    },
+    {
+      "asset": "SOUND36.WAV",
+      "exact_amplitude_sequence": true,
+      "amplitude_runs": 33210,
+      "max_hold_error_mix_samples": 1.4696408275922295
+    },
+    {
+      "asset": "SOUND38.WAV",
+      "exact_amplitude_sequence": true,
+      "amplitude_runs": 12783,
+      "max_hold_error_mix_samples": 1.0422902289647027
+    },
+    {
+      "asset": "SOUND39.WAV",
+      "exact_amplitude_sequence": true,
+      "amplitude_runs": 27771,
+      "max_hold_error_mix_samples": 1.7299916799966013
+    },
+    {
+      "asset": "SOUND42.WAV",
+      "exact_amplitude_sequence": true,
+      "amplitude_runs": 27431,
+      "max_hold_error_mix_samples": 0.6894178868965497
+    },
+    {
+      "asset": "SOUND43.WAV",
+      "exact_amplitude_sequence": true,
+      "amplitude_runs": 18862,
+      "max_hold_error_mix_samples": 0.9909601986219059
+    },
+    {
+      "asset": "SOUND45.WAV",
+      "exact_amplitude_sequence": true,
+      "amplitude_runs": 9173,
+      "max_hold_error_mix_samples": 1.55321873655339
+    },
+    {
+      "asset": "SOUND49.WAV",
+      "exact_amplitude_sequence": true,
+      "amplitude_runs": 1664,
+      "max_hold_error_mix_samples": 0.8468967282760786
+    },
+    {
+      "asset": "SOUND49D.WAV",
+      "exact_amplitude_sequence": true,
+      "amplitude_runs": 3011,
+      "max_hold_error_mix_samples": 0.8972437186203024
+    },
+    {
+      "asset": "SOUND50.WAV",
+      "exact_amplitude_sequence": true,
+      "amplitude_runs": 11702,
+      "max_hold_error_mix_samples": 0.9653816496551713
+    },
+    {
+      "asset": "SOUND53.WAV",
+      "exact_amplitude_sequence": true,
+      "amplitude_runs": 7265,
+      "max_hold_error_mix_samples": 1.302390113103229
+    },
+    {
+      "asset": "SOUND54.WAV",
+      "exact_amplitude_sequence": true,
+      "amplitude_runs": 17738,
+      "max_hold_error_mix_samples": 0.8964726289655189
+    },
+    {
+      "asset": "SOUND55.WAV",
+      "exact_amplitude_sequence": true,
+      "amplitude_runs": 20025,
+      "max_hold_error_mix_samples": 1.2360635144868866
+    },
+    {
+      "asset": "SOUND57.WAV",
+      "exact_amplitude_sequence": true,
+      "amplitude_runs": 26982,
+      "max_hold_error_mix_samples": 1.59275228689512
+    },
+    {
+      "asset": "SOUND58.WAV",
+      "exact_amplitude_sequence": true,
+      "amplitude_runs": 2848,
+      "max_hold_error_mix_samples": 0.6908443365518906
+    },
+    {
+      "asset": "SOUND65.WAV",
+      "exact_amplitude_sequence": true,
+      "amplitude_runs": 13025,
+      "max_hold_error_mix_samples": 0.999248419309879
+    },
+    {
+      "asset": "SOUND68.WAV",
+      "exact_amplitude_sequence": true,
+      "amplitude_runs": 25000,
+      "max_hold_error_mix_samples": 0.916635365516413
+    },
+    {
+      "asset": "SOUND104.WAV",
+      "exact_amplitude_sequence": true,
+      "amplitude_runs": 1019,
+      "max_hold_error_mix_samples": 0.7707787475865189
+    },
+    {
+      "asset": "SOUND105.WAV",
+      "exact_amplitude_sequence": true,
+      "amplitude_runs": 1697,
+      "max_hold_error_mix_samples": 0.7240362372413784
+    },
+    {
+      "asset": "SOUND108.WAV",
+      "exact_amplitude_sequence": true,
+      "amplitude_runs": 7330,
+      "max_hold_error_mix_samples": 0.7929452579310379
+    },
+    {
+      "asset": "SOUND111.WAV",
+      "exact_amplitude_sequence": true,
+      "amplitude_runs": 604,
+      "max_hold_error_mix_samples": 0.7237085572413662
+    },
+    {
+      "asset": "SOUND112.WAV",
+      "exact_amplitude_sequence": true,
+      "amplitude_runs": 417,
+      "max_hold_error_mix_samples": 0.9307632993103425
+    },
+    {
+      "asset": "SOUND131.WAV",
+      "exact_amplitude_sequence": true,
+      "amplitude_runs": 1060,
+      "max_hold_error_mix_samples": 0.551599845517238
+    },
+    {
+      "asset": "SOUND136.WAV",
+      "exact_amplitude_sequence": true,
+      "amplitude_runs": 16407,
+      "max_hold_error_mix_samples": 0.9403050372347934
+    },
+    {
+      "asset": "SOUND181.WAV",
+      "exact_amplitude_sequence": true,
+      "amplitude_runs": 24151,
+      "max_hold_error_mix_samples": 1.0335195806892443
+    },
+    {
+      "asset": "SOUND240.WAV",
+      "exact_amplitude_sequence": true,
+      "amplitude_runs": 12720,
+      "max_hold_error_mix_samples": 0.7240362372413784
+    },
+    {
+      "asset": "SOUND243.WAV",
+      "exact_amplitude_sequence": true,
+      "amplitude_runs": 9405,
+      "max_hold_error_mix_samples": 2.7454316579314764
+    },
+    {
+      "asset": "SOUND528.WAV",
+      "exact_amplitude_sequence": true,
+      "amplitude_runs": 7438,
+      "max_hold_error_mix_samples": 0.5813225048259483
+    },
+    {
+      "asset": "SOUND560.WAV",
+      "exact_amplitude_sequence": true,
+      "amplitude_runs": 23912,
+      "max_hold_error_mix_samples": 1.5106008275906788
+    },
+    {
+      "asset": "SOUND563.WAV",
+      "exact_amplitude_sequence": true,
+      "amplitude_runs": 21033,
+      "max_hold_error_mix_samples": 1.168447028961964
+    },
+    {
+      "asset": "SOUND713.WAV",
+      "exact_amplitude_sequence": true,
+      "amplitude_runs": 11463,
+      "max_hold_error_mix_samples": 2.7042401986182085
+    },
+    {
+      "asset": "SOUND735.WAV",
+      "exact_amplitude_sequence": true,
+      "amplitude_runs": 23979,
+      "max_hold_error_mix_samples": 1.0653630675806198
+    },
+    {
+      "asset": "SOUND827.WAV",
+      "exact_amplitude_sequence": true,
+      "amplitude_runs": 39370,
+      "max_hold_error_mix_samples": 2.1925392772536725
+    },
+    {
+      "asset": "SOUND999.WAV",
+      "exact_amplitude_sequence": true,
+      "amplitude_runs": 5803,
+      "max_hold_error_mix_samples": 0.901946968275297
+    }
+  ]
+}

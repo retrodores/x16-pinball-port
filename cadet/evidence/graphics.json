@@ -1,0 +1,28 @@
+{
+  "resolution": [
+    640,
+    480
+  ],
+  "original_table_pixels": [
+    365,
+    470
+  ],
+  "tile_size": [
+    16,
+    16
+  ],
+  "bpp": 4,
+  "palette_banks": 16,
+  "tiles": 773,
+  "tile_bytes": 98944,
+  "map_bytes": 4096,
+  "tile_base": 4096,
+  "tile_end": 103040,
+  "sprite_reserve_start": 122880,
+  "palette_base": 129536,
+  "spatial_resampling": false,
+  "psnr_all_db": 31.246637641650963,
+  "psnr_nonblack_db": 28.96391876552322,
+  "identical_rgb_fraction": 0.4098209635416667,
+  "source": "PINBALL.DAT groups 107,2,355,363,372,380,388,396,405,413,421,473"
+}

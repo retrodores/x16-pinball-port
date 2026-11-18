@@ -1,0 +1,172 @@
+{
+  "source": "PINBALL.MID",
+  "source_sha256": "b030f95b0d3b7b582a8c030ce548e11ab9457e2281f615af1e291401ffb0be41",
+  "duration_seconds": 527.9129119999919,
+  "zsm_seconds": 527.9333333333333,
+  "tick_rate": 60,
+  "note_ons": 14139,
+  "melodic_notes": 7263,
+  "percussion_onsets": 6876,
+  "dropped_or_stolen_notes": 0,
+  "melodic_peak": 5,
+  "programs": {
+    "1": 38,
+    "3": 28,
+    "2": 11
+  },
+  "pitch_bend_events": 481,
+  "max_onset_error_ms": 8.333302083332939,
+  "zsm_bytes": 272155,
+  "ram_start_bank": 16,
+  "ram_last_bank": 49,
+  "timbre": "new YM2151 additive patches and PSG percussion; not Windows General MIDI timbre",
+  "percussion": "source onset and velocity retained; one-shot PSG envelopes replace drum samples",
+  "unsupported_expression": [
+    {
+      "seconds": 0,
+      "type": "control_change",
+      "channel": 9,
+      "control": 91,
+      "value": 79
+    },
+    {
+      "seconds": 0,
+      "type": "control_change",
+      "channel": 9,
+      "control": 93,
+      "value": 0
+    },
+    {
+      "seconds": 0,
+      "type": "control_change",
+      "channel": 9,
+      "control": 64,
+      "value": 0
+    },
+    {
+      "seconds": 0,
+      "type": "control_change",
+      "channel": 1,
+      "control": 1,
+      "value": 0
+    },
+    {
+      "seconds": 0,
+      "type": "control_change",
+      "channel": 1,
+      "control": 91,
+      "value": 29
+    },
+    {
+      "seconds": 0,
+      "type": "control_change",
+      "channel": 1,
+      "control": 93,
+      "value": 0
+    },
+    {
+      "seconds": 0,
+      "type": "control_change",
+      "channel": 1,
+      "control": 10,
+      "value": 64
+    },
+    {
+      "seconds": 0,
+      "type": "aftertouch",
+      "channel": 1,
+      "value": 0
+    },
+    {
+      "seconds": 0,
+      "type": "control_change",
+      "channel": 1,
+      "control": 64,
+      "value": 0
+    },
+    {
+      "seconds": 0,
+      "type": "control_change",
+      "channel": 3,
+      "control": 91,
+      "value": 115
+    },
+    {
+      "seconds": 0,
+      "type": "control_change",
+      "channel": 3,
+      "control": 93,
+      "value": 81
+    },
+    {
+      "seconds": 0,
+      "type": "control_change",
+      "channel": 3,
+      "control": 10,
+      "value": 74
+    },
+    {
+      "seconds": 0,
+      "type": "control_change",
+      "channel": 3,
+      "control": 1,
+      "value": 0
+    },
+    {
+      "seconds": 0,
+      "type": "control_change",
+      "channel": 3,
+      "control": 64,
+      "value": 0
+    },
+    {
+      "seconds": 0,
+      "type": "aftertouch",
+      "channel": 3,
+      "value": 0
+    },
+    {
+      "seconds": 0,
+      "type": "control_change",
+      "channel": 2,
+      "control": 91,
+      "value": 92
+    },
+    {
+      "seconds": 0,
+      "type": "control_change",
+      "channel": 2,
+      "control": 93,
+      "value": 0
+    },
+    {
+      "seconds": 0,
+      "type": "control_change",
+      "channel": 2,
+      "control": 10,
+      "value": 41
+    },
+    {
+      "seconds": 0,
+      "type": "control_change",
+      "channel": 2,
+      "control": 1,
+      "value": 0
+    },
+    {
+      "seconds": 0,
+      "type": "control_change",
+      "channel": 2,
+      "control": 64,
+      "value": 0
+    },
+    {
+      "seconds": 0,
+      "type": "aftertouch",
+      "channel": 2,
+      "value": 0
+    }
+  ],
+  "PINBALL2.MID": "bitmap font, not a second music track",
+  "max_register_writes_per_tick": 162
+}
