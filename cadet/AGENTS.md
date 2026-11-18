@@ -15,3 +15,7 @@ validation of original-table topology. Restore original rails, one-way gates,
 ramp height/layers and legal transfers; test forbidden crossings explicitly.
 Do not place original artwork over unrelated practice-table collisions.
 Use VERA fully and convert effects/music to native X16 audio.
+
+Delivery preference: preserve extraction-root launcher/PRG layout (no wrapper folder),
+parent-folder x16emu.exe/rom.bin by default, and -scale 2 on both launcher paths.
+Preserve faithful score/backbox/control presentation; see NEXT-MILESTONE.md.

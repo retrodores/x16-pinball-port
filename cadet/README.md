@@ -12,11 +12,13 @@ Tested on stock r49, 65C02, 8 MHz, both 512 KB and 2048 KB banked RAM.
 From the release directory:
 
 ```
-x16emu -c02 -mhz 8 -ram 512 -fsroot . -prg LAB.PRG -run
+x16emu -c02 -mhz 8 -ram 512 -fsroot . -prg LAB.PRG -run -scale 2
 ```
 
-Windows: drag x16emu.exe onto RUN-WINDOWS.bat, or pass its full path as the first
-argument. The launcher uses the ROM beside that emulator. The distribution does
+Windows: double-click RUN-WINDOWS.bat with x16emu.exe and rom.bin one folder
+above. It keeps the game directory current and uses scale 2. You may also drag
+x16emu.exe onto the BAT or pass its full path. Both paths use the ROM beside the
+emulator. ZIP contents stay at the extraction root, with no enclosing folder. The distribution does
 not include an emulator, ROM or original Windows executable.
 
 - M: start/restart or stop the complete Space Cadet theme.

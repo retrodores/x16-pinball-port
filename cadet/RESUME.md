@@ -1,6 +1,7 @@
 # Resume CmdrX Cadet fidelity work
 
 Author: Codex. User: Brett Estrade. The VM is the working environment; use DC.
+Current next-milestone plan and launcher preferences: NEXT-MILESTONE.md.
 This checkpoint is an art/audio audition and initial C modules, NOT completion
 of the original-table port. Read README.md, VALIDATION.md and AGENTS.md here.
 
