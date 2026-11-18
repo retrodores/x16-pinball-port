@@ -73,3 +73,5 @@ Toolchain /opt/llvm-mos-sdk-23.4.0/llvm-mos/bin/mos-cx16-clang.
 Emulator /opt/x16emu-r49/x16emu and matching rom.bin.
 Windows delivery remains flat, parent-folder x16emu.exe/rom.bin, -scale 2,
 -c02 -mhz 8 -ram 512, with the game directory current.
+
+Additional profiling item: music_start currently pre-fills 2048 decoded bytes with interrupts disabled. Startup and an M-key restart can therefore pause for more than one frame; that restart cost is outside the scripted 6000-frame workload. Move that prefill to an interruptible staged path before release. The five reported budget overruns are not the only possible user-triggered timing spikes.

@@ -71,3 +71,5 @@ The Windows launcher preference remains parent x16emu.exe/rom.bin, flat files,
 Original reconstruction: Andrey Muzychenko / k4zmu2a, MIT source.
 Original art/audio: Cinematronics and their respective rights holders.
 X16 adaptation and validation: Codex, working with Brett Estrade.
+
+Additional profiling item: music_start currently pre-fills 2048 decoded bytes with interrupts disabled. Startup and an M-key restart can therefore pause for more than one frame; that restart cost is outside the scripted 6000-frame workload. Move that prefill to an interruptible staged path before release. The five reported budget overruns are not the only possible user-triggered timing spikes.
