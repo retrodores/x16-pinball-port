@@ -12,7 +12,7 @@ colors={'7TBumper':3,'11TSoloTarget':4,'12TPopupTarget':4,'5TRamp':6,'7TOneway':
 im=Image.new('P',(320,240),0);im.putpalette([v for rgb in palette for v in rgb]);draw=ImageDraw.Draw(im)
 for e in src:
  col=colors.get(e['class'],2);mask=e['mask']
- if e['class'] in ('12TPopupTarget','5TGate'):continue
+ if e['class'] in ('12TPopupTarget','5TGate') or 280<=e['component']<=287 or 310<=e['component']<=315 or e['class']=='6TDrain':continue
  if 'line'in e:
   x,y,ex,ey=e['line']
   if e['class'] in ('5TWall','11TTableLayer','11TSoloTarget','12TPopupTarget','5TGate','9TKickback','8TPlunger'):
@@ -23,13 +23,17 @@ for e in src:
   if e['class']=='7TBumper':radius=max(.05,radius-.3)
   if e['class'] in ('5TWall','11TSoloTarget','12TPopupTarget'):continue
   a=pt(x+radius,y-radius);b=pt(x-radius,y+radius);draw.ellipse([a,b],outline=col)
+for sling in j['slings']:draw.line([pt(*p)for p in sling+sling[:1]],fill=2,width=1)
+outline=j['outline']
+for k in range(len(outline)):
+ draw.line([pt(*outline[k]),pt(*outline[(k+1)%len(outline)])],fill=4 if k==6 else 2,width=1)
 draw.rectangle((200,0,319,239),fill=0);draw.line((199,4,199,235),fill=9)
 font=ImageFont.truetype('/usr/share/fonts/truetype/dejavu/DejaVuSansMono.ttf',9)
 bold=ImageFont.truetype('/usr/share/fonts/truetype/dejavu/DejaVuSansMono-Bold.ttf',12)
 def text(x,y,s,c=8,f=font):draw.text((x,y),s,fill=c,font=f)
-text(207,8,'CMDRX CADET',2,bold);text(207,25,'WIREFRAME',3)
+text(207,8,'CMDRX CADET',2,bold);text(207,25,'WIREFRAME 0.2',3);text(95,217,'DRAIN',4)
 text(207,48,'SCORE',9);text(207,112,'BALLS',9);text(207,128,'LAYER',9);text(207,145,'CHARGE',9)
-for y,t in [(173,'N   NEW GAME'),(185,'SPACE  LAUNCH'),(197,'SHIFT  FLIPPERS'),(209,'UP  NUDGE / P PAUSE'),(221,'S SOUND / ESC EXIT')]:text(205,y,t)
+for y,t in [(170,'N   NEW GAME'),(181,'SPACE  PLUNGER'),(192,'SHIFT  FLIPPERS'),(203,'UP NUDGE / P PAUSE'),(214,'S SOUND / M MUSIC'),(225,'ESC  QUIT')]:text(205,y,t)
 (o/'TABLE.BIN').write_bytes(im.tobytes());im.save(o/'wireframe.png')
 sprites=bytearray();positions=[]
 def add(sprite):
@@ -66,7 +70,18 @@ for e in src:
  a=pt(x-nx,y-ny);b=pt(ex-nx,ey-ny);x0=min(a[0],b[0])-2;y0=min(a[1],b[1])-2
  sp=Image.new('P',(32,32),0);sd=ImageDraw.Draw(sp);sd.line([(a[0]-x0,a[1]-y0),(b[0]-x0,b[1]-y0)],fill=colors[e['class']])
  mechanisms.append((ids.index(e['component']),x0,y0,add(sp)))
-assert len(markers)+len(mechanisms)+3<128 and len(sprites)<0xc000
+digit_addrs=[]
+for code in range(48,58):
+ sp=Image.new('P',(8,8),0);ImageDraw.Draw(sp).text((0,-2),chr(code),font=font,fill=8);digit_addrs.append(add(sp))
+plunger_addrs=[]
+for phase in range(13):
+ sp=Image.new('P',(8,16),0);sd=ImageDraw.Draw(sp);head=1+phase*7//12
+ sd.line((1,head,6,head),fill=3);sd.line((4,head,4,15),fill=9)
+ coil=[]
+ for yy in range(head+2,15):coil.append((2 if yy%2 else 6,yy))
+ if len(coil)>1:sd.line(coil,fill=3)
+ sd.line((1,15,6,15),fill=8);plunger_addrs.append(add(sp))
+assert len(markers)+len(mechanisms)+44<128 and len(sprites)<0xc000
 (o/'SPRITES.BIN').write_bytes(sprites)
 # Glyphs for runtime score/status updates, one byte per 6-pixel row.
 glyph=[]
@@ -75,13 +90,7 @@ for code in range(32,96):
  for y in range(8):glyph.append(sum((1<<(5-x))for x in range(6)if tile.getpixel((x,y))))
 h=['#pragma once','static const uint8_t glyphs[]={'+','.join(map(str,glyph))+'};','struct Marker{uint8_t group;uint16_t x,y,addr;};','static const Marker markers[]={'+','.join('{%d,%d,%d,%d}'%(g,x,y,(a>>5)|0x8000) for g,x,y,a in markers)+'};','static const uint16_t paddle_x[2]={%d,%d},paddle_y[2]={%d,%d};'%(flippers[0]['x'],flippers[1]['x'],flippers[0]['y'],flippers[1]['y']),'static const uint16_t paddle_addr[2][13]={'+','.join('{'+','.join(str((a>>5)|0x8000)for a in f['addresses'])+'}'for f in flippers)+'};',f'constexpr uint16_t ball_addr={(balladdr>>5)|0x8000};']
 h.append('static const Marker mechanisms[]={'+','.join('{%d,%d,%d,%d}'%(g,x,y,(a>>5)|0x8000)for g,x,y,a in mechanisms)+'};')
+h+=['static const uint16_t digit_addr[10]={'+','.join(str((a>>5)|0x8000)for a in digit_addrs)+'};','static const uint16_t plunger_addr[13]={'+','.join(str((a>>5)|0x8000)for a in plunger_addrs)+'};',f'constexpr uint8_t score_sprite={3+len(markers)+len(mechanisms)},plunger_sprite=score_sprite+40;',f'constexpr uint16_t plunger_x={pt(j["plunger"][0],0)[0]-4},plunger_y_screen=198;']
 (o/'video.h').write_text('\n'.join(h)+'\n')
 print('sprites',len(sprites),'markers',len(markers))
-# The proven PCM driver uses upper banks for the new compact world model.
-sfx=(r.parent/'assets/SFX.BIN').read_bytes();(o/'SFXA.BIN').write_bytes(sfx[:65536]);(o/'SFXB.BIN').write_bytes(sfx[65536:])
-lengths=[790,1329,3020,6579,11895,40219,5449];pos=0;banks=[];lo=[];hi=[]
-for n in lengths:
- bank=56+pos//8192;banks.append(2 if bank==64 else bank);a=0xa000+pos%8192;lo.append(a&255);hi.append(a>>8);pos+=n
-arrays={'audio_banks':banks,'audio_low':lo,'audio_high':hi,'audio_length_low':[n&255 for n in lengths],'audio_length_high':[n>>8 for n in lengths],'audio_priorities':[2,1,4,3,1,5,0]}
-(o/'audio-assets.inc').write_text('\n'.join(k+': .byte '+','.join(map(str,v))for k,v in arrays.items())+'\n')
-s=(r.parent/'direct/integer/audio.s').read_text().replace('cmp #32','cmp #64').replace('direct/build/integer/audio-assets.inc','wireframe/build/audio-assets.inc');(o/'audio.s').write_text(s)
+# Sound data is generated separately; original PCM assets remain in the archive.

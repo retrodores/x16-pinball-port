@@ -1,32 +1,36 @@
-# Recovery notes — CmdrX Cadet wireframe
+# Recovery notes — CmdrX Cadet wireframe 0.2
 
-Writer: Codex. Date: 2026-11-17.
+Writer: Codex. Updated for the user's wireframe refinement and 2 MHz direction.
 
-The active project is `/opt/cmdrx-cadet-direct` on the connected development VM,
-branch `wireframe-rebuild`. The earlier `direct-engine` work remains preserved;
-its base checkpoint is `973210b1288b62d27db575972c21b87906e867b2`.
-There is no configured Git remote. This package's SOURCE.zip is a complete
-recoverable snapshot; no unavailable chat is needed to build the game.
+Project: /opt/cmdrx-cadet-direct on the connected development VM.
+Branch: wireframe-rebuild. No Git remote is configured.
+Accepted 0.1 checkpoint: 6a1996d4dd7ec450d8ccae75419637ba5f3dda7a.
+Earlier direct-engine checkpoint: 973210b1288b62d27db575972c21b87906e867b2.
+This package's SOURCE.zip is a recoverable snapshot; no missing chat is needed.
 
-Read `wireframe/README.md`, `wireframe/AGENTS.md`, `wireframe/VALIDATION.md` and
-`wireframe/CHANGELOG.md`. `wireframe/layout.py` generates the new 47-edge practice table.
-`wireframe/table.json` is its geometry input; `recovered-table.json` preserves
-the earlier Space Cadet geometry;
-`assets/SFX.BIN` contains the seven original effects. `pack.py` generates the
-banked geometry, spatial index and conservative occupancy data. `assets.py`
-builds the wireframe bitmap, sprites, font data and PCM bank metadata.
+The user's current goal is a playable wireframe game in its own right: close
+unintended gaps, show a moving plunger, track score clearly, soften effects, add
+music and support the stock 65C02 at 2 MHz with 8 MHz recommended. Do not switch
+back to the dense recovered Space Cadet geometry as the default table.
 
-`engine.cpp` is a new integer engine, separate from the recovered C++ methods in
-`direct/`. `main.cpp` handles VERA rendering and real keyboard input. `sqrt.s`, `widemul.s` and `narrowmul_shared.s` provide small exact arithmetic primitives. `build.sh` creates
-both CPU binaries; the 65816 build selects the existing native multiply helper.
+Read wireframe/AGENTS.md, README.md, VALIDATION.md and CHANGELOG.md.
+layout.py generates the 49-edge table; pack.py makes the spatial index and banked
+collision model. recovered-table.json preserves the earlier original layout.
+engine.cpp is the integer solver. main.cpp uses the IRQ video clock for fixed
+physics updates and renders ball/flippers, mechanisms, plunger and exact score.
+assets.py builds bitmap/sprite/font data. sound_assets.py generates original soft
+PSG effects and music; audio.s handles their bounded 60 Hz IRQ updates while
+preserving both VERA address ports. Older PCM/reference data remain in the archive.
 
-Validation includes sustained host games, targeted native mechanics/arithmetic,
-normal-ROM full-game replays, actual recorded sound waveforms, and SDL keyboard
-input against the exact distribution PRGs. The frame budget is 133333 cycles at
-8 MHz and must not be weakened. Consult the report for actual results.
+build.sh makes both CPUs. test_native.sh tests arithmetic/mechanics and PSG audio.
+verify_emu.py checks full-game replay agreement, 8 MHz cycle budget, simulation
+clock conservation and 2 MHz display cadence. keyboard_test.py uses real SDL keys.
+boundary_test.cpp fires 3,213 directed shots at perimeter segments and corners.
+soak.cpp completes 120 games and counts traps, timeouts, drains and escapes.
 
-Future artwork should replace assets and sprite art while retaining the world
-projection and collision definitions. The default table is newly designed; the
-recovered original layout is a preserved experiment and failed the timing gate. The first version has basic pinball rules;
-the original mission/rank controller, tilt penalties, music and saved high scores
-remain separate future work. Preserve vendor attribution and the older engines.
+Keep the strict 133333-cycle 8 MHz gate. Do not claim unbroken 60 FPS at 2 MHz;
+report actual cadence from the instrumented tests. No automatic rescue/teleport
+may conceal a physics defect. The fallback lost-ball path is counted as an escape
+and must stay at zero in perimeter and stress tests. Preserve 128-bit scores and
+all attribution. Original missions/ranks, tilt, multiball and saved high scores
+are not implemented. Artwork and original-table restoration are deferred.

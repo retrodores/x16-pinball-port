@@ -1,8 +1,9 @@
-# Current playable rebuild
+# Current playable rebuild: wireframe 0.2
 
-See [wireframe/README.md](wireframe/README.md) for the new original practice table,
-integer engine, sound, controls and runnable builds. Earlier recovered-table
-engines remain below and in direct/ as preserved reference work.
+See [wireframe/README.md](wireframe/README.md) for the standalone practice table,
+joined perimeter, animated plunger, live score, soft effects and quiet music.
+The stock 65C02 is primary: playable at 2 MHz, best at 8 MHz.
+Earlier recovered-table engines remain below and in direct/ as reference work.
 
 # Current runnable build: integer engine
 

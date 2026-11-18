@@ -13,10 +13,27 @@ def line(c,cls,a,b,mask=1,boost=0,elastic=.65,inflate=False,**extra):
  e=dict(component=c,**{'class':cls},mask=mask,active=1,elasticity=elastic,smoothness=.95,threshold=1,boost=boost,line=[x,y,ex,ey]);e.update(extra);edges.append(e)
 def circle(c,cls,x,y,radius,mask=1,boost=0,**extra):
  e=dict(component=c,**{'class':cls},mask=mask,active=1,elasticity=.7,smoothness=.95,threshold=1,boost=boost,circle=[x,y,radius*radius]);e.update(extra);edges.append(e)
-# The boundary normals face into the table. The bottom edge is the drain.
-outline=[(8,14),(8,-10),(5,-13.5),(-5,-13.5),(-8,-10),(-8,14)]
-for k,(a,b)in enumerate(zip(outline,outline[1:])):line(280+k,'5TWall',a,b,inflate=True)
-line(106,'6TDrain',(-8,14.5),(8,14.5))
+def joined(c,points,closed=False,**kw):
+ # Intersect adjacent offset lines so every joint shares one identical endpoint.
+ segments=[]
+ pairs=list(zip(points,points[1:]+points[:1])) if closed else list(zip(points,points[1:]))
+ for a,b in pairs:
+  x,y=a;ex,ey=b;n=math.hypot(ex-x,ey-y);nx=(ey-y)/n*.3;ny=(x-ex)/n*.3
+  segments.append([[x+nx,y+ny],[ex+nx,ey+ny]])
+ for k in range(len(segments) if closed else len(segments)-1):
+  v=segments[k];w=segments[(k+1)%len(segments)];a,b=v;c0,d=w
+  ux,uy=b[0]-a[0],b[1]-a[1];vx,vy=d[0]-c0[0],d[1]-c0[1];cross=ux*vy-uy*vx
+  if abs(cross)<1e-9:joint=b
+  else:
+   t=((c0[0]-a[0])*vy-(c0[1]-a[1])*vx)/cross;joint=[a[0]+t*ux,a[1]+t*uy]
+  v[1]=joint;w[0]=joint
+ for k,(a,b)in enumerate(segments):
+  if c==280 and k==6:line(106,'6TDrain',a,b,**kw)
+  else:line(c+k,'5TWall',a,b,**kw)
+# A continuous inset perimeter, including the corners. Only the marked bottom
+# drain is open to a lost ball; side walls reach below it with no exit gap.
+outline=[(8,13.5),(8,-10),(5,-13.5),(-5,-13.5),(-8,-10),(-8,13.5),(-.75,14.5),(.75,14.5)]
+joined(280,outline,closed=True,mask=7)
 # Shooter lane, open at its top. A thin two-sided rail separates it from play.
 line(290,'5TWall',(-6.25,12),(-6.25,-9.1),inflate=True)
 line(291,'5TWall',(-6.25,-9.1),(-6.25,12),inflate=True)
@@ -25,10 +42,12 @@ line(102,'8TPlunger',(-7.7,12),(-6.55,12),inflate=True)
 # Inlanes and sling faces lead toward the existing two flipper pivots.
 line(300,'5TWall',(2.7,11.7),(7.3,9.8),inflate=True)
 line(301,'5TWall',(-5.85,9.8),(-2.7,11.7),inflate=True)
+slings=[]
 for side in (-1,1):
  pts=[(side*3.8,8.8),(side*5.3,6.6),(side*5.3,9.8)]
  if side<0:pts.reverse()
- for k in range(3):line(310+(side==1)*3+k,'5TWall',pts[k],pts[(k+1)%3],boost=7,inflate=True)
+ slings.append(pts)
+ joined(310+(side==1)*3,pts,closed=True,boost=7)
 # Five independent pop bumpers.
 for k,(x,y)in enumerate(((0,-9.2),(3,-6.5),(-2.5,-6.4),(1.2,-3.4),(-1.2,-.5))):circle(380+k,'7TBumper',x,y,.7,boost=9)
 # Three three-target banks: physical, individually retracting targets.
@@ -59,5 +78,5 @@ circle(510,'8TKickout',0,2.5,.15,capture=cap)
 # The outer return lanes provide two distinct automatic kickbacks.
 line(469,'9TKickback',(6.7,12.5),(7.7,12.5),inflate=True)
 line(470,'9TKickback',(-5.9,12.5),(-4.9,12.5),inflate=True)
-j['edges']=edges;j['layout']='Original CmdrX wireframe practice table, version 0.1';j['plunger']=[-7.02093887,10.0848541]
+j['outline']=outline;j['slings']=slings;j['edges']=edges;j['layout']='Original CmdrX wireframe practice table, version 0.2';j['plunger']=[-7.02093887,10.0848541]
 (r/'table.json').write_text(json.dumps(j,indent=2)+'\n');print('Fresh table:',len(edges),'edges')

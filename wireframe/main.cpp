@@ -3,9 +3,9 @@
 #include <cbm.h>
 #include <cx16.h>
 #include <stdint.h>
-extern "C" {void audio_install();void audio_uninstall();void audio_stop();void audio_toggle();
+extern "C" {void audio_install();void audio_uninstall();void audio_stop();void audio_toggle();void audio_music_toggle();void audio_pause(uint8_t);uint16_t audio_clock();extern volatile uint8_t audio_enabled,music_enabled;
 __attribute__((used)) volatile uint8_t keys[128],commands;
-__attribute__((naked,used)) void keyboard(){asm volatile("phx\npha\nand #127\ntax\npla\nbmi 1f\nlda keys,x\nbne 3f\ncpx #$2c\nbeq 4f\ncpx #$2e\nbeq 4f\ncpx #$37\nbeq 5f\ncpx #$39\nbeq 5f\ncpx #$33\nbeq 6f\ncpx #$20\nbeq 7f\ncpx #$1a\nbeq 8f\ncpx #$6e\nbeq 9f\ncpx #$53\nbeq 10f\nbra 3f\n4: lda #16\nbra 11f\n5: lda #32\nbra 11f\n6: lda #1\nbra 11f\n7: lda #8\nbra 11f\n8: lda #2\nbra 11f\n9: lda #4\nbra 11f\n10: lda #64\n11: ora commands\nsta commands\n3: lda #1\nbra 2f\n1: lda #0\n2: sta keys,x\nplx\nlda #0\nrts");}
+__attribute__((naked,used)) void keyboard(){asm volatile("phx\npha\nand #127\ntax\npla\nbmi 1f\nlda keys,x\nbne 3f\ncpx #$2c\nbeq 4f\ncpx #$2e\nbeq 4f\ncpx #$37\nbeq 5f\ncpx #$39\nbeq 5f\ncpx #$33\nbeq 6f\ncpx #$20\nbeq 7f\ncpx #$1a\nbeq 8f\ncpx #$6e\nbeq 9f\ncpx #$34\nbeq 12f\ncpx #$53\nbeq 10f\nbra 3f\n4: lda #16\nbra 11f\n5: lda #32\nbra 11f\n6: lda #1\nbra 11f\n7: lda #8\nbra 11f\n8: lda #2\nbra 11f\n9: lda #4\nbra 11f\n10: lda #64\nbra 11f\n12: lda #128\n11: ora commands\nsta commands\n3: lda #1\nbra 2f\n1: lda #0\n2: sta keys,x\nplx\nlda #0\nrts");}
 __attribute__((naked)) void screen(){asm volatile("jmp $ff81");}
 }
 static volatile uint8_t*const vera=(volatile uint8_t*)0x9f20;
@@ -16,7 +16,8 @@ static void word(uint16_t v){vera[3]=v;vera[3]=v>>8;}
 static void sprite(uint8_t i,uint16_t addr,uint16_t x,uint16_t y,uint8_t size,bool visible){address(0x1fc00UL+i*8);word(addr);word(x);word(y);vera[3]=visible?12:0;vera[3]=size;}
 __attribute__((noinline)) static void glyph(uint16_t x,uint8_t y,uint8_t c,uint8_t color){if(c<32||c>95)c='?';const uint8_t*g=glyphs+(c-32)*8;uint16_t a=(uint16_t)y*320+x;for(uint8_t row=0;row<8;++row){address(a);uint8_t bits=*g++;for(uint8_t k=0;k<6;++k){vera[3]=(bits&32)?color:0;bits<<=1;}a+=320;}}
 static void line(uint16_t x,uint8_t y,const char*s,uint8_t c=8){while(*s){glyph(x,y,*s++,c);x+=6;}}
-static void video_init(){vera[5]=0;vera[9]=0x51;vera[10]=64;vera[11]=64;vera[12]=0;vera[13]=7;vera[14]=0;vera[15]=0;vera[16]=0;vera[17]=0;vera[18]=0;vera[19]=0;for(uint8_t i=0;i<128;++i)sprite(i,0,1000,0,0,false);for(uint8_t i=0;i<sizeof(markers)/sizeof(markers[0]);++i){const auto&m=markers[i];sprite(i+3,m.addr,m.x,m.y,0,false);}for(uint8_t i=0;i<sizeof(mechanisms)/sizeof(mechanisms[0]);++i){const auto&m=mechanisms[i];sprite(i+3+sizeof(markers)/sizeof(markers[0]),m.addr,m.x,m.y,0xa0,true);}}
+static void video_init(){vera[5]=0;vera[9]=0x51;vera[10]=64;vera[11]=64;vera[12]=0;vera[13]=7;vera[14]=0;vera[15]=0;vera[16]=0;vera[17]=0;vera[18]=0;vera[19]=0;for(uint8_t i=0;i<128;++i)sprite(i,0,1000,0,0,false);for(uint8_t i=0;i<sizeof(markers)/sizeof(markers[0]);++i){const auto&m=markers[i];sprite(i+3,m.addr,m.x,m.y,0,false);}for(uint8_t i=0;i<sizeof(mechanisms)/sizeof(mechanisms[0]);++i){const auto&m=mechanisms[i];sprite(i+3+sizeof(markers)/sizeof(markers[0]),m.addr,m.x,m.y,0xa0,true);}for(uint8_t i=0;i<40;++i)sprite(score_sprite+i,digit_addr[0],207+(i%10)*8,60+(i/10)*10,0,false);sprite(plunger_sprite,plunger_addr[0],plunger_x,plunger_y_screen,0x40,true);pin::game.score_dirty=true;}
+static uint8_t plunger_cache=255,sound_cache=255,music_cache=255;
 static uint8_t mechanism_cache[sizeof(mechanisms)/sizeof(mechanisms[0])];
 static uint8_t marker_cache[sizeof(markers)/sizeof(markers[0])],phase_cache[2]={255,255};
 static char status_cache[16];static uint8_t status_cursor=0;
@@ -34,10 +35,19 @@ __attribute__((noinline)) static void display(){auto&g=pin::game;
 
  if(g.balls!=lastballs){glyph(260,113,'0'+g.balls,8);lastballs=g.balls;}
  if(g.mask!=lastmask){glyph(260,129,'0'+g.mask,6);lastmask=g.mask;}
- if(g.charge!=lastcharge){address(156UL*320+207);for(uint8_t i=0;i<100;++i)vera[3]=i<g.charge?2:10;lastcharge=g.charge;}
- // At most two changed digits per display frame; all 128 bits remain visible.
- uint8_t budget=2;uint8_t significant=0;for(int i=39;i>=0;--i){if(g.digits[i]||i==0)significant=1;uint8_t c=significant?'0'+g.digits[i]:' ';if(c!=score_cache[i]&&budget){uint8_t place=39-i;glyph(207+(place%10)*6,60+(place/10)*10,c,8);score_cache[i]=c;--budget;}}
- if(g.overflow)line(207,100,"SCORE OVERFLOW",4);
+ if(g.charge!=lastcharge){uint8_t lo=lastcharge==255?0:lastcharge<g.charge?lastcharge:g.charge,hi=lastcharge==255?100:lastcharge>g.charge?lastcharge:g.charge;address(156UL*320+207+lo);for(uint8_t i=lo;i<hi;++i)vera[3]=i<g.charge?2:10;lastcharge=g.charge;}
+ uint8_t pose=g.state==pin::Serving?(uint16_t)g.charge*12/100:0;
+ if(pose!=plunger_cache){address(0x1fc00UL+plunger_sprite*8);word(plunger_addr[pose]);plunger_cache=pose;}
+ uint8_t sound_on=audio_enabled&&!paused,music_on=sound_on&&music_enabled;
+ if(sound_cache!=sound_on){glyph(284,145,'S',sound_on?5:9);sound_cache=sound_on;}
+ if(music_cache!=music_on){glyph(300,145,'M',music_on?5:9);music_cache=music_on;}
+ // Sprite glyphs update an entire exact score without slow bitmap drawing.
+ if(g.score_dirty){uint8_t high=39;while(high&&!g.digits[high])--high;
+  for(uint8_t i=0;i<40;++i){uint8_t digit=i<=high?g.digits[high-i]:255;if(digit!=score_cache[i]){address(0x1fc00UL+(score_sprite+i)*8);word(digit_addr[digit==255?0:digit]);address(0x1fc06UL+(score_sprite+i)*8);vera[3]=digit==255?0:12;score_cache[i]=digit;}}
+  g.score_dirty=false;
+ }
+ if(g.overflow&&laststate!=7){line(207,100,"SCORE OVERFLOW",4);laststate=7;}
+
 }
 #ifdef PIN_AUTOPLAY
 static void log(const char*s){while(*s)*(volatile uint8_t*)0x9fbb=*s++;}
@@ -46,36 +56,55 @@ static void hex(uint32_t n){for(int8_t i=7;i>=0;--i)*(volatile uint8_t*)0x9fbb="
 int main(){print("\x93" "CMDRX WIREFRAME\rLOADING...\r");if(!pin::load()){print("MODEL LOAD FAILED\r");return 1;}
  vera[5]=0;vera[9]=1;
  if(!load("TABLE.BIN",2,0)||!load("PALETTE.BIN",3,0xfa00)||!load("SPRITES.BIN",3,0x3000)){screen();print("ASSET LOAD FAILED\r");return 1;}
- *(volatile uint8_t*)0=56;bool ok=load("SFXA.BIN",0,0xa000);*(volatile uint8_t*)0=2;ok=load("SFXB.BIN",0,0xa000)&&ok;*(volatile uint8_t*)0=0;
- if(!ok){screen();print("SOUND LOAD FAILED\r");return 1;}audio_install();video_init();
+ audio_install();video_init();for(auto&v:score_cache)v=255;
  uint16_t old=*(volatile uint16_t*)0x032e;asm volatile("sei");*(volatile uint16_t*)0x032e=(uint16_t)(uintptr_t)keyboard;asm volatile("cli");
 #ifdef PIN_AUTOPLAY
- pin::start();uint32_t maximum=0,total=0;uint16_t over=0,frames=0,game_frame=0,total_drains=0,total_returns=0;uint8_t game_index=0;log("# START\n");
+ pin::start();uint32_t maximum=0,total=0;uint16_t over=0,frames=0,game_frame=0,total_drains=0,total_returns=0,draws=0;uint8_t game_index=0,max_gap=0,max_debt=0,left_counter=0,right_counter=0;uint16_t gaps[8]={};bool ended=false;log("# START\n");
 #endif
- for(;;){waitvsync();asm volatile("sei":::"memory");uint8_t cmd=commands;commands=0;asm volatile("cli":::"memory");if(cmd&4)break;
+ uint16_t simulation_clock=audio_clock();
 #ifdef PIN_AUTOPLAY
- *(volatile uint8_t*)0x9fb8=0;
+ uint16_t start_clock=simulation_clock,last_draw=simulation_clock;
 #endif
- if(cmd&1){audio_stop();pin::start();paused=false;}if(cmd&2){paused=!paused;if(paused)audio_stop();}if(cmd&8)audio_toggle();
- if(!paused){
+ for(;;){
+  uint16_t now;do{now=audio_clock();}while(now==simulation_clock);
+  asm volatile("sei":::"memory");uint8_t cmd=commands;commands=0;asm volatile("cli":::"memory");if(cmd&4)break;
 #ifdef PIN_AUTOPLAY
- const uint8_t charge[3]={80,73,78},left_period[3]={53,50,96},right_period[3]={67,56,102};
- bool pull=pin::game.state==pin::Serving&&pin::game.charge<charge[game_index];
- pin::frame(game_frame%left_period[game_index]<12,game_frame%right_period[game_index]<12,pull);
+  *(volatile uint8_t*)0x9fb8=0;
+#endif
+  if(cmd&1){audio_stop();pin::start();paused=false;audio_pause(0);simulation_clock=now-1;}
+  if(cmd&2){paused=!paused;audio_pause(paused);simulation_clock=now-(paused?0:1);}
+  if(cmd&8)audio_toggle();if(cmd&128)audio_music_toggle();
+  uint16_t debt=now-simulation_clock;
+#ifdef PIN_AUTOPLAY
+  if(debt>max_debt)max_debt=debt>255?255:debt;
+#endif
+  uint8_t steps=debt>2?2:debt;
+  if(paused){simulation_clock=now;steps=0;}
+  for(uint8_t step=0;step<steps;++step){
+#ifdef PIN_AUTOPLAY
+   const uint8_t charge[3]={80,73,78},left_period[3]={53,50,96},right_period[3]={67,56,102};
+   bool pull=pin::game.state==pin::Serving&&pin::game.charge<charge[game_index];
+   pin::frame(left_counter<12,right_counter<12,pull);
+   if(++left_counter==left_period[game_index])left_counter=0;if(++right_counter==right_period[game_index])right_counter=0;
 #else
- pin::frame(keys[0x2c]||keys[0x2e]||(cmd&16),keys[0x37]||keys[0x39]||(cmd&32),keys[0x3d],cmd&64);
+   pin::frame(keys[0x2c]||keys[0x2e]||(cmd&16),keys[0x37]||keys[0x39]||(cmd&32),keys[0x3d],cmd&64);cmd&=~64;
 #endif
- }
- #ifdef PIN_AUTOPLAY
- uint32_t physics_cycles=*(volatile uint32_t*)0x9fb8;
-#endif
- display();
+   ++simulation_clock;
 #ifdef PIN_AUTOPLAY
- uint32_t elapsed=*(volatile uint32_t*)0x9fb8;total+=elapsed;if(elapsed>maximum){maximum=elapsed;log("# WORST ");hex(frames);log(" ");hex(elapsed);log(" ");hex(pin::game.x);log(" ");hex(pin::game.y);log(" ");hex(pin::game.contacts);log(" ");hex(physics_cycles);log("\n");}if(elapsed>133333)++over;
- if(frames%120==0){log("# PLAY ");hex(frames);log(" ");hex(pin::game.x);log(" ");hex(pin::game.y);log(" ");hex(pin::game.state);log(" ");hex(pin::game.drains);log("\n");}
- if(frames==240||frames==1000||frames==1800)*(volatile uint8_t*)0x9fb5=1;
- ++frames;++game_frame;bool ended=false;if(pin::game.state==pin::GameOver){total_drains+=pin::game.drains;total_returns+=pin::game.returns;if(++game_index==3)ended=true;else{pin::start();game_frame=0;}}
- if(frames>=18000||ended){log("# RESULT ");hex(frames);log(" ");hex(maximum);log(" ");hex(total/frames);log(" ");hex(over);log(" ");hex(total_drains);log(" ");hex(total_returns);log("\n");break;}
+   if(frames%120==0){log("# PLAY ");hex(frames);log(" ");hex(pin::game.x);log(" ");hex(pin::game.y);log(" ");hex(pin::game.state);log(" ");hex(pin::game.drains);log("\n");}
+   ++frames;++game_frame;if(pin::game.state==pin::GameOver){total_drains+=pin::game.drains;total_returns+=pin::game.returns;if(++game_index==3)ended=true;else{pin::start();game_frame=0;left_counter=right_counter=0;}}
+   if(frames>=18000||ended)break;
+#endif
+  }
+#ifdef PIN_AUTOPLAY
+  uint32_t physics_cycles=*(volatile uint32_t*)0x9fb8;
+#endif
+  display();
+#ifdef PIN_AUTOPLAY
+  uint32_t elapsed=*(volatile uint32_t*)0x9fb8;total+=elapsed;++draws;
+  if(elapsed>maximum){maximum=elapsed;log("# WORST ");hex(frames);log(" ");hex(elapsed);log(" ");hex(pin::game.x);log(" ");hex(pin::game.y);log(" ");hex(pin::game.contacts);log(" ");hex(physics_cycles);log("\n");}if(elapsed>133333)++over;
+  uint16_t draw_clock=audio_clock(),gap=draw_clock-last_draw;last_draw=draw_clock;if(gap>max_gap)max_gap=gap>255?255:gap;++gaps[gap<7?gap:7];
+  if(frames>=18000||ended){log("# RESULT ");hex(frames);log(" ");hex(maximum);log(" ");hex(total/draws);log(" ");hex(over);log(" ");hex(total_drains);log(" ");hex(total_returns);log("\n# CLOCK ");hex(draw_clock-start_clock);log(" ");hex(draws);log(" ");hex(max_gap);log(" ");hex(max_debt);log("\n# GAPS ");for(uint8_t i=0;i<8;++i){hex(gaps[i]);log(" ");}log("\n");break;}
 #endif
  }
  audio_uninstall();asm volatile("sei");*(volatile uint16_t*)0x032e=old;asm volatile("cli");screen();print("WIREFRAME ENDED\r");

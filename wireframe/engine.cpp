@@ -75,9 +75,9 @@ void sound(uint8_t id){game.last_sound=id;
  if(id==255)audio_stop();else audio_effect(id);
 #endif
 }
-void add_score(uint16_t n){if(game.overflow)return;uint16_t carry=n;for(uint8_t i=0;i<16&&carry;++i){uint16_t sum=game.score[i]+(carry&255);carry=(carry>>8)+(sum>>8);}if(carry){game.overflow=true;return;}carry=n;for(uint8_t i=0;i<16&&carry;++i){uint16_t sum=game.score[i]+(carry&255);game.score[i]=sum;carry=(carry>>8)+(sum>>8);}if(carry){game.overflow=true;return;}carry=n;for(uint8_t i=0;i<40&&carry;++i){uint8_t add=carry%10;carry/=10;uint8_t d=game.digits[i]+add;if(d>=10){d-=10;++carry;}game.digits[i]=d;}}
+void add_score(uint16_t n){if(game.overflow)return;game.score_dirty=true;uint16_t carry=n;for(uint8_t i=0;i<16&&carry;++i){uint16_t sum=game.score[i]+(carry&255);carry=(carry>>8)+(sum>>8);}if(carry){game.overflow=true;return;}carry=n;for(uint8_t i=0;i<16&&carry;++i){uint16_t sum=game.score[i]+(carry&255);game.score[i]=sum;carry=(carry>>8)+(sum>>8);}if(carry){game.overflow=true;return;}carry=n;for(uint8_t i=0;i<40&&carry;++i){uint8_t add=carry%10;carry/=10;uint8_t d=game.digits[i]+add;if(d>=10){d-=10;++carry;}game.digits[i]=d;}}
 static void serve(){sound(255);game.state=Serving;game.x=serve_x;game.y=plunger_y-2;game.z=77;game.vx=game.vy=game.remx=game.remy=game.accx=game.accy=0;game.mask=1;game.ramp=false;game.charge=0;game.flags=0;game.nudges=0;}
-void start(){active_count=0;memset(active_flags,0,sizeof active_flags);memset(&game,0,sizeof game);game.balls=3;game.multiplier=1;serve();}
+void start(){active_count=0;memset(active_flags,0,sizeof active_flags);memset(&game,0,sizeof game);game.balls=3;game.multiplier=1;game.score_dirty=true;serve();}
 static void drain(){if(game.state!=InPlay)return;game.state=Between;game.wait=120;game.vx=game.vy=0;game.mask=0;game.ramp=false;++game.drains;if(game.balls)--game.balls;sound(5);}
 static void limit(){const int16_t cap=15360;int16_t m=ax(game.vx)>ax(game.vy)?ax(game.vx):ax(game.vy);if(m>cap){game.vx=(int32_t)game.vx*cap/m;game.vy=(int32_t)game.vy*cap/m;}}
 static int16_t rebound(int16_t nx,int16_t ny,uint8_t e,uint8_t boost,int16_t ux=0,int16_t uy=0){
@@ -251,6 +251,11 @@ static void move(int16_t dx,int16_t dy,uint8_t steps){int16_t remaining=256;ramp
 }
 static void paddle(uint8_t side,uint8_t old){
  if(game.mask!=1||game.state!=InPlay)return;const Vec&p=pivots[side];const Vec&t=tips[side][game.phase[side]];
+#ifndef PIN_REFERENCE
+ // Reject outside the actual capsule before the closest-point division.
+ // 158 is conservative: the maximum physical collision radius is 156 Q8.
+ if(game.x<(p.x<t.x?p.x:t.x)-158||game.x>(p.x>t.x?p.x:t.x)+158||game.y<(p.y<t.y?p.y:t.y)-158||game.y>(p.y>t.y?p.y:t.y)+158)return;
+#endif
  int16_t bx=game.x-p.x,by=game.y-p.y;if(ax(bx)>800||ax(by)>800)return;
  int16_t ux=t.x-p.x,uy=t.y-p.y;
  int32_t projection=mul(bx,ux)+mul(by,uy);int16_t f=projection<=0?0:projection>=flipper_length2?256:(projection*256)/flipper_length2;
@@ -298,7 +303,7 @@ __attribute__((noinline)) static void tick(bool left,bool right,bool pull,bool n
   if(game.state==InPlay){move(game.vx==before_vx?dx-dx/2:div120(game.vx),game.vy==before_vy?dy-dy/2:div120(game.vy),2);paddle(0,old[0]);paddle(1,old[1]);}
  }else move(dx,dy,1);
  if(game.ramp){const Meta&m=metadata[game.param];game.z=dot(game.x,game.y,m.ax,m.ay)+m.az+77;}
- if(game.x< -3072||game.x>3072||game.y>3900||game.y< -4352)drain();
+ if(game.x< -3072||game.x>3072||game.y>3900||game.y< -4352){++game.escapes;drain();}
 }
 __attribute__((noinline)) void frame(bool l,bool r,bool p,bool n){
 #ifdef __CX16__

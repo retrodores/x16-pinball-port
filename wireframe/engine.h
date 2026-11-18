@@ -10,8 +10,8 @@ struct Meta {int16_t x,y,vx,vy,fx,fy,ax,ay,az;uint16_t delay;uint8_t action,mask
 struct Game {
  int16_t x,y,z,vx,vy,remx,remy,accx,accy,fx,fy;uint16_t tick,wait,ignore,contacts;
  uint8_t mask,phase[2],charge,balls,state,last_sound,flash[160],score[16],digits[40];
- uint16_t disabled[160];uint8_t lamps[160];uint8_t captured,param,flags,multiplier,nudges;bool ramp,overflow;
- uint16_t bumper_hits,flipper_hits,target_hits,returns,drains,guard_hits;
+ uint16_t disabled[160];uint8_t lamps[160];uint8_t captured,param,flags,multiplier,nudges;bool ramp,overflow,score_dirty;
+ uint16_t bumper_hits,flipper_hits,target_hits,returns,drains,guard_hits,escapes;
 };
 extern Game game;
 bool load();void start();void frame(bool left,bool right,bool pull,bool nudge=false);void add_score(uint16_t n);void sound(uint8_t id);
