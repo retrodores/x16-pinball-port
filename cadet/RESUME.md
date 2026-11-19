@@ -2,6 +2,9 @@
 
 Author: Codex, working with Brett Estrade. Session date: November 19, 2026 (America/Chicago).
 
+See [BETA-FOLLOW-UP.md](BETA-FOLLOW-UP.md) for the newer 1.0 Beta audio, outlane,
+and timing work.
+
 ## Checkout and preservation
 
 Use Desktop Commander on the authorized VM. Repository:
