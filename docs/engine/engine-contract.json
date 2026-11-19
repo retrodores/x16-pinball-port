@@ -1,0 +1,2768 @@
+{
+  "schema_version": "1.0.0",
+  "baseline_commit": "9534fb8ed127092b0e9580ab75bfaf5d010e9b94",
+  "baseline_branch": "spacecadet-fidelity",
+  "status": "descriptive_implementation_snapshot",
+  "hardware": {
+    "cpu": "65C02",
+    "clock_hz": 8000000,
+    "minimum_banked_ram_kib": 512,
+    "test_ram_kib": [
+      512,
+      2048
+    ],
+    "bank_register": 0,
+    "bank_window_start": 40960,
+    "bank_bytes": 8192,
+    "software_stack_start": 40704,
+    "maximum_bss_end": 39680,
+    "vera_io_base": 40736,
+    "emulator_cycle_ports": [
+      40888,
+      40889,
+      40890,
+      40891
+    ]
+  },
+  "timing": {
+    "nominal_physics_hz": 60,
+    "calls_per_observed_vblank": 1,
+    "catch_up": false,
+    "timer_units_per_call": 2,
+    "timer_units_per_nominal_second": 120,
+    "vga_refresh_hz_numerator": 25000000,
+    "vga_refresh_hz_denominator": 420000,
+    "music_ticks_per_125_frames": 126,
+    "strict_cycles_per_frame": 133333,
+    "panel_threshold_cycles": 80000,
+    "prefetch_threshold_cycles": 100000,
+    "current_commit_budget_certified": false
+  },
+  "numeric": {
+    "coordinate_scale": 256,
+    "velocity_scale": 256,
+    "force_scale": 256,
+    "normal_scale": 256,
+    "fraction_scale": 256,
+    "projection_scale": 4096,
+    "signed_division": "truncate_toward_zero",
+    "sqrt": "floor",
+    "max_velocity_component": 15360,
+    "gravity_y": 3068,
+    "drag_divisor": 300,
+    "score_bytes": 16,
+    "score_endian": "little",
+    "decimal_digits": 40,
+    "score_overflow": "reject_entire_award_preserve_value_and_latch_overflow"
+  },
+  "enums": {
+    "kind": {
+      "0": "Wall",
+      "1": "Bumper",
+      "2": "Plunger",
+      "3": "Drain",
+      "4": "Ramp",
+      "5": "Target",
+      "6": "Drop",
+      "7": "Sensor",
+      "8": "Spinner",
+      "9": "Gate",
+      "10": "Kickback",
+      "11": "Sink",
+      "12": "Kickout",
+      "13": "Hole",
+      "14": "Pass"
+    },
+    "state": {
+      "0": "Ready",
+      "1": "Serving",
+      "2": "InPlay",
+      "3": "Captured",
+      "4": "Between",
+      "5": "GameOver"
+    }
+  },
+  "geometry": {
+    "edge_struct_format": "<11h8Bh",
+    "edge_bytes": 32,
+    "fields": [
+      "x",
+      "y",
+      "ex",
+      "ey",
+      "nx",
+      "ny",
+      "r",
+      "xlo",
+      "ylo",
+      "xhi",
+      "yhi",
+      "group",
+      "smooth",
+      "kind",
+      "mask",
+      "elastic",
+      "boost",
+      "param",
+      "flags",
+      "threshold"
+    ],
+    "edges": 1217,
+    "components": 144,
+    "component_capacity": 160,
+    "grid": [
+      48,
+      64
+    ],
+    "grid_origin": [
+      -3072,
+      -4096
+    ],
+    "cell_width_q8": 128,
+    "layers": [
+      1,
+      2,
+      4
+    ],
+    "candidate_buffer_words": 128,
+    "contact_iterations_per_substep": 5,
+    "ramp_ignore_capacity": 8,
+    "circle_radius_max_q8": 181,
+    "flag_bits": {
+      "circle": 1,
+      "active": 2,
+      "rollover_pair": 4,
+      "required_lamp_on": 8
+    }
+  },
+  "bank_allocations": [
+    {
+      "banks": [
+        1,
+        2,
+        3
+      ],
+      "owner": "geometry_index"
+    },
+    {
+      "banks": [
+        4,
+        5,
+        6,
+        7,
+        8,
+        9
+      ],
+      "owner": "geometry_candidates"
+    },
+    {
+      "banks": [
+        10
+      ],
+      "owner": "depth_index"
+    },
+    {
+      "banks": [
+        11
+      ],
+      "owner": "ui_tables"
+    },
+    {
+      "banks": [
+        12,
+        13,
+        14,
+        15,
+        16
+      ],
+      "owner": "geometry_edges"
+    },
+    {
+      "banks": [
+        17,
+        18,
+        45,
+        46,
+        47,
+        48,
+        49,
+        50
+      ],
+      "owner": "depth_data"
+    },
+    {
+      "banks": [
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28,
+        29,
+        30,
+        51,
+        52,
+        53,
+        54,
+        55,
+        56,
+        57
+      ],
+      "owner": "pcm"
+    },
+    {
+      "banks": [
+        31
+      ],
+      "owner": "music_dictionary"
+    },
+    {
+      "banks": [
+        32,
+        33,
+        34,
+        35,
+        36,
+        37,
+        38,
+        39,
+        40,
+        41,
+        42,
+        43,
+        44
+      ],
+      "owner": "music_lz"
+    },
+    {
+      "banks": [
+        58,
+        59,
+        60,
+        63
+      ],
+      "owner": "dynamic_patches"
+    },
+    {
+      "banks": [
+        61
+      ],
+      "owner": "rules_overlay"
+    },
+    {
+      "banks": [
+        62
+      ],
+      "owner": "physics_overlay"
+    }
+  ],
+  "vera": {
+    "output": [
+      640,
+      480
+    ],
+    "tile_size": [
+      16,
+      16
+    ],
+    "bpp": 4,
+    "map_size": [
+      64,
+      32
+    ],
+    "map_base": 0,
+    "tile_base": 4096,
+    "sprite_pattern_base": 102656,
+    "font_base": 121344,
+    "ball_scratch_base": 123392,
+    "palette_base": 129536,
+    "sprite_attributes_base": 130048,
+    "psg_base": 129472,
+    "register_values": {
+      "DC_VIDEO": 81,
+      "DC_HSCALE": 119,
+      "DC_VSCALE": 117,
+      "L0_CONFIG": 18,
+      "L0_MAPBASE": 0,
+      "L0_TILEBASE": 11
+    }
+  },
+  "audio": {
+    "pcm_format": "signed8_mono",
+    "pcm_rate_register": 29,
+    "pcm_rate_hz": 11062.6220703125,
+    "voices": 3,
+    "voice_order": [
+      "table",
+      "flipper",
+      "plunger"
+    ],
+    "gain_right_shift_by_active_voices": {
+      "1": 0,
+      "2": 1,
+      "3": 2
+    },
+    "prime_samples": 256,
+    "regular_base_samples": 185,
+    "fraction_increment": 55840,
+    "fraction_modulus": 65536,
+    "music_dictionary_bytes": 4096,
+    "music_prefetch_max_bytes": 64,
+    "music_lead_target_bytes": 2048,
+    "music_decoded_command_bytes": 214239
+  },
+  "runtime_files": [
+    {
+      "path": "cadet/play-build/CADET.PRG",
+      "bytes": 38657,
+      "sha256": "4aa2a2583002cd66e44de07e1e718ec593253cecd108d48153f177b1aae762c6"
+    },
+    {
+      "path": "cadet/play-build/CADET.RUL",
+      "bytes": 8192,
+      "sha256": "def7687c6af596bb6ad67bfbdf645d1093dc291f5ff67beb33a42c79c59e9e7e"
+    },
+    {
+      "path": "cadet/play-build/CADET.PHY",
+      "bytes": 8192,
+      "sha256": "728da432a76b24808e976504ddfaff2c6f84bda62b9de65370662854ef49fcaf"
+    },
+    {
+      "path": "cadet/play-build/MAP.BIN",
+      "bytes": 4096,
+      "sha256": "5e13fdd9f11ff762f3656b8685296a778c78d995a91439f5546c7f7c46780e7f"
+    },
+    {
+      "path": "cadet/play-build/TILES.BIN",
+      "bytes": 98560,
+      "sha256": "0f5cbf23dd41122d60da927c68899a55c27f51da0f2159356442d23fe4905d05"
+    },
+    {
+      "path": "cadet/play-build/PAL.BIN",
+      "bytes": 512,
+      "sha256": "8f94a15c67fae3f52b4da0ce6e84b05cac2891146167c87da486054d57a5192b"
+    },
+    {
+      "path": "cadet/play-build/SPRITES.BIN",
+      "bytes": 18688,
+      "sha256": "b69983fccf9c13fcd2294a8284f9bd37a85b3af75a2474adf48682b1f844cede"
+    },
+    {
+      "path": "cadet/play-build/FONT.BIN",
+      "bytes": 2048,
+      "sha256": "7a89b8682eeac94c0f91373cd1478b54630ecea49712a4776c24993d3677c015"
+    },
+    {
+      "path": "cadet/play-build/UI.BIN",
+      "bytes": 6530,
+      "sha256": "3756b6903d2c1aefe03f0d01fe108d0f11859d97f74654a7abffdfb4a9f14251"
+    },
+    {
+      "path": "cadet/play-build/GEOM0.BIN",
+      "bytes": 65536,
+      "sha256": "fae9acb796bc25f6afe48e98db849c38071671fd214f6e08ac0f2c25713b1192"
+    },
+    {
+      "path": "cadet/play-build/GEOM1.BIN",
+      "bytes": 65536,
+      "sha256": "6598497fa23946b59d8c952f7ac2e53b0c3ce0da1bff72ffe2cd9f3cfd919a35"
+    },
+    {
+      "path": "cadet/play-build/GEOM2.BIN",
+      "bytes": 16384,
+      "sha256": "a19049d8fa2795b880705e23051745cc7648eec38166d9db91cb5e3097f860ca"
+    },
+    {
+      "path": "cadet/play-build/MUSIC0.BIN",
+      "bytes": 65536,
+      "sha256": "a725d34230c7eb2f6d0ddad3139807682dbeb0ae9d0fd3e4054aff829e544706"
+    },
+    {
+      "path": "cadet/play-build/MUSIC1.BIN",
+      "bytes": 37194,
+      "sha256": "5d7b84eb6f4246dffee695330247f45b8551d7701a32bc168feaabc5c078cfa9"
+    },
+    {
+      "path": "cadet/play-build/PCM0.BIN",
+      "bytes": 65536,
+      "sha256": "6f4f91a14d9b61fbdd4698ee652188a7299ff79d28e594460d788bf9327c7dfd"
+    },
+    {
+      "path": "cadet/play-build/PCM1.BIN",
+      "bytes": 32768,
+      "sha256": "b03f7f82ad07a442620f2b10ab130d1d5467ad111739fc7aca26ba76ddde3b73"
+    },
+    {
+      "path": "cadet/play-build/PCM2.BIN",
+      "bytes": 49938,
+      "sha256": "e98cb5cf4ce2dcd9c481fa31a4d9bc6e683c335b60d99480bb5694eb92f64e7b"
+    },
+    {
+      "path": "cadet/play-build/DYN0.BIN",
+      "bytes": 8192,
+      "sha256": "91ff6f13d5f400003a456c17a3af74a21b9cac98db6c0785f0052c0dd11b64fd"
+    },
+    {
+      "path": "cadet/play-build/DYN1.BIN",
+      "bytes": 8192,
+      "sha256": "6b2fe859745b70c27abcb0e665cb542f0aab9be9649daef76c816d4d00907d03"
+    },
+    {
+      "path": "cadet/play-build/DYN2.BIN",
+      "bytes": 8192,
+      "sha256": "48bbd0ed2fe044593b8237f818d4652c11cb481baa982bb70ab253a03aa96232"
+    },
+    {
+      "path": "cadet/play-build/DYN3.BIN",
+      "bytes": 8192,
+      "sha256": "89e5280efbf3b730d4ddf9617a2097553e1645fa5909b4275c0d98fb8c62486d"
+    },
+    {
+      "path": "cadet/play-build/DEPTH00.BIN",
+      "bytes": 5640,
+      "sha256": "5cdeb8f62c4c3d05c913b10c4867dcb979bf5676c6c0544be709051cf30fbcee"
+    },
+    {
+      "path": "cadet/play-build/DEPTH01.BIN",
+      "bytes": 8192,
+      "sha256": "ee82683f10ee9946e434110341075894cbf5186f7bce86d06fb92ecb89c4cedf"
+    },
+    {
+      "path": "cadet/play-build/DEPTH02.BIN",
+      "bytes": 8192,
+      "sha256": "b3d9e7e58e3f77d5b3296681c87591fba0dfd166b897934eb485f1584ff50d73"
+    },
+    {
+      "path": "cadet/play-build/DEPTH03.BIN",
+      "bytes": 8192,
+      "sha256": "02b21af3bdc3c3dc817e629fe8abc10c8684d2759414ac583d05a45883ee5893"
+    },
+    {
+      "path": "cadet/play-build/DEPTH04.BIN",
+      "bytes": 8192,
+      "sha256": "3952176ba429294da837bdb398b4c615096cb2c189892c91e9068957e506afdb"
+    },
+    {
+      "path": "cadet/play-build/DEPTH05.BIN",
+      "bytes": 8192,
+      "sha256": "9fe7e6b81247c064afba092bafb617419db9383681627f73cd3c29c7c81c1b1d"
+    },
+    {
+      "path": "cadet/play-build/DEPTH06.BIN",
+      "bytes": 8192,
+      "sha256": "2e19f5b0b20bb83e7659db8f197cb82006bc6edcc126d6a239c99a5c70be6dba"
+    },
+    {
+      "path": "cadet/play-build/DEPTH07.BIN",
+      "bytes": 8192,
+      "sha256": "7f7979831bb7b83421d5395562ed896b99488f1a10d640a3b0df80b12633a2c2"
+    },
+    {
+      "path": "cadet/play-build/DEPTH08.BIN",
+      "bytes": 6825,
+      "sha256": "507e6af35c651824d100f1f0659f07544b3beb1bcc84abad4578f014ab565c32"
+    }
+  ],
+  "sources": [
+    {
+      "path": "cadet/game/audio.s",
+      "sha256": "6f7f4d96ecc3a532db34dc3ee56bce4572b2d307277a9b4817145d2c9d1e910c",
+      "symbols": [
+        {
+          "line": 6,
+          "declaration": "lab_install:"
+        },
+        {
+          "line": 52,
+          "declaration": "lab_uninstall:"
+        },
+        {
+          "line": 78,
+          "declaration": "lab_clock:"
+        },
+        {
+          "line": 85,
+          "declaration": "pcm_stop:"
+        },
+        {
+          "line": 103,
+          "declaration": "pcm_start:"
+        },
+        {
+          "line": 108,
+          "declaration": "pcm_flipper_start:"
+        },
+        {
+          "line": 113,
+          "declaration": "pcm_plunger_start:"
+        },
+        {
+          "line": 117,
+          "declaration": "pcm_voice_start:"
+        },
+        {
+          "line": 144,
+          "declaration": "music_start:"
+        },
+        {
+          "line": 157,
+          "declaration": "music_stop:"
+        },
+        {
+          "line": 194,
+          "declaration": "lab_irq:"
+        },
+        {
+          "line": 251,
+          "declaration": "irq_end:"
+        },
+        {
+          "line": 256,
+          "declaration": "pcm_service:"
+        },
+        {
+          "line": 271,
+          "declaration": "pcm_done:"
+        },
+        {
+          "line": 273,
+          "declaration": "pcm_pending:"
+        },
+        {
+          "line": 282,
+          "declaration": "pcm_prime:"
+        },
+        {
+          "line": 293,
+          "declaration": "pcm_regular:"
+        },
+        {
+          "line": 307,
+          "declaration": "pcm_fill:"
+        },
+        {
+          "line": 318,
+          "declaration": "pcm_fifo_write:"
+        },
+        {
+          "line": 329,
+          "declaration": "pcm_count_underrun:"
+        },
+        {
+          "line": 343,
+          "declaration": "pcm_render:"
+        },
+        {
+          "line": 384,
+          "declaration": "pcm_next_voice:"
+        },
+        {
+          "line": 424,
+          "declaration": "pcm_read:"
+        },
+        {
+          "line": 427,
+          "declaration": "pcm_gain_jump:"
+        },
+        {
+          "line": 429,
+          "declaration": "pcm_two_shift:"
+        },
+        {
+          "line": 432,
+          "declaration": "pcm_one_shift:"
+        },
+        {
+          "line": 435,
+          "declaration": "pcm_no_shift:"
+        },
+        {
+          "line": 455,
+          "declaration": "pcm_next_sample:"
+        },
+        {
+          "line": 466,
+          "declaration": "pcm_voice_done:"
+        },
+        {
+          "line": 478,
+          "declaration": "save_address:"
+        },
+        {
+          "line": 490,
+          "declaration": "restore_address:"
+        },
+        {
+          "line": 500,
+          "declaration": "music_service:"
+        },
+        {
+          "line": 517,
+          "declaration": "music_command:"
+        },
+        {
+          "line": 537,
+          "declaration": "music_fm:"
+        },
+        {
+          "line": 541,
+          "declaration": "music_fm_loop:"
+        },
+        {
+          "line": 562,
+          "declaration": "music_extension:"
+        },
+        {
+          "line": 573,
+          "declaration": "music_wait:"
+        },
+        {
+          "line": 578,
+          "declaration": "music_eof:"
+        },
+        {
+          "line": 583,
+          "declaration": "music_return:"
+        },
+        {
+          "line": 591,
+          "declaration": "old_irq: .zero 2"
+        },
+        {
+          "line": 592,
+          "declaration": "lab_ticks: .zero 2"
+        },
+        {
+          "line": 593,
+          "declaration": "saved_ctrl: .zero 1"
+        },
+        {
+          "line": 594,
+          "declaration": "saved_addr: .zero 3"
+        },
+        {
+          "line": 595,
+          "declaration": "saved_psg: .zero 64"
+        },
+        {
+          "line": 597,
+          "declaration": "pcm_voices:"
+        },
+        {
+          "line": 598,
+          "declaration": "pcm_remaining: .zero 2"
+        },
+        {
+          "line": 600,
+          "declaration": "pcm_flipper_remaining: .zero 2"
+        },
+        {
+          "line": 602,
+          "declaration": "pcm_plunger_remaining: .zero 2"
+        },
+        {
+          "line": 604,
+          "declaration": "pcm_new_length: .zero 2"
+        },
+        {
+          "line": 605,
+          "declaration": "pcm_count: .zero 2"
+        },
+        {
+          "line": 606,
+          "declaration": "pcm_current_bank: .zero 1"
+        },
+        {
+          "line": 607,
+          "declaration": "pcm_voice_index: .zero 1"
+        },
+        {
+          "line": 608,
+          "declaration": "pcm_active_count: .zero 1"
+        },
+        {
+          "line": 609,
+          "declaration": "pcm_quota: .zero 2"
+        },
+        {
+          "line": 610,
+          "declaration": "pcm_phase: .zero 2"
+        },
+        {
+          "line": 611,
+          "declaration": "pcm_started: .zero 1"
+        },
+        {
+          "line": 612,
+          "declaration": "pcm_fresh: .zero 1"
+        },
+        {
+          "line": 613,
+          "declaration": "pcm_underruns: .zero 2"
+        },
+        {
+          "line": 614,
+          "declaration": "pcm_buffer: .zero 256"
+        },
+        {
+          "line": 615,
+          "declaration": "music_enabled: .zero 1"
+        },
+        {
+          "line": 616,
+          "declaration": "music_bank: .zero 1"
+        },
+        {
+          "line": 617,
+          "declaration": "music_delay: .zero 1"
+        },
+        {
+          "line": 618,
+          "declaration": "music_phase: .zero 1"
+        },
+        {
+          "line": 619,
+          "declaration": "music_count: .zero 1"
+        },
+        {
+          "line": 620,
+          "declaration": "music_reg: .zero 1"
+        },
+        {
+          "line": 621,
+          "declaration": "music_loops: .zero 1"
+        },
+        {
+          "line": 622,
+          "declaration": "music_error: .zero 1"
+        },
+        {
+          "line": 623,
+          "declaration": "irq_start: .zero 4"
+        },
+        {
+          "line": 624,
+          "declaration": "irq_elapsed: .zero 4"
+        },
+        {
+          "line": 625,
+          "declaration": "irq_max: .zero 4"
+        },
+        {
+          "line": 626,
+          "declaration": "fm_writes: .zero 4"
+        },
+        {
+          "line": 627,
+          "declaration": "psg_writes: .zero 4"
+        },
+        {
+          "line": 630,
+          "declaration": "pcm_select_bank: .zero 1"
+        },
+        {
+          "line": 631,
+          "declaration": "pcm_select_ptr: .zero 2"
+        },
+        {
+          "line": 635,
+          "declaration": "lz_flags: .zero 1"
+        },
+        {
+          "line": 636,
+          "declaration": "lz_left: .zero 1"
+        },
+        {
+          "line": 637,
+          "declaration": "lz_run: .zero 1"
+        },
+        {
+          "line": 638,
+          "declaration": "lz_low: .zero 1"
+        },
+        {
+          "line": 639,
+          "declaration": "lz_high: .zero 1"
+        },
+        {
+          "line": 640,
+          "declaration": "music_buffered: .zero 2"
+        },
+        {
+          "line": 641,
+          "declaration": "lz_remaining: .zero 3"
+        }
+      ]
+    },
+    {
+      "path": "cadet/game/audio_events.h",
+      "sha256": "ce4379629bbfa7cae70db208019b631118757505bf2ef59c2fbbc07da381773d",
+      "symbols": [
+        {
+          "line": 8,
+          "declaration": "static uint16_t audio_event_sample(uint8_t event,uint8_t group,uint8_t kind,uint8_t value){"
+        }
+      ]
+    },
+    {
+      "path": "cadet/game/bounds.s",
+      "sha256": "9b102ddfa1482bf62a0d3d1a33375bbcbcfe01827a74d6d86fbebdaf5b4df55b",
+      "symbols": [
+        {
+          "line": 8,
+          "declaration": "bounded_edge:"
+        },
+        {
+          "line": 76,
+          "declaration": "rejected:"
+        }
+      ]
+    },
+    {
+      "path": "cadet/game/build.sh",
+      "sha256": "986069550772b6f5a747a444b04d5f2eeaebbea630a0a94f0d06ae8e68ae1b22",
+      "symbols": []
+    },
+    {
+      "path": "cadet/game/build_native.py",
+      "sha256": "91d50cf711a22a40d30b993eee62e624d02b408906dd14a38b04c3c7b3f02185",
+      "symbols": []
+    },
+    {
+      "path": "cadet/game/depth.c",
+      "sha256": "e4b898f7f56503dfbe2d0ece99c36789190763d828f32aaa1a0ca3a39d81b057",
+      "symbols": [
+        {
+          "line": 4,
+          "declaration": "uint16_t depth_mask(int16_t x,int16_t y,uint8_t depth){"
+        }
+      ]
+    },
+    {
+      "path": "cadet/game/depth_quant.s",
+      "sha256": "78dacdc87ed5afb049d038c0379b5c84bcf004591fd5f6db6d39dfa2146f5d83",
+      "symbols": [
+        {
+          "line": 8,
+          "declaration": "depth_quant:"
+        }
+      ]
+    },
+    {
+      "path": "cadet/game/depth_rect.s",
+      "sha256": "56e8d72540f2a375f9a0290493b21a45eef0c4c3fec67cc13e11df167938e799",
+      "symbols": [
+        {
+          "line": 8,
+          "declaration": "depth_decode:"
+        },
+        {
+          "line": 70,
+          "declaration": "depth_token:"
+        },
+        {
+          "line": 87,
+          "declaration": "depth_literal_partial:"
+        },
+        {
+          "line": 97,
+          "declaration": "depth_literal_emit:"
+        },
+        {
+          "line": 110,
+          "declaration": "depth_repeat:"
+        },
+        {
+          "line": 124,
+          "declaration": "depth_repeat_partial:"
+        },
+        {
+          "line": 130,
+          "declaration": "depth_repeat_emit:"
+        },
+        {
+          "line": 142,
+          "declaration": "depth_nextblock:"
+        },
+        {
+          "line": 154,
+          "declaration": "depth_done:"
+        },
+        {
+          "line": 160,
+          "declaration": "depth_getblock:"
+        },
+        {
+          "line": 184,
+          "declaration": "depth_banks: .byte 17,18,45,46,47,48,49,50"
+        },
+        {
+          "line": 190,
+          "declaration": "depth_masks:"
+        },
+        {
+          "line": 209,
+          "declaration": "rect_row:"
+        },
+        {
+          "line": 252,
+          "declaration": "rect_bits_low: .byte 0,1,3,7,15,31,63,127,255,255,255,255,255,255,255,255,255"
+        },
+        {
+          "line": 253,
+          "declaration": "rect_bits_high: .byte 0,0,0,0,0,0,0,0,0,1,3,7,15,31,63,127,255"
+        },
+        {
+          "line": 255,
+          "declaration": "rect_x: .space 2"
+        },
+        {
+          "line": 256,
+          "declaration": "rect_y: .space 2"
+        },
+        {
+          "line": 257,
+          "declaration": "rect_dest: .space 2"
+        },
+        {
+          "line": 258,
+          "declaration": "rect_depth: .space 1"
+        },
+        {
+          "line": 259,
+          "declaration": "rect_width: .space 1"
+        },
+        {
+          "line": 260,
+          "declaration": "rect_height: .space 1"
+        }
+      ]
+    },
+    {
+      "path": "cadet/game/dynamic.c",
+      "sha256": "f68d045f31b98e773faef33e2a185c3c8feddb8a362a5fd0d33c9454f6c8ace0",
+      "symbols": [
+        {
+          "line": 12,
+          "declaration": "static void bank(uint8_t b){__asm__ volatile(\"\":::\"memory\");*(volatile uint8_t*)0=b;__asm__ volatile(\"\":::\"memory\");}"
+        },
+        {
+          "line": 13,
+          "declaration": "static uint16_t u16(const uint8_t*p){return(uint16_t)p[0]|((uint16_t)p[1]<<8);}"
+        },
+        {
+          "line": 14,
+          "declaration": "static void write_address(uint32_t a){dv[5]=0;dv[0]=a;dv[1]=a>>8;dv[2]=0x10|(a>>16);}"
+        },
+        {
+          "line": 15,
+          "declaration": "static void addresses(void){"
+        },
+        {
+          "line": 19,
+          "declaration": "static bool fast_update(void){"
+        },
+        {
+          "line": 33,
+          "declaration": "bool dynamic_update(uint8_t budget){"
+        },
+        {
+          "line": 66,
+          "declaration": "void dynamic_init(void){"
+        }
+      ]
+    },
+    {
+      "path": "cadet/game/engine.c",
+      "sha256": "2cef1fa4cec1c049a7c45d91e8477bd68e46245d6552eb02503be1c15d817c8c",
+      "symbols": [
+        {
+          "line": 21,
+          "declaration": "static uint32_t cycles(void){uint8_t a=*(volatile uint8_t*)0x9fb8,b=*(volatile uint8_t*)0x9fb9,c=*(volatile uint8_t*)0x9fba,d=*(volatile uint8_t*)0x9fbb;return(uint32_t)a|((uint32_t)b<<8)|((uint32_t)c<<16)|((uint32_t)d<<24);}"
+        },
+        {
+          "line": 33,
+          "declaration": "static void touch(uint8_t c){if(!active_flags[c]){active_flags[c]=1;active[active_count++]=c;}}"
+        },
+        {
+          "line": 44,
+          "declaration": "static int16_t ax(int16_t x){return x<0?-x:x;}"
+        },
+        {
+          "line": 49,
+          "declaration": "static int32_t mul(int16_t a,int16_t b){return(int32_t)a*b;}"
+        },
+        {
+          "line": 51,
+          "declaration": "static uint32_t umul(uint16_t a,uint16_t b){"
+        },
+        {
+          "line": 58,
+          "declaration": "static uint32_t wide_mul(uint32_t a,uint16_t b){return umul(a,b)+((uint32_t)((uint16_t)(a>>16)*b)<<16);}"
+        },
+        {
+          "line": 61,
+          "declaration": "static int16_t div60(int16_t v){uint16_t q=umul(v<0?-(int32_t)v:v,34953)>>21;return v<0?-q:q;}"
+        },
+        {
+          "line": 62,
+          "declaration": "static int16_t div120(int16_t v){uint16_t q=umul(v<0?-(int32_t)v:v,34953)>>22;return v<0?-q:q;}"
+        },
+        {
+          "line": 63,
+          "declaration": "static int16_t div300(int16_t v){uint16_t q=umul(v<0?-(int32_t)v:v,55925)>>24;return v<0?-q:q;}"
+        },
+        {
+          "line": 64,
+          "declaration": "static int16_t dot(int16_t x,int16_t y,int16_t nx,int16_t ny){if(!ny){if(nx==256)return x;if(nx== -256)return -x;}if(!nx){if(ny==256)return y;if(ny== -256)return -y;}return (mul(x,nx)+mul(y,ny))/256;}"
+        },
+        {
+          "line": 70,
+          "declaration": "__attribute__((noinline)) static uint16_t fraction(uint16_t n,uint16_t d){if(!n)return 0;if(n>=d)return 256;uint16_t q=0;for(uint8_t i=0;i<8;++i){n<<=1;q<<=1;if(n>=d){n-=d;++q;}}return q;}"
+        },
+        {
+          "line": 74,
+          "declaration": "static uint16_t fraction_wide(uint32_t n,uint32_t d){return n<32768&&d<32768?fraction(n,d):fraction32(n,d);}"
+        },
+        {
+          "line": 76,
+          "declaration": "static uint16_t fraction_wide(uint32_t n,uint32_t d){if(n<32768&&d<32768)return fraction(n,d);if(n>=d)return 256;uint16_t q=0;for(uint8_t i=0;i<8;++i){n<<=1;q<<=1;if(n>=d){n-=d;++q;}}return q;}"
+        },
+        {
+          "line": 78,
+          "declaration": "static int16_t normal(int16_t n,uint16_t d){int16_t q=fraction(ax(n),d);return n<0?-q:q;}"
+        },
+        {
+          "line": 79,
+          "declaration": "static uint16_t isqrt(uint32_t n){"
+        },
+        {
+          "line": 86,
+          "declaration": "static void read(uint8_t bank,uint16_t offset,void*d,uint16_t n){"
+        },
+        {
+          "line": 93,
+          "declaration": "bool game_load(void){cell_id=65535;"
+        },
+        {
+          "line": 113,
+          "declaration": "void sound(uint8_t id){game.last_sound=id;"
+        },
+        {
+          "line": 118,
+          "declaration": "void add_score(uint16_t n){if(game.overflow)return;game.score_dirty=true;uint16_t carry=n;for(uint8_t i=0;i<16&&carry;++i){uint16_t sum=game.score[i]+(carry&255);carry=(carry>>8)+(sum>>8);}if(carry){game.overflow=true;return;}carry=n;for(uint8_t i=0;"
+        },
+        {
+          "line": 144,
+          "declaration": "static BANK_TRAMPOLINE void rules_reset(void){RULE_ENTER;rule_reset();RULE_LEAVE;}"
+        },
+        {
+          "line": 145,
+          "declaration": "static BANK_TRAMPOLINE void rules_tick(void){RULE_ENTER;rule_tick();RULE_LEAVE;}"
+        },
+        {
+          "line": 146,
+          "declaration": "static BANK_TRAMPOLINE void rules_capture(const Edge*e){RULE_ENTER;rule_capture(e);++game.visual_epoch;RULE_LEAVE;}"
+        },
+        {
+          "line": 147,
+          "declaration": "static BANK_TRAMPOLINE void rules_release(void){RULE_ENTER;rule_release();++game.visual_epoch;RULE_LEAVE;}"
+        },
+        {
+          "line": 148,
+          "declaration": "static BANK_TRAMPOLINE void rules_lane(uint16_t n){RULE_ENTER;rule_lane(n);++game.visual_epoch;RULE_LEAVE;}"
+        },
+        {
+          "line": 149,
+          "declaration": "static BANK_TRAMPOLINE void rules_shift(uint8_t n){RULE_ENTER;rule_shift_lanes(n);++game.visual_epoch;RULE_LEAVE;}"
+        },
+        {
+          "line": 150,
+          "declaration": "static BANK_TRAMPOLINE void rules_hazard(uint16_t n){RULE_ENTER;rule_hazard(n);++game.visual_epoch;RULE_LEAVE;}"
+        },
+        {
+          "line": 151,
+          "declaration": "static BANK_TRAMPOLINE void rules_rebounder(uint8_t n){RULE_ENTER;rule_rebounder(n);RULE_LEAVE;}"
+        },
+        {
+          "line": 152,
+          "declaration": "static BANK_TRAMPOLINE void rules_destination(bool n){RULE_ENTER;rule_destination(n);++game.visual_epoch;RULE_LEAVE;}"
+        },
+        {
+          "line": 153,
+          "declaration": "BANK_TRAMPOLINE uint8_t game_lamp(uint16_t n){RULE_ENTER;uint8_t r=rule_lamp(n);RULE_LEAVE;return r;}"
+        },
+        {
+          "line": 154,
+          "declaration": "BANK_TRAMPOLINE uint8_t game_pose(uint16_t n){RULE_ENTER;uint8_t r=rule_pose(n);RULE_LEAVE;return r;}"
+        },
+        {
+          "line": 155,
+          "declaration": "static void serve(){sound(255);rules.gate[0]=rules.gate[1]=1;rules.gate_flash[0]=rules.gate_flash[1]=600;++game.visual_epoch;game.ball_number=4-game.balls;game.state=Serving;game.x=serve_x;game.y=plunger_y-2;game.z=77;game.vx=game.vy=game.remx=game.r"
+        },
+        {
+          "line": 156,
+          "declaration": "void game_start(void){uint8_t epoch=game.visual_epoch;active_count=0;memset(active_flags,0,sizeof active_flags);memset(&game,0,sizeof game);game.visual_epoch=epoch;game.balls=3;game.multiplier=1;game.score_dirty=true;rules_reset();serve();}"
+        },
+        {
+          "line": 157,
+          "declaration": "static void drain(){if(game.state!=InPlay)return;game.state=Between;game.wait=120;game.vx=game.vy=0;game.mask=0;game.ramp=false;++game.drains;if(rules.replay)rules.replay=0;else if(game.balls)--game.balls;rules_reset();memset(game.lamps,0,sizeof game"
+        },
+        {
+          "line": 161,
+          "declaration": "static void limit_core(){const int16_t cap=15360;int16_t m=ax(game.vx)>ax(game.vy)?ax(game.vx):ax(game.vy);if(m>cap){game.vx=(int32_t)game.vx*cap/m;game.vy=(int32_t)game.vy*cap/m;}}"
+        },
+        {
+          "line": 162,
+          "declaration": "static BANK_TRAMPOLINE void limit(void){"
+        },
+        {
+          "line": 176,
+          "declaration": "static uint16_t ratio12(uint16_t n,uint16_t d){"
+        },
+        {
+          "line": 183,
+          "declaration": "static int16_t rebound_core(int16_t nx,int16_t ny,uint8_t e,uint8_t smooth,uint8_t boost,int16_t inward){"
+        },
+        {
+          "line": 196,
+          "declaration": "static int16_t rebound(int16_t nx,int16_t ny,uint8_t e,uint8_t smooth,uint8_t boost,int16_t inward){"
+        },
+        {
+          "line": 207,
+          "declaration": "static const Edge* edge(uint16_t id){"
+        },
+        {
+          "line": 219,
+          "declaration": "static const Edge* bounded_edge(uint16_t id){const Edge*e=edge(id);return bound_query[1]<e->xlo||bound_query[3]<e->ylo||bound_query[0]>e->xhi||bound_query[2]>e->yhi?0:e;}"
+        },
+        {
+          "line": 222,
+          "declaration": "__attribute__((noinline)) static bool circle_hit(uint16_t id,int16_t dx,int16_t dy,Hit*hit){const Edge*e=edge(id);int16_t t,nx,ny,px,py;"
+        },
+        {
+          "line": 256,
+          "declaration": "__attribute__((noinline)) static bool nearest_core(int16_t dx,int16_t dy,Hit*hit){"
+        },
+        {
+          "line": 318,
+          "declaration": "static bool nearest(int16_t dx,int16_t dy,Hit*hit){"
+        },
+        {
+          "line": 328,
+          "declaration": "static uint8_t bumper_index(uint8_t group){uint16_t g=original_groups[group];return g>=405?4+(g-405)/8:(g-372)/8;}"
+        },
+        {
+          "line": 332,
+          "declaration": "static bool event_core(const Edge*e){"
+        },
+        {
+          "line": 366,
+          "declaration": "static BANK_TRAMPOLINE bool event(const Edge*e){"
+        },
+        {
+          "line": 376,
+          "declaration": "static int16_t scaled_step(int16_t v,int16_t remain,uint8_t steps){int16_t q=div60(v);uint32_t n=umul(ax(q),remain);int16_t result=(n>>8)/steps;return q<0?-result:result;}"
+        },
+        {
+          "line": 377,
+          "declaration": "static void move_time(int16_t dx,int16_t dy,uint8_t steps,uint16_t remaining){ramp_ignore_count=0;"
+        },
+        {
+          "line": 401,
+          "declaration": "static void move(int16_t dx,int16_t dy,uint8_t steps){move_time(dx,dy,steps,256);}"
+        },
+        {
+          "line": 402,
+          "declaration": "static RULE_FN void paddle_core(uint8_t side,uint8_t old){"
+        },
+        {
+          "line": 450,
+          "declaration": "static BANK_TRAMPOLINE void paddle(uint8_t side,uint8_t old){RULE_ENTER;paddle_core(side,old);RULE_LEAVE;}"
+        },
+        {
+          "line": 451,
+          "declaration": "static bool well_force(){"
+        },
+        {
+          "line": 464,
+          "declaration": "static bool plunger_input(bool pull){"
+        },
+        {
+          "line": 476,
+          "declaration": "__attribute__((noinline)) static void tick(bool left,bool right,bool pull,bool nudge){"
+        },
+        {
+          "line": 511,
+          "declaration": "__attribute__((noinline)) void game_frame(bool l,bool r,bool p,bool n){"
+        },
+        {
+          "line": 520,
+          "declaration": "void game_place(int16_t x,int16_t y,int16_t vx,int16_t vy,uint8_t mask){game.state=InPlay;game.x=x;game.y=y;game.vx=vx;game.vy=vy;game.mask=mask;game.ramp=false;game.ignore=0;game.remx=game.remy=0;}"
+        }
+      ]
+    },
+    {
+      "path": "cadet/game/engine.h",
+      "sha256": "31b8238cea7d0d800e7c8f7a43bb29f17e7f57181bd393249b514485e69b6b2f",
+      "symbols": []
+    },
+    {
+      "path": "cadet/game/flipper_sweep.h",
+      "sha256": "2d296c64250e0c9c764c0ca55b09e7aa7cb61fa85793c97cf1d2dc9b16ef21a4",
+      "symbols": [
+        {
+          "line": 12,
+          "declaration": "static TIP_FN bool paddle_static_tip_core(uint8_t side,uint8_t old,int16_t sx,int16_t sy){"
+        },
+        {
+          "line": 38,
+          "declaration": "static BANK_TRAMPOLINE bool paddle_static_tip(uint8_t side,uint8_t old,int16_t sx,int16_t sy,uint8_t steps){"
+        }
+      ]
+    },
+    {
+      "path": "cadet/game/fraction.s",
+      "sha256": "8f1d1c6dded6b26081435aaa6f8786ad7cb2e24a4bf460fd5d42f0ec38b6ef6b",
+      "symbols": [
+        {
+          "line": 5,
+          "declaration": "fraction8:"
+        },
+        {
+          "line": 15,
+          "declaration": "full:"
+        },
+        {
+          "line": 19,
+          "declaration": "begin:"
+        }
+      ]
+    },
+    {
+      "path": "cadet/game/import_local.py",
+      "sha256": "35e02776a04c97f0f327e929e649896b0b536470c235035b5a186568bb3d9982",
+      "symbols": []
+    },
+    {
+      "path": "cadet/game/linker/link.ld",
+      "sha256": "b943a646cd1d45dc9dbb5260cc8e161266bc50de9f7f273d3377737dc14544b1",
+      "symbols": []
+    },
+    {
+      "path": "cadet/game/mask_pixels.s",
+      "sha256": "a90eae2a592a36efcad5b8bc7e11039fca5febbf9cbf9abb7d14113e0d58e37f",
+      "symbols": [
+        {
+          "line": 7,
+          "declaration": "mask_pixels:"
+        },
+        {
+          "line": 29,
+          "declaration": "pixel_keep: .byte 0,240,15,255"
+        }
+      ]
+    },
+    {
+      "path": "cadet/game/music_lz.s.inc",
+      "sha256": "4b13ca1ec326bc1eb2c4d85c7cbc85143c79d221761d39baa05a11f8d29f2406",
+      "symbols": [
+        {
+          "line": 4,
+          "declaration": "music_reset:"
+        },
+        {
+          "line": 12,
+          "declaration": "lz_restart:"
+        },
+        {
+          "line": 27,
+          "declaration": "lz_byte:"
+        },
+        {
+          "line": 42,
+          "declaration": "lz_flag:"
+        },
+        {
+          "line": 48,
+          "declaration": "lz_token:"
+        },
+        {
+          "line": 72,
+          "declaration": "lz_match:"
+        },
+        {
+          "line": 76,
+          "declaration": "lz_read:"
+        },
+        {
+          "line": 87,
+          "declaration": "lz_emit:"
+        },
+        {
+          "line": 92,
+          "declaration": "lz_write:"
+        },
+        {
+          "line": 103,
+          "declaration": "lz_done:"
+        },
+        {
+          "line": 117,
+          "declaration": "music_raw:"
+        },
+        {
+          "line": 120,
+          "declaration": "music_read:"
+        },
+        {
+          "line": 138,
+          "declaration": "raw_restore:"
+        },
+        {
+          "line": 140,
+          "declaration": "raw_done:"
+        },
+        {
+          "line": 145,
+          "declaration": "music_prefetch:"
+        },
+        {
+          "line": 151,
+          "declaration": "prefetch_next:"
+        },
+        {
+          "line": 165,
+          "declaration": "prefetch_done:"
+        },
+        {
+          "line": 183,
+          "declaration": "prefetch_return:"
+        },
+        {
+          "line": 186,
+          "declaration": "music_byte:"
+        },
+        {
+          "line": 199,
+          "declaration": "music_consume:"
+        },
+        {
+          "line": 210,
+          "declaration": "consumer_done:"
+        }
+      ]
+    },
+    {
+      "path": "cadet/game/native_check.py",
+      "sha256": "362a3faab3444336698b5ce5516fd9403db26e5421560b0d74a1d761c0ee3f24",
+      "symbols": []
+    },
+    {
+      "path": "cadet/game/native_probe.c",
+      "sha256": "081d47700133127791b4a663e7bc43e2b4f0dd17bbb8b84a1404420403faaa58",
+      "symbols": [
+        {
+          "line": 7,
+          "declaration": "static void text(const char*s){while(*s)*(volatile uint8_t*)0x9fbb=*s++;}"
+        },
+        {
+          "line": 8,
+          "declaration": "static void hex(uint32_t x){for(uint8_t i=0;i<8;++i){*(volatile uint8_t*)0x9fbb=\"0123456789abcdef\"[x>>28];x<<=4;}}"
+        },
+        {
+          "line": 9,
+          "declaration": "static uint32_t clock_read(void){uint8_t a=*(volatile uint8_t*)0x9fb8,b=*(volatile uint8_t*)0x9fb9,c=*(volatile uint8_t*)0x9fba,d=*(volatile uint8_t*)0x9fbb;return(uint32_t)a|((uint32_t)b<<8)|((uint32_t)c<<16)|((uint32_t)d<<24);}"
+        },
+        {
+          "line": 11,
+          "declaration": "static void text(const char*s){fputs(s,stdout);}"
+        },
+        {
+          "line": 12,
+          "declaration": "static void hex(uint32_t x){printf(\"%08x\",x);}"
+        },
+        {
+          "line": 13,
+          "declaration": "static uint32_t clock_read(void){return 0;}"
+        },
+        {
+          "line": 15,
+          "declaration": "int main(void){"
+        }
+      ]
+    },
+    {
+      "path": "cadet/game/pack_depth.py",
+      "sha256": "ffe65e93a10fc8c307f21ebc84fd02b3d12af68495b5d88b297dd074bb0886fd",
+      "symbols": []
+    },
+    {
+      "path": "cadet/game/pack_dynamic.py",
+      "sha256": "2871e4be3bf204aee5c03185e85820f167c0bd3d59513d5c2dddb1262de2dc83",
+      "symbols": []
+    },
+    {
+      "path": "cadet/game/pack_model.py",
+      "sha256": "735908693b697a040bf70ec65f0c7d2a1dc4740a87a929c2cff7ee33af58f5d6",
+      "symbols": []
+    },
+    {
+      "path": "cadet/game/pack_music.py",
+      "sha256": "abc53863a15669d4ddea864273c3232bae885c71a8378081802f455d5e359aab",
+      "symbols": []
+    },
+    {
+      "path": "cadet/game/pack_sprites.py",
+      "sha256": "5e0253d3f19ade4624190a9aa4567ae827904f9247950db36346373e1243b8d9",
+      "symbols": []
+    },
+    {
+      "path": "cadet/game/package_development.py",
+      "sha256": "1d19a6443df691d79217d12fb3df384b6ede4021ab649522f216f921cd4ef6a9",
+      "symbols": []
+    },
+    {
+      "path": "cadet/game/play.c",
+      "sha256": "02af6f6d3d0eef45e66c5d2c6554fba702071753844902ef14aab505b3ee1ec3",
+      "symbols": [
+        {
+          "line": 18,
+          "declaration": "static int16_t projected(int16_t value,uint16_t scale){uint32_t p=fastmul16(value<0?-value:value,scale);return value<0?-(int16_t)(p>>12):(int16_t)(p>>12);}"
+        },
+        {
+          "line": 28,
+          "declaration": "__attribute__((naked,used)) void keyboard(void){__asm__ volatile("
+        },
+        {
+          "line": 35,
+          "declaration": "static void addr(uint32_t a){v[5]=0;v[0]=a;v[1]=a>>8;v[2]=0x10|(a>>16);}"
+        },
+        {
+          "line": 36,
+          "declaration": "static void word(uint16_t a){v[3]=a;v[3]=a>>8;}"
+        },
+        {
+          "line": 37,
+          "declaration": "static void hide(uint8_t n){addr(0x1fc06UL+(uint16_t)n*8);v[3]=0;}"
+        },
+        {
+          "line": 38,
+          "declaration": "static void tile(uint8_t n,uint16_t a,int16_t x,int16_t y,uint8_t size){addr(0x1fc00UL+(uint16_t)n*8);word(a);word(x);word(y);v[3]=12;v[3]=size;}"
+        },
+        {
+          "line": 39,
+          "declaration": "static void frame(uint8_t n,uint8_t f,int16_t x,int16_t y,uint8_t reserved){"
+        },
+        {
+          "line": 45,
+          "declaration": "static uint8_t load(const char*n,uint8_t mode,uint16_t a){cbm_k_setnam(n);cbm_k_setlfs(1,8,2);return(uintptr_t)cbm_k_load(mode,(void*)a)>255;}"
+        },
+        {
+          "line": 46,
+          "declaration": "static void print(const char*s){while(*s)cbm_k_bsout(*s++);}"
+        },
+        {
+          "line": 47,
+          "declaration": "static void echo(const char*s){while(*s)*(volatile uint8_t*)0x9fbb=*s++;}"
+        },
+        {
+          "line": 48,
+          "declaration": "static void hex(uint32_t a){for(uint8_t i=0;i<8;++i){*(volatile uint8_t*)0x9fbb=\"0123456789abcdef\"[a>>28];a<<=4;}}"
+        },
+        {
+          "line": 49,
+          "declaration": "static uint32_t cycles(void){uint8_t a=*(volatile uint8_t*)0x9fb8,b=*(volatile uint8_t*)0x9fb9,c=*(volatile uint8_t*)0x9fba,d=*(volatile uint8_t*)0x9fbb;return(uint32_t)a|((uint32_t)b<<8)|((uint32_t)c<<16)|((uint32_t)d<<24);}"
+        },
+        {
+          "line": 50,
+          "declaration": "static void effect(uint8_t id,uint8_t rank,uint8_t voice){"
+        },
+        {
+          "line": 61,
+          "declaration": "void audio_stop(void){pcm_stop();priority=0;}"
+        },
+        {
+          "line": 62,
+          "declaration": "void audio_effect(uint8_t id){"
+        },
+        {
+          "line": 68,
+          "declaration": "static void status(const char*s){"
+        },
+        {
+          "line": 76,
+          "declaration": "static void ball(uint8_t f,int16_t x,int16_t y,uint32_t distance_squared){"
+        },
+        {
+          "line": 104,
+          "declaration": "static void display(bool update_panel){"
+        },
+        {
+          "line": 142,
+          "declaration": "static void compact_footer(void){"
+        },
+        {
+          "line": 169,
+          "declaration": "static void controls_panel(void){"
+        },
+        {
+          "line": 184,
+          "declaration": "int main(void){"
+        },
+        {
+          "line": 270,
+          "declaration": "fail:*(volatile uint8_t*)0=oldbank;__asm__ volatile(\"jsr $ff81\");print(\"ASSET LOAD FAILED\\r\");echo(\"# LOAD FAILED\\n\");return 1;"
+        }
+      ]
+    },
+    {
+      "path": "cadet/game/prepare_runtime.py",
+      "sha256": "8775c3f258768768de6298b838b8b669324367097c0d9b92cb8dd913da1eba7e",
+      "symbols": []
+    },
+    {
+      "path": "cadet/game/profile_probe.c",
+      "sha256": "f4dacb77aa13dca6967a9800138d44d8ce2a334ef42863c9d1734b4ee29615fc",
+      "symbols": [
+        {
+          "line": 4,
+          "declaration": "static void text(const char*s){while(*s)*(volatile uint8_t*)0x9fbb=*s++;}"
+        },
+        {
+          "line": 5,
+          "declaration": "static void hex(uint32_t x){for(uint8_t i=0;i<8;++i){*(volatile uint8_t*)0x9fbb=\"0123456789abcdef\"[x>>28];x<<=4;}}"
+        },
+        {
+          "line": 6,
+          "declaration": "static uint32_t clock_read(void){uint8_t a=*(volatile uint8_t*)0x9fb8,b=*(volatile uint8_t*)0x9fb9,c=*(volatile uint8_t*)0x9fba,d=*(volatile uint8_t*)0x9fbb;return(uint32_t)a|((uint32_t)b<<8)|((uint32_t)c<<16)|((uint32_t)d<<24);}"
+        },
+        {
+          "line": 7,
+          "declaration": "int main(void){"
+        }
+      ]
+    },
+    {
+      "path": "cadet/game/ratio.s",
+      "sha256": "739a15a768308a0a7f71fa465f62902d988af03ba0fbc7da52efb2bb8377fc6f",
+      "symbols": [
+        {
+          "line": 6,
+          "declaration": "ratio12:"
+        },
+        {
+          "line": 18,
+          "declaration": "whole_loop:"
+        },
+        {
+          "line": 26,
+          "declaration": "subtract_whole:"
+        },
+        {
+          "line": 39,
+          "declaration": "fractional:"
+        },
+        {
+          "line": 74,
+          "declaration": "fraction32:"
+        },
+        {
+          "line": 92,
+          "declaration": "fraction_full:"
+        },
+        {
+          "line": 96,
+          "declaration": "fraction_begin:"
+        }
+      ]
+    },
+    {
+      "path": "cadet/game/rules.inc",
+      "sha256": "eb3939ab939e62cc020bbaf8d8d8acb9f4d028a83dee106443ec5cef42935f7b",
+      "symbols": [
+        {
+          "line": 10,
+          "declaration": "static RULE_FN void rule_sound(uint8_t id,uint8_t group,uint8_t kind){game.last_group=group;game.last_kind=kind;sound(id);}"
+        },
+        {
+          "line": 11,
+          "declaration": "static RULE_FN uint16_t countdown(uint16_t n){return n>2?n-2:0;}"
+        },
+        {
+          "line": 12,
+          "declaration": "static RULE_FN void rule_reset(void){memset(&rules,0,sizeof rules);rules.blink=1;++game.visual_epoch;}"
+        },
+        {
+          "line": 13,
+          "declaration": "static RULE_FN void rule_gate(uint8_t side,bool open){rules.gate[side]=open;rules.gate_flash[side]=open?600:0;rules.gate_alert[side]=0;++game.visual_epoch;rule_sound(open?SoundGateOpen:SoundGateClose,side?GROUP_502:GROUP_501,Gate);}"
+        },
+        {
+          "line": 14,
+          "declaration": "static RULE_FN void rule_upgrade(uint8_t bank){"
+        },
+        {
+          "line": 24,
+          "declaration": "static RULE_FN void rule_rebounder(uint8_t group){rules.rebounder_fire[group-GROUP_469]=12;++game.visual_epoch;add_score(500);rule_sound(2,group,Wall);}"
+        },
+        {
+          "line": 25,
+          "declaration": "static RULE_FN void rule_tick(void){"
+        },
+        {
+          "line": 44,
+          "declaration": "static RULE_FN void rule_lane(uint16_t original){"
+        },
+        {
+          "line": 51,
+          "declaration": "static RULE_FN void rule_shift_lanes(uint8_t side){"
+        },
+        {
+          "line": 54,
+          "declaration": "static RULE_FN void rule_hazard(uint16_t original){"
+        },
+        {
+          "line": 59,
+          "declaration": "static RULE_FN void rule_destination(bool force){"
+        },
+        {
+          "line": 62,
+          "declaration": "static RULE_FN void rule_award_large(uint32_t n){"
+        },
+        {
+          "line": 71,
+          "declaration": "static RULE_FN void rule_capture(const Edge*e){"
+        },
+        {
+          "line": 97,
+          "declaration": "static RULE_FN void rule_release(void){"
+        },
+        {
+          "line": 109,
+          "declaration": "static RULE_FN uint8_t rule_lamp(uint16_t gid){"
+        },
+        {
+          "line": 123,
+          "declaration": "static RULE_FN uint8_t rule_pose(uint16_t gid){"
+        }
+      ]
+    },
+    {
+      "path": "cadet/game/signedmul.s",
+      "sha256": "002a88a59e621699023190374551ba5cbc8b60fcff82fe1e13ad5db13e238ad9",
+      "symbols": [
+        {
+          "line": 5,
+          "declaration": "signedmul:"
+        },
+        {
+          "line": 39,
+          "declaration": "swap:"
+        },
+        {
+          "line": 46,
+          "declaration": "narrow:"
+        },
+        {
+          "line": 50,
+          "declaration": "sign:"
+        },
+        {
+          "line": 68,
+          "declaration": "positive:"
+        }
+      ]
+    },
+    {
+      "path": "cadet/game/soak.c",
+      "sha256": "769a206250b3f62fd1fdb241310545c3518e4e102b5641ee63a631b66a07db01",
+      "symbols": [
+        {
+          "line": 4,
+          "declaration": "int main(int argc,char**argv){"
+        }
+      ]
+    },
+    {
+      "path": "cadet/game/test_audio.py",
+      "sha256": "ddd214a906835cdffc93cfdf1ea2a7bea216fb9aa60b83e46a3414f73c6ee723",
+      "symbols": []
+    },
+    {
+      "path": "cadet/game/test_audio_events.c",
+      "sha256": "ddd8cc1e6bd443e1e53e1c2c70427def3bf1512e6db450595986b20a2f8cacd7",
+      "symbols": [
+        {
+          "line": 8,
+          "declaration": "static uint8_t group(uint16_t original){for(uint8_t i=0;i<component_count;++i)if(original_groups[i]==original)return i;assert(0);return 0;}"
+        },
+        {
+          "line": 9,
+          "declaration": "static uint8_t sample(uint8_t event,uint16_t original,uint8_t kind){return audio_event_sample(event,group(original),kind,0);}"
+        },
+        {
+          "line": 10,
+          "declaration": "int main(void){"
+        }
+      ]
+    },
+    {
+      "path": "cadet/game/test_audio_mix.c",
+      "sha256": "01c2267798b607cef7cd391514c63fec6d75cadf4b5958bc264554fe53c0f3d3",
+      "symbols": [
+        {
+          "line": 16,
+          "declaration": "static void text(const char*s){while(*s)*(volatile uint8_t*)0x9fbb=*s++;}"
+        },
+        {
+          "line": 17,
+          "declaration": "static void hex(uint32_t x){for(uint8_t i=0;i<8;++i){*(volatile uint8_t*)0x9fbb=\"0123456789abcdef\"[x>>28];x<<=4;}}"
+        },
+        {
+          "line": 18,
+          "declaration": "static uint32_t cycles(void){uint8_t a=*(volatile uint8_t*)0x9fb8,b=*(volatile uint8_t*)0x9fb9,c=*(volatile uint8_t*)0x9fba,d=*(volatile uint8_t*)0x9fbb;return(uint32_t)a|((uint32_t)b<<8)|((uint32_t)c<<16)|((uint32_t)d<<24);}"
+        },
+        {
+          "line": 19,
+          "declaration": "static void frame(void){uint16_t t=lab_clock();while(lab_clock()==t){"
+        },
+        {
+          "line": 24,
+          "declaration": "static void check(uint8_t ok,uint16_t line){if(!ok){++failures;text(\"# FAIL \");hex(line);text(\"\\n\");}}"
+        },
+        {
+          "line": 26,
+          "declaration": "static uint8_t load(const char*n,uint8_t b){*(volatile uint8_t*)0=b;cbm_k_setnam(n);cbm_k_setlfs(1,8,2);return(uintptr_t)cbm_k_load(0,(void*)0xa000)>255;}"
+        },
+        {
+          "line": 27,
+          "declaration": "static void start(uint8_t id,uint8_t voice){const Effect*e=effects+id;pcm_select_bank=e->bank;pcm_select_ptr=e->ptr;if(voice==0)pcm_start(e->length);else if(voice==1)pcm_flipper_start(e->length);else pcm_plunger_start(e->length);}"
+        },
+        {
+          "line": 28,
+          "declaration": "static int16_t source(uint8_t id,uint16_t offset){"
+        },
+        {
+          "line": 33,
+          "declaration": "static int16_t attenuation(int16_t v,uint8_t shift){if(!shift)return v;return v<0?-(((-v)+(1u<<shift)-1)>>shift):v>>shift;}"
+        },
+        {
+          "line": 34,
+          "declaration": "static void exact(void){"
+        },
+        {
+          "line": 56,
+          "declaration": "static void marker(uint8_t on){"
+        },
+        {
+          "line": 60,
+          "declaration": "static void cue(uint8_t id,uint8_t voice){text(\"# CUE \");hex(lab_clock());text(\" \");hex(voice);text(\" \");hex(id);text(\"\\n\");start(id,voice);}"
+        },
+        {
+          "line": 61,
+          "declaration": "int main(void){"
+        },
+        {
+          "line": 109,
+          "declaration": "fail:text(\"# AUDIO MIX FAIL\\n# DONE\\n\");"
+        },
+        {
+          "line": 110,
+          "declaration": "done:*(volatile uint8_t*)0x9fb4=0;__asm__ volatile(\"jmp $ffff\");return failures!=0;"
+        }
+      ]
+    },
+    {
+      "path": "cadet/game/test_audio_mix.py",
+      "sha256": "a4e6f6fc7149582c05216964161139e6e98728bec162360f9080947bacca0210",
+      "symbols": []
+    },
+    {
+      "path": "cadet/game/test_audio_start.c",
+      "sha256": "8ff9f3eb00b112252ad2a2b0dd49aead8bc06d6254b9ae0ab27c45bfc27b903f",
+      "symbols": [
+        {
+          "line": 9,
+          "declaration": "static void text(const char*s){while(*s)*(volatile uint8_t*)0x9fbb=*s++;}"
+        },
+        {
+          "line": 10,
+          "declaration": "static void hex(uint32_t x){for(uint8_t i=0;i<8;++i){*(volatile uint8_t*)0x9fbb=\"0123456789abcdef\"[x>>28];x<<=4;}}"
+        },
+        {
+          "line": 11,
+          "declaration": "static uint32_t cycles(void){uint8_t a=*(volatile uint8_t*)0x9fb8,b=*(volatile uint8_t*)0x9fb9,c=*(volatile uint8_t*)0x9fba,d=*(volatile uint8_t*)0x9fbb;return(uint32_t)a|((uint32_t)b<<8)|((uint32_t)c<<16)|((uint32_t)d<<24);}"
+        },
+        {
+          "line": 12,
+          "declaration": "static void frame(void){uint16_t a=lab_clock();while(lab_clock()==a);}"
+        },
+        {
+          "line": 13,
+          "declaration": "static uint8_t load(const char*n,uint8_t bank){*(volatile uint8_t*)0=bank;cbm_k_setnam(n);cbm_k_setlfs(1,8,2);return(uintptr_t)cbm_k_load(0,(void*)0xa000)>255;}"
+        },
+        {
+          "line": 14,
+          "declaration": "int main(void){"
+        },
+        {
+          "line": 46,
+          "declaration": "fail_installed:lab_uninstall();"
+        },
+        {
+          "line": 47,
+          "declaration": "fail:text(\"# AUDIO START FAIL\\n# DONE\\n\");"
+        },
+        {
+          "line": 48,
+          "declaration": "done:*(volatile uint8_t*)0x9fb4=0;__asm__ volatile(\"jmp $ffff\");return 0;"
+        }
+      ]
+    },
+    {
+      "path": "cadet/game/test_award_large.c",
+      "sha256": "4591431989fcdef312a35df3da0d5563b11e7e2fc98c42e7fa3862da8c3ff403",
+      "symbols": [
+        {
+          "line": 10,
+          "declaration": "static void setup_score(Wide n){"
+        },
+        {
+          "line": 15,
+          "declaration": "static void verify_score(Wide n){"
+        },
+        {
+          "line": 19,
+          "declaration": "int main(void){"
+        }
+      ]
+    },
+    {
+      "path": "cadet/game/test_bounds.c",
+      "sha256": "74ca3e167738c65d50633c02018dee116eca0fe30a4c44205d7c32261a088a1f",
+      "symbols": [
+        {
+          "line": 6,
+          "declaration": "static void text(const char*s){while(*s)*(volatile uint8_t*)0x9fbb=*s++;}"
+        },
+        {
+          "line": 7,
+          "declaration": "static void hex(uint16_t n){for(uint8_t i=0;i<4;++i){*(volatile uint8_t*)0x9fbb=\"0123456789abcdef\"[n>>12];n<<=4;}}"
+        },
+        {
+          "line": 8,
+          "declaration": "int main(void){"
+        },
+        {
+          "line": 35,
+          "declaration": "fail:text(\"# FAIL\\n# DONE\\n\");"
+        },
+        {
+          "line": 36,
+          "declaration": "done:*(volatile uint8_t*)0x9fb4=0;__asm__ volatile(\"jmp $ffff\");return 0;"
+        }
+      ]
+    },
+    {
+      "path": "cadet/game/test_build_native.py",
+      "sha256": "9ca79e8537237c8968897e698a7395ef6083b89b64943c9971f63e76c5a51732",
+      "symbols": []
+    },
+    {
+      "path": "cadet/game/test_depth.c",
+      "sha256": "f9280fae605470e64d88db57a03eb90702ef65004e0f3b258f80169de6a516d3",
+      "symbols": [
+        {
+          "line": 8,
+          "declaration": "static bool load(const char*n,uint8_t bank){*(volatile uint8_t*)0=bank;cbm_k_setnam(n);cbm_k_setlfs(1,8,2);return(uintptr_t)cbm_k_load(0,(void*)0xa000)>255;}"
+        },
+        {
+          "line": 9,
+          "declaration": "static void text(const char*s){while(*s)*(volatile uint8_t*)0x9fbb=*s++;}"
+        },
+        {
+          "line": 10,
+          "declaration": "static void hex(uint16_t n){for(uint8_t i=0;i<4;++i){*(volatile uint8_t*)0x9fbb=\"0123456789abcdef\"[n>>12];n<<=4;}}"
+        },
+        {
+          "line": 11,
+          "declaration": "static uint32_t clock_cycles(void){uint8_t a=*(volatile uint8_t*)0x9fb8,b=*(volatile uint8_t*)0x9fb9,c=*(volatile uint8_t*)0x9fba,d=*(volatile uint8_t*)0x9fbb;return(uint32_t)a|((uint32_t)b<<8)|((uint32_t)c<<16)|((uint32_t)d<<24);}"
+        },
+        {
+          "line": 12,
+          "declaration": "int main(void){"
+        },
+        {
+          "line": 38,
+          "declaration": "fail:text(\"# FAIL\\n# DONE\\n\");"
+        },
+        {
+          "line": 39,
+          "declaration": "done:*(volatile uint8_t*)0x9fb4=0;__asm__ volatile(\"jmp $ffff\");return 0;"
+        }
+      ]
+    },
+    {
+      "path": "cadet/game/test_depth.py",
+      "sha256": "4316c3b7d47421aded1adbeca77c24b1060c3b093feadf61c805be00056f1a68",
+      "symbols": []
+    },
+    {
+      "path": "cadet/game/test_dynamic.c",
+      "sha256": "d8f2f1f59800313f6b5d381de57819ffa7f2be4f55dc9f61a2d9e7d796048b85",
+      "symbols": [
+        {
+          "line": 10,
+          "declaration": "uint8_t game_pose(uint16_t group){for(uint8_t i=0;i<DYNAMIC_COUNT;++i)if(dynamic_desc[i].group==group)return poses[i];return 0;}"
+        },
+        {
+          "line": 11,
+          "declaration": "uint8_t game_lamp(uint16_t group){return game_pose(group);}"
+        },
+        {
+          "line": 12,
+          "declaration": "static void text(const char*s){while(*s)*(volatile uint8_t*)0x9fbb=*s++;}"
+        },
+        {
+          "line": 13,
+          "declaration": "static void hex(uint16_t n){for(uint8_t i=0;i<4;++i){*(volatile uint8_t*)0x9fbb=\"0123456789abcdef\"[n>>12];n<<=4;}}"
+        },
+        {
+          "line": 14,
+          "declaration": "static uint16_t word(const uint8_t*p){return(uint16_t)p[0]|((uint16_t)p[1]<<8);}"
+        },
+        {
+          "line": 15,
+          "declaration": "static uint8_t load(const char*n,uint8_t mode,uint16_t a){cbm_k_setnam(n);cbm_k_setlfs(1,8,2);return(uintptr_t)cbm_k_load(mode,(void*)a)>255;}"
+        },
+        {
+          "line": 16,
+          "declaration": "static void addr(uint16_t a,uint8_t high){v[5]=0;v[0]=a;v[1]=a>>8;v[2]=0x10|high;}"
+        },
+        {
+          "line": 17,
+          "declaration": "static uint32_t cycles(void){uint8_t a=*(volatile uint8_t*)0x9fb8,b=*(volatile uint8_t*)0x9fb9,c=*(volatile uint8_t*)0x9fba,d=*(volatile uint8_t*)0x9fbb;return(uint32_t)a|((uint32_t)b<<8)|((uint32_t)c<<16)|((uint32_t)d<<24);}"
+        },
+        {
+          "line": 18,
+          "declaration": "static void fast_maps(uint8_t pose){"
+        },
+        {
+          "line": 26,
+          "declaration": "static void fast_tick(void){uint32_t start=cycles();dynamic_update(0);uint32_t elapsed=cycles()-start;if(elapsed>fast_max)fast_max=elapsed;if(*(volatile uint8_t*)0!=11)++errors;}"
+        },
+        {
+          "line": 27,
+          "declaration": "int main(void){"
+        }
+      ]
+    },
+    {
+      "path": "cadet/game/test_dynamic.py",
+      "sha256": "a64d6a7dde283a46ea0407d33a8b839847deb1f91c8ac0cb625a062dfe52be57",
+      "symbols": []
+    },
+    {
+      "path": "cadet/game/test_feedback_events.c",
+      "sha256": "68fed8822b6a038abafa1af88a7c2244f0a5a042c4fd8af38cbff3bd4dad762f",
+      "symbols": [
+        {
+          "line": 9,
+          "declaration": "static uint32_t score(void){return game.score[0]|((uint32_t)game.score[1]<<8)|((uint32_t)game.score[2]<<16);}"
+        },
+        {
+          "line": 17,
+          "declaration": "static void contact(Edge*e,int16_t speed){"
+        },
+        {
+          "line": 22,
+          "declaration": "static void slingshots(void){"
+        },
+        {
+          "line": 33,
+          "declaration": "static void input_events(void){"
+        },
+        {
+          "line": 70,
+          "declaration": "int main(void){if(!game_load()){puts(\"# LOAD FAIL\\n# DONE\");return 1;}slingshots();input_events();printf(\"# FEEDBACK %s %u %u\\n\",failures?\"FAIL\":\"PASS\",checks,failures);puts(\"# DONE\");return failures!=0;}"
+        }
+      ]
+    },
+    {
+      "path": "cadet/game/test_feedback_events.py",
+      "sha256": "af107125b4850dc76ce2a4d86c53128532fa7ac1444af33b647fff7c2715164b",
+      "symbols": []
+    },
+    {
+      "path": "cadet/game/test_flipper_contact.c",
+      "sha256": "8bc4751480bc9e0b66f59151b35db3c0652112cfc794ee53f3503910a0a0fd61",
+      "symbols": [
+        {
+          "line": 9,
+          "declaration": "static void check(bool ok){if(!ok)++failures;}"
+        },
+        {
+          "line": 10,
+          "declaration": "int main(void){"
+        }
+      ]
+    },
+    {
+      "path": "cadet/game/test_flipper_contact.py",
+      "sha256": "d03738ba2cde8e23bc399a8b7c77da155750afb7324afb0649ba19e4e6808c7d",
+      "symbols": []
+    },
+    {
+      "path": "cadet/game/test_large_award.c",
+      "sha256": "3f1de7110628eb95ef976766475431c6f058b411401c07d2de2791b0e2adfe13",
+      "symbols": [
+        {
+          "line": 7,
+          "declaration": "static void near_max(uint32_t subtract){"
+        },
+        {
+          "line": 13,
+          "declaration": "static void award(void){"
+        },
+        {
+          "line": 25,
+          "declaration": "int main(void){"
+        }
+      ]
+    },
+    {
+      "path": "cadet/game/test_large_award.py",
+      "sha256": "4cd848e54b7bf4fccb09422d62453801485fc4cb8d9a04f8e42bd5f590120a2c",
+      "symbols": []
+    },
+    {
+      "path": "cadet/game/test_math.c",
+      "sha256": "38e6a10016df58172f4a13ed4b6ccba92b4181a9c49803239f7affd87fb46cf8",
+      "symbols": [
+        {
+          "line": 5,
+          "declaration": "static void text(const char*s){while(*s)*(volatile uint8_t*)0x9fbb=*s++;}"
+        },
+        {
+          "line": 7,
+          "declaration": "static uint16_t next(void){rng^=rng<<7;rng^=rng>>9;rng^=rng<<8;return rng;}"
+        },
+        {
+          "line": 8,
+          "declaration": "static uint8_t check(int16_t a,int16_t b){return signedmul(a,b)==(int32_t)a*b;}"
+        },
+        {
+          "line": 9,
+          "declaration": "int main(void){"
+        },
+        {
+          "line": 23,
+          "declaration": "bad:text(\"# MATH FAILED\\n# DONE\\n\");"
+        },
+        {
+          "line": 24,
+          "declaration": "done:*(volatile uint8_t*)0x9fb4=0;__asm__ volatile(\"jmp $ffff\");return 0;"
+        }
+      ]
+    },
+    {
+      "path": "cadet/game/test_mechanisms.c",
+      "sha256": "23545e3d719418cb07ba280cbf3154a73ab1ed5a562571b454e7c33f1f445bd3",
+      "symbols": [
+        {
+          "line": 8,
+          "declaration": "static uint32_t score(void){return (uint32_t)game.score[0]|((uint32_t)game.score[1]<<8)|((uint32_t)game.score[2]<<16)|((uint32_t)game.score[3]<<24);}"
+        },
+        {
+          "line": 12,
+          "declaration": "static void hit(uint16_t original){Edge e=object(original,0);game.flash[e.group]=0;event(&e);}"
+        },
+        {
+          "line": 13,
+          "declaration": "static void timers(uint16_t n){while(n--)rules_tick();}"
+        },
+        {
+          "line": 14,
+          "declaration": "static void lane(uint16_t original){Edge e=object(original,0),out=object(original,1);event(&e);event(&out);game.disabled[e.group]=0;}"
+        },
+        {
+          "line": 15,
+          "declaration": "static void contact(uint16_t original){"
+        },
+        {
+          "line": 19,
+          "declaration": "static void lanes(void){"
+        },
+        {
+          "line": 32,
+          "declaration": "static void kickbacks(void){"
+        },
+        {
+          "line": 43,
+          "declaration": "static void captures(void){"
+        },
+        {
+          "line": 69,
+          "declaration": "int main(void){"
+        }
+      ]
+    },
+    {
+      "path": "cadet/game/test_mechanisms.py",
+      "sha256": "796ed08927ff14d940b5fd908ff4d83bd56612d0132808799a755fcfea22f415",
+      "symbols": []
+    },
+    {
+      "path": "cadet/game/test_music_lz.c",
+      "sha256": "8053bc4c8f73737b1b6da91d600a919d149fc550fc7804e5510062078806dd12",
+      "symbols": [
+        {
+          "line": 8,
+          "declaration": "static void text(const char*s){while(*s)*(volatile uint8_t*)0x9fbb=*s++;}"
+        },
+        {
+          "line": 9,
+          "declaration": "static uint8_t load(const char*n,uint8_t bank){*(volatile uint8_t*)0=bank;cbm_k_setnam(n);cbm_k_setlfs(1,8,2);return(uintptr_t)cbm_k_load(0,(void*)0xa000)>255;}"
+        },
+        {
+          "line": 10,
+          "declaration": "int main(void){"
+        },
+        {
+          "line": 34,
+          "declaration": "fail:text(\"# MUSIC LZ FAIL\\n# DONE\\n\");"
+        },
+        {
+          "line": 35,
+          "declaration": "done:*(volatile uint8_t*)0x9fb4=0;__asm__ volatile(\"jmp $ffff\");return 0;"
+        }
+      ]
+    },
+    {
+      "path": "cadet/game/test_native.py",
+      "sha256": "1a0aba146ebd7266b7146f1895ad85aae23c229fd1c76e0f8ca9b93f0ec4b7f7",
+      "symbols": []
+    },
+    {
+      "path": "cadet/game/test_package_development.py",
+      "sha256": "1eb600973278bf20f2b2c1770175aec78c877f4a8c7d9318ea70643a461e14d6",
+      "symbols": []
+    },
+    {
+      "path": "cadet/game/test_pixels.c",
+      "sha256": "e24f9ea175b30e0ae02e0a167fa191ba5da9ca74b8ccf0217479fecb6f7b25f2",
+      "symbols": [
+        {
+          "line": 4,
+          "declaration": "static void addr(uint8_t port,uint32_t a){v[5]=port;v[0]=a;v[1]=a>>8;v[2]=0x10|(a>>16);}"
+        },
+        {
+          "line": 5,
+          "declaration": "static void text(const char*s){while(*s)*(volatile uint8_t*)0x9fbb=*s++;}"
+        },
+        {
+          "line": 6,
+          "declaration": "int main(void){"
+        },
+        {
+          "line": 21,
+          "declaration": "done:*(volatile uint8_t*)0x9fb4=0;__asm__ volatile(\"jmp $ffff\");return 0;"
+        }
+      ]
+    },
+    {
+      "path": "cadet/game/test_quant.c",
+      "sha256": "657e15d54ede6ee211da07c7ff2ae07493391720a10dc9db36cbb8c4ada7ccb7",
+      "symbols": [
+        {
+          "line": 5,
+          "declaration": "static void text(const char*s){while(*s)*(volatile uint8_t*)0x9fbb=*s++;}"
+        },
+        {
+          "line": 6,
+          "declaration": "int main(void){"
+        },
+        {
+          "line": 16,
+          "declaration": "fail:text(\"# QUANT FAIL\\n# DONE\\n\");"
+        },
+        {
+          "line": 17,
+          "declaration": "done:*(volatile uint8_t*)0x9fb4=0;__asm__ volatile(\"jmp $ffff\");return 0;"
+        }
+      ]
+    },
+    {
+      "path": "cadet/game/test_routes.c",
+      "sha256": "23c9fe65213d5f894c3087914b6cdd45117964691a6d0707c797a9ccc8b95e96",
+      "symbols": [
+        {
+          "line": 9,
+          "declaration": "static void check(bool ok){++checks;if(!ok)++failures;}"
+        },
+        {
+          "line": 10,
+          "declaration": "static void text(const char*s){"
+        },
+        {
+          "line": 17,
+          "declaration": "static void hex(uint16_t x){"
+        },
+        {
+          "line": 20,
+          "declaration": "static void prepare(const Edge*e,uint8_t mask,int16_t*dx,int16_t*dy){"
+        },
+        {
+          "line": 25,
+          "declaration": "static void gateway(uint16_t id,uint16_t group,uint8_t source,uint8_t target,uint8_t action){"
+        },
+        {
+          "line": 36,
+          "declaration": "static void rail(uint16_t id,uint16_t group,uint8_t source){"
+        },
+        {
+          "line": 46,
+          "declaration": "int main(void){"
+        }
+      ]
+    },
+    {
+      "path": "cadet/game/test_routes.py",
+      "sha256": "b228f25d71dae57b9a88697dc6363160303f4d4be6add3ceb1ba981ceb3f3824",
+      "symbols": []
+    },
+    {
+      "path": "cadet/game/test_routes_tip.c",
+      "sha256": "a7e43e37b875fe52aa2418ddbcf5a2d86e544395d03c623e10e2bee34b5e5b66",
+      "symbols": [
+        {
+          "line": 8,
+          "declaration": "static void check(bool ok){++checks;if(!ok)++failures;}"
+        },
+        {
+          "line": 9,
+          "declaration": "static void text(const char*s){"
+        },
+        {
+          "line": 16,
+          "declaration": "static void hex(uint16_t x){for(uint8_t i=0;i<4;++i){char s[2]={\"0123456789abcdef\"[x>>12],0};text(s);x<<=4;}}"
+        },
+        {
+          "line": 17,
+          "declaration": "int main(void){"
+        }
+      ]
+    },
+    {
+      "path": "cadet/game/test_score_host.c",
+      "sha256": "b5e76ef3a5a57770f80553eee1c1bcae51c43a6d77417f895557de0c9009128a",
+      "symbols": [
+        {
+          "line": 7,
+          "declaration": "static void setup(Wide n){"
+        },
+        {
+          "line": 12,
+          "declaration": "static void verify(Wide n){"
+        },
+        {
+          "line": 16,
+          "declaration": "int main(void){"
+        }
+      ]
+    },
+    {
+      "path": "cadet/game/test_slingshot_render.c",
+      "sha256": "d75d913f8d388a89399feadab660ab31904a5ae0342719d0fc5859c3aea3e41c",
+      "symbols": [
+        {
+          "line": 10,
+          "declaration": "static void text(const char*s){while(*s)*(volatile uint8_t*)0x9fbb=*s++;}"
+        },
+        {
+          "line": 11,
+          "declaration": "static void hex(uint32_t n){for(uint8_t i=0;i<8;++i){*(volatile uint8_t*)0x9fbb=\"0123456789abcdef\"[n>>28];n<<=4;}}"
+        },
+        {
+          "line": 12,
+          "declaration": "static uint16_t word(const uint8_t*p){return(uint16_t)p[0]|((uint16_t)p[1]<<8);}"
+        },
+        {
+          "line": 13,
+          "declaration": "static uint8_t load(const char*n,uint8_t mode,uint16_t a){cbm_k_setnam(n);cbm_k_setlfs(1,8,2);return(uintptr_t)cbm_k_load(mode,(void*)a)>255;}"
+        },
+        {
+          "line": 14,
+          "declaration": "static uint32_t cycles(void){uint8_t a=*(volatile uint8_t*)0x9fb8,b=*(volatile uint8_t*)0x9fb9,c=*(volatile uint8_t*)0x9fba,d=*(volatile uint8_t*)0x9fbb;return(uint32_t)a|((uint32_t)b<<8)|((uint32_t)c<<16)|((uint32_t)d<<24);}"
+        },
+        {
+          "line": 15,
+          "declaration": "static void check(uint8_t condition){++checks;if(!condition)++errors;}"
+        },
+        {
+          "line": 16,
+          "declaration": "static void visible(uint8_t side,uint8_t pose){"
+        },
+        {
+          "line": 24,
+          "declaration": "static void render(void){uint32_t start=cycles();dynamic_update(0);uint32_t elapsed=cycles()-start;if(elapsed>maximum)maximum=elapsed;check(*(volatile uint8_t*)0==11);}"
+        },
+        {
+          "line": 25,
+          "declaration": "int main(void){"
+        }
+      ]
+    },
+    {
+      "path": "cadet/game/test_slingshot_render.py",
+      "sha256": "07c48da60b5c3d2f2a03a424142e29280cf830fea8843ad5fbd9e27b1f256972",
+      "symbols": []
+    },
+    {
+      "path": "cadet/game/test_ui.py",
+      "sha256": "44dea52343d60bccfa04c55b70f1d0b5def72b1c9b50a98e3359d2ab1a27c204",
+      "symbols": []
+    },
+    {
+      "path": "cadet/game/verify_milestone_fixture_probe.c",
+      "sha256": "ddc7830007a7e0bede8cc13e53a1c5cc7838470b80e76fda83d0d493dab659e2",
+      "symbols": [
+        {
+          "line": 4,
+          "declaration": "int main(void){if(!game_load())return 1;game_start();for(uint16_t i=0;i<12000;++i){uint8_t before=milestone_placement_index;milestone_setup(i);game_frame(i%43<12,i%67<14,game.state==Serving&&game.charge<80,false);if(game.state==GameOver)game_start();"
+        }
+      ]
+    },
+    {
+      "path": "cadet/game/verify_milestone_input.h",
+      "sha256": "ecae0e4096d4a056af7efe2b9bccab7141bdb8e2cf62dc48d04dd5b8090e7eea",
+      "symbols": [
+        {
+          "line": 27,
+          "declaration": "static void milestone_setup(uint16_t tick){"
+        }
+      ]
+    },
+    {
+      "path": "cadet/game/verify_milestone_inputs.py",
+      "sha256": "a86184a287498c93b878230c94157be33b8f056a7450b02729abe1c48dfd97d7",
+      "symbols": [
+        {
+          "line": 34,
+          "declaration": " 'static void milestone_setup(uint16_t tick){',"
+        }
+      ]
+    },
+    {
+      "path": "cadet/game/verify_music.py",
+      "sha256": "8f1ceba45d695e60f14347508ccf3280d67b96f1f780c7ad7adc651e6310ce19",
+      "symbols": []
+    },
+    {
+      "path": "wireframe/assets.py",
+      "sha256": "b43a7919a86874ccb4bf115eb98cb35475a79ca75d6cdcf3a2cacdc387a3e827",
+      "symbols": []
+    },
+    {
+      "path": "wireframe/audio.s",
+      "sha256": "738036391ebaa6b5c5b5829c6f02d8cf8b8a43e179d8f4f846147e7f82afc43a",
+      "symbols": [
+        {
+          "line": 7,
+          "declaration": "audio_install:"
+        },
+        {
+          "line": 48,
+          "declaration": "audio_uninstall:"
+        },
+        {
+          "line": 65,
+          "declaration": "audio_clock:"
+        },
+        {
+          "line": 73,
+          "declaration": "audio_pause:"
+        },
+        {
+          "line": 83,
+          "declaration": "audio_toggle:"
+        },
+        {
+          "line": 95,
+          "declaration": "audio_music_toggle:"
+        },
+        {
+          "line": 109,
+          "declaration": "audio_silence:"
+        },
+        {
+          "line": 117,
+          "declaration": "audio_clear_fx:"
+        },
+        {
+          "line": 126,
+          "declaration": "audio_stop:"
+        },
+        {
+          "line": 134,
+          "declaration": "audio_effect:"
+        },
+        {
+          "line": 154,
+          "declaration": "effect_start:"
+        },
+        {
+          "line": 165,
+          "declaration": "effect_done:"
+        },
+        {
+          "line": 169,
+          "declaration": "audio_irq:"
+        },
+        {
+          "line": 187,
+          "declaration": "audio_service:"
+        },
+        {
+          "line": 194,
+          "declaration": "voice_loop:"
+        },
+        {
+          "line": 221,
+          "declaration": "voice_off:"
+        },
+        {
+          "line": 223,
+          "declaration": "voice_next:"
+        },
+        {
+          "line": 228,
+          "declaration": "voices_done:"
+        },
+        {
+          "line": 233,
+          "declaration": "service_done:"
+        },
+        {
+          "line": 235,
+          "declaration": "sound_read:"
+        },
+        {
+          "line": 239,
+          "declaration": "music_service:"
+        },
+        {
+          "line": 281,
+          "declaration": "music_done:"
+        },
+        {
+          "line": 285,
+          "declaration": "audio_save_address:"
+        },
+        {
+          "line": 303,
+          "declaration": "audio_restore_address:"
+        },
+        {
+          "line": 313,
+          "declaration": "audio_flush:"
+        },
+        {
+          "line": 328,
+          "declaration": "audio_enabled: .zero 1"
+        },
+        {
+          "line": 329,
+          "declaration": "music_enabled: .zero 1"
+        },
+        {
+          "line": 330,
+          "declaration": "audio_paused: .zero 1"
+        },
+        {
+          "line": 331,
+          "declaration": "audio_ticks: .zero 2"
+        },
+        {
+          "line": 332,
+          "declaration": "audio_old_irq: .zero 2"
+        },
+        {
+          "line": 333,
+          "declaration": "audio_remaining: .zero 2"
+        },
+        {
+          "line": 334,
+          "declaration": "music_step: .zero 1"
+        },
+        {
+          "line": 335,
+          "declaration": "music_tick: .zero 1"
+        },
+        {
+          "line": 336,
+          "declaration": "fx_count: .zero 8"
+        },
+        {
+          "line": 337,
+          "declaration": "fx_id: .zero 8"
+        },
+        {
+          "line": 338,
+          "declaration": "fx_pos: .zero 8"
+        },
+        {
+          "line": 339,
+          "declaration": "fx_priority: .zero 8"
+        },
+        {
+          "line": 340,
+          "declaration": "audio_regs: .zero 16"
+        },
+        {
+          "line": 341,
+          "declaration": "saved_psg: .zero 16"
+        },
+        {
+          "line": 342,
+          "declaration": "vera_ctrl_saved: .zero 1"
+        },
+        {
+          "line": 343,
+          "declaration": "vera_lo_saved: .zero 1"
+        },
+        {
+          "line": 344,
+          "declaration": "vera_mid_saved: .zero 1"
+        },
+        {
+          "line": 345,
+          "declaration": "vera_hi_saved: .zero 1"
+        }
+      ]
+    },
+    {
+      "path": "wireframe/build.sh",
+      "sha256": "63246fbb976f30ac46bd50b462cfe0c1430df8b91a40ff602d99db21c4245e15",
+      "symbols": []
+    },
+    {
+      "path": "wireframe/engine.h",
+      "sha256": "6dff273ea76918d86a8a5f582dc0c8ff6cda83b9f700d3fe5ab7a873214b35e4",
+      "symbols": []
+    },
+    {
+      "path": "wireframe/export.py",
+      "sha256": "12338a87a62944bf4c3e3f698c97aa85f694fbfb2a012753f67163315776b8c3",
+      "symbols": []
+    },
+    {
+      "path": "wireframe/keyboard_test.py",
+      "sha256": "280a9bc5e32a1f639d5dab491fc9e38fa091aa89252b7230aba994cdfd56bbbb",
+      "symbols": []
+    },
+    {
+      "path": "wireframe/layout.py",
+      "sha256": "dd2a69508283723db158abfe92765b2c7904779057aa69147f6cc2d2e22d1ad1",
+      "symbols": []
+    },
+    {
+      "path": "wireframe/narrowmul.s",
+      "sha256": "53d36bf74f4b17b6b9d0138e0e8d650924caf6db3574d1d9f4f035fba0a63137",
+      "symbols": [
+        {
+          "line": 6,
+          "declaration": "fastmul8:"
+        },
+        {
+          "line": 36,
+          "declaration": "nm_byte:"
+        },
+        {
+          "line": 51,
+          "declaration": "nm_high:"
+        },
+        {
+          "line": 55,
+          "declaration": "nm_diff:"
+        },
+        {
+          "line": 63,
+          "declaration": "nm_positive:"
+        },
+        {
+          "line": 74,
+          "declaration": "nm_zero:"
+        },
+        {
+          "line": 80,
+          "declaration": "nm_sqlo:"
+        },
+        {
+          "line": 82,
+          "declaration": "nm_sqhi:"
+        }
+      ]
+    },
+    {
+      "path": "wireframe/narrowmul_shared.s",
+      "sha256": "daf071b6c9289518696ce37f6779a8496193076d234af3cb8efb49056bc1512a",
+      "symbols": [
+        {
+          "line": 6,
+          "declaration": "fastmul8:"
+        },
+        {
+          "line": 36,
+          "declaration": "nm_byte:"
+        },
+        {
+          "line": 51,
+          "declaration": "nm_high:"
+        },
+        {
+          "line": 55,
+          "declaration": "nm_diff:"
+        },
+        {
+          "line": 63,
+          "declaration": "nm_positive:"
+        },
+        {
+          "line": 74,
+          "declaration": "nm_zero:"
+        }
+      ]
+    },
+    {
+      "path": "wireframe/pack.py",
+      "sha256": "08673b000effef1d07d2d9b5a08002528ef8eb4ea34351501e8693457626d0d1",
+      "symbols": []
+    },
+    {
+      "path": "wireframe/score_display_test.py",
+      "sha256": "660092880c9d8adf95dae3d2dfb195ad9f48a8517e08d287458b09e0ec7b176c",
+      "symbols": []
+    },
+    {
+      "path": "wireframe/sound_assets.py",
+      "sha256": "d671d336e7779fa9341d05e4a3f9c039816cb1ef0cf90f24bf46fdb7f4bee5a5",
+      "symbols": []
+    },
+    {
+      "path": "wireframe/sqrt.s",
+      "sha256": "65df7ebbf7a1e0d1f61baed85ad4ea075d791d5814b1bdd64e4c2d2bfd95a11b",
+      "symbols": [
+        {
+          "line": 7,
+          "declaration": "fastsqrt:"
+        }
+      ]
+    },
+    {
+      "path": "wireframe/test_native.sh",
+      "sha256": "1fb87eee37605461be1067e667fd0dde95b85aed13da7df853141da77a320a06",
+      "symbols": []
+    },
+    {
+      "path": "wireframe/verify_audio.py",
+      "sha256": "1448dbebc1c8ba84b036c13ff23faa2ae22bb4c42db12bd12aaa5c9335e89c16",
+      "symbols": []
+    },
+    {
+      "path": "wireframe/verify_emu.py",
+      "sha256": "4888463380e54af00894adfed634c16cce589594364e7498191e861a2065615c",
+      "symbols": []
+    },
+    {
+      "path": "wireframe/widemul.s",
+      "sha256": "86a5d836754b61fa9cc34e2fbb64374638eb959cf16087dd9749e6de6291eeb3",
+      "symbols": [
+        {
+          "line": 7,
+          "declaration": "fastmul16:"
+        },
+        {
+          "line": 53,
+          "declaration": "fm_byte:"
+        },
+        {
+          "line": 68,
+          "declaration": "fm_high:"
+        },
+        {
+          "line": 72,
+          "declaration": "fm_diff:"
+        },
+        {
+          "line": 80,
+          "declaration": "fm_positive:"
+        },
+        {
+          "line": 91,
+          "declaration": "fm_zero:"
+        },
+        {
+          "line": 98,
+          "declaration": "fm_sqlo:"
+        },
+        {
+          "line": 101,
+          "declaration": "fm_sqhi:"
+        }
+      ]
+    }
+  ],
+  "reference_data": "reference-data.json",
+  "limitations": [
+    "not_generic_level_loader",
+    "no_multiball",
+    "moving_flipper_ccd_incomplete",
+    "no_current_commit_60fps_certification",
+    "real_hardware_cycle_gating_unverified",
+    "advanced_rules_incomplete"
+  ],
+  "arithmetic_vectors": [
+    {
+      "operation": "trunc_div",
+      "inputs": [
+        -61,
+        60
+      ],
+      "output": -1
+    },
+    {
+      "operation": "fraction8",
+      "inputs": [
+        1,
+        3
+      ],
+      "output": 85
+    },
+    {
+      "operation": "isqrt",
+      "inputs": [
+        15
+      ],
+      "output": 3
+    },
+    {
+      "operation": "add_score",
+      "initial_hex_le": "ff000000000000000000000000000000",
+      "award": 1,
+      "output_hex_le": "00010000000000000000000000000000",
+      "overflow": false
+    },
+    {
+      "operation": "add_score",
+      "initial_hex_le": "ffffffffffffffffffffffffffffffff",
+      "award": 1,
+      "output_hex_le": "ffffffffffffffffffffffffffffffff",
+      "overflow": true
+    }
+  ]
+}

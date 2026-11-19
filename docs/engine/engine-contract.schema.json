@@ -1,0 +1,213 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Space CmdrX16 implementation contract",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "baseline_commit",
+    "baseline_branch",
+    "status",
+    "hardware",
+    "timing",
+    "numeric",
+    "enums",
+    "geometry",
+    "bank_allocations",
+    "vera",
+    "audio",
+    "runtime_files",
+    "sources",
+    "reference_data",
+    "limitations",
+    "arithmetic_vectors"
+  ],
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "const": "1.0.0"
+    },
+    "baseline_commit": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{40}$"
+    },
+    "baseline_branch": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string"
+    },
+    "hardware": {
+      "type": "object",
+      "required": [
+        "cpu",
+        "clock_hz",
+        "minimum_banked_ram_kib",
+        "test_ram_kib",
+        "bank_register",
+        "bank_window_start",
+        "bank_bytes",
+        "software_stack_start",
+        "maximum_bss_end",
+        "vera_io_base",
+        "emulator_cycle_ports"
+      ]
+    },
+    "timing": {
+      "type": "object",
+      "required": [
+        "nominal_physics_hz",
+        "calls_per_observed_vblank",
+        "catch_up",
+        "timer_units_per_call",
+        "timer_units_per_nominal_second",
+        "vga_refresh_hz_numerator",
+        "vga_refresh_hz_denominator",
+        "music_ticks_per_125_frames",
+        "strict_cycles_per_frame",
+        "panel_threshold_cycles",
+        "prefetch_threshold_cycles",
+        "current_commit_budget_certified"
+      ]
+    },
+    "numeric": {
+      "type": "object",
+      "required": [
+        "coordinate_scale",
+        "velocity_scale",
+        "force_scale",
+        "normal_scale",
+        "fraction_scale",
+        "projection_scale",
+        "signed_division",
+        "sqrt",
+        "max_velocity_component",
+        "gravity_y",
+        "drag_divisor",
+        "score_bytes",
+        "score_endian",
+        "decimal_digits",
+        "score_overflow"
+      ]
+    },
+    "enums": {
+      "type": "object"
+    },
+    "geometry": {
+      "type": "object",
+      "required": [
+        "edge_struct_format",
+        "edge_bytes",
+        "fields",
+        "edges",
+        "components",
+        "component_capacity",
+        "grid",
+        "grid_origin",
+        "cell_width_q8",
+        "layers",
+        "candidate_buffer_words",
+        "contact_iterations_per_substep",
+        "ramp_ignore_capacity",
+        "circle_radius_max_q8",
+        "flag_bits"
+      ]
+    },
+    "bank_allocations": {
+      "type": "array"
+    },
+    "vera": {
+      "type": "object",
+      "required": [
+        "output",
+        "tile_size",
+        "bpp",
+        "map_size",
+        "map_base",
+        "tile_base",
+        "sprite_pattern_base",
+        "font_base",
+        "ball_scratch_base",
+        "palette_base",
+        "sprite_attributes_base",
+        "psg_base",
+        "register_values"
+      ]
+    },
+    "audio": {
+      "type": "object",
+      "required": [
+        "pcm_format",
+        "pcm_rate_register",
+        "pcm_rate_hz",
+        "voices",
+        "voice_order",
+        "gain_right_shift_by_active_voices",
+        "prime_samples",
+        "regular_base_samples",
+        "fraction_increment",
+        "fraction_modulus",
+        "music_dictionary_bytes",
+        "music_prefetch_max_bytes",
+        "music_lead_target_bytes",
+        "music_decoded_command_bytes"
+      ]
+    },
+    "runtime_files": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "path",
+          "bytes",
+          "sha256"
+        ],
+        "properties": {
+          "path": {
+            "type": "string"
+          },
+          "bytes": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          }
+        }
+      }
+    },
+    "sources": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "path",
+          "sha256",
+          "symbols"
+        ],
+        "properties": {
+          "path": {
+            "type": "string"
+          },
+          "sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "symbols": {
+            "type": "array"
+          }
+        }
+      }
+    },
+    "reference_data": {
+      "type": "string"
+    },
+    "limitations": {
+      "type": "array"
+    },
+    "arithmetic_vectors": {
+      "type": "array"
+    }
+  }
+}
