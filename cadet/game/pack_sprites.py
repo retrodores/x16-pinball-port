@@ -1,11 +1,12 @@
 """Original movable bitmaps, spatially unchanged, using VERA's local palettes."""
 from pathlib import Path
+import os
 import json,struct
 import numpy as np
 from PIL import Image
 r=Path(__file__).resolve().parents[2];o=r/'cadet/play-build'
-j=json.loads(Path('/opt/spacecadet-x16-analysis/evidence/inventory.json').read_text())
-d=Path('/opt/spacecadet-x16-analysis/input/game/PINBALL.DAT').read_bytes()
+j=json.loads(Path(os.environ.get('CADET_INVENTORY', '/opt/spacecadet-x16-analysis/evidence/inventory.json')).read_text())
+d=Path(os.environ.get('CADET_DAT', '/opt/spacecadet-x16-analysis/input/game/PINBALL.DAT')).read_bytes()
 pe=next(e for g in j['groups'] for e in g['entries'] if e['type']==5)
 rgb=np.array([(r,g,b)for b,g,r,a in struct.iter_unpack('BBBB',d[pe['offset']:pe['offset']+1024])],dtype=np.int32)
 rgb[:10]=[(0,0,0),(128,0,0),(0,128,0),(128,128,0),(0,0,128),(128,0,128),(0,128,128),(192,192,192),(192,220,192),(166,202,240)]

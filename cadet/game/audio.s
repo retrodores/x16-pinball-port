@@ -416,13 +416,14 @@ pcm_next_voice:
  lda pcm_voices+2,y
  sta pcm_current_bank
  sta $00
- lda pcm_voices+3,y
- sta pcm_read+1
  lda pcm_voices+4,y
  sta pcm_read+2
+ lda pcm_voices+3,y
+ tay
  ldx #0
 pcm_read:
- lda $a000
+ ; Keep the sample offset in Y and patch the page only on wrap.
+ lda $a000,y
 pcm_gain_jump:
  jmp pcm_no_shift
 pcm_two_shift:
@@ -435,7 +436,7 @@ pcm_no_shift:
  clc
  adc pcm_buffer,x
  sta pcm_buffer,x
- inc pcm_read+1
+ iny
  bne pcm_next_sample
  inc pcm_read+2
  lda pcm_read+2
@@ -455,11 +456,11 @@ pcm_next_sample:
  inx
  cpx pcm_count
  bne pcm_read
+ tya
  ldy pcm_voice_index
+ sta pcm_voices+3,y
  lda pcm_current_bank
  sta pcm_voices+2,y
- lda pcm_read+1
- sta pcm_voices+3,y
  lda pcm_read+2
  sta pcm_voices+4,y
 pcm_voice_done:

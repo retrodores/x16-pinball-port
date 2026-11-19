@@ -46,7 +46,8 @@ if __name__=='__main__':
       'cadet/game/bounds.s','cadet/game/audio.s','cadet/game/engine.c',
       'cadet/game/depth_quant.s','cadet/game/mask_pixels.s','cadet/game/depth_rect.s',
       'cadet/game/depth.c','cadet/game/dynamic.c','cadet/game/play.c']
-    for name in ('CADET','TEST'):
+    targets = ('CADET',) if os.environ.get('CADET_BUILD_PLAYER_ONLY') == '1' else ('CADET', 'TEST')
+    for name in targets:
         defs=['-DPIN_AUDIO']
         if name=='TEST':
             defs+=['-DGAME_TEST','-DTEST_FRAMES='+os.environ.get('CADET_TEST_FRAMES','12000')]

@@ -1,4 +1,5 @@
 from pathlib import Path
+import os
 import json,re,struct,math,numpy as np
 from PIL import Image,ImageFont,ImageDraw
 r=Path(__file__).resolve().parents[2];o=r/'cadet/play-build';src=r/'cadet/build'
@@ -44,13 +45,13 @@ report={'bytes':len(data),'banks':banks,'load_banks':[x[2]for x in segments],'ef
 # Compact status text is provisional; the numeric display uses original glyphs.
 pal=(o/'PAL.BIN').read_bytes();colors=np.array([((pal[i+1]&15)*17,(pal[i]>>4)*17,(pal[i]&15)*17)for i in range(0,512,2)])
 i=int(np.argmin(((colors-(221,221,204))**2).sum(axis=1)));bank,pen=divmod(i,16);assert pen
-base=json.loads((o/'sprites.json').read_text())['end'];font=ImageFont.truetype('/usr/share/fonts/truetype/dejavu/DejaVuSansMono.ttf',9);data=bytearray()
+base=json.loads((o/'sprites.json').read_text())['end'];font=ImageFont.truetype(os.environ.get('CADET_FONT', '/usr/share/fonts/truetype/dejavu/DejaVuSansMono.ttf'),9);data=bytearray()
 for code in range(32,96):
  a=Image.new('1',(8,8));ImageDraw.Draw(a).text((0,-2),chr(code),font=font,fill=1)
  p=np.asarray(a,np.uint8)*pen;data.extend(((p[:,::2]<<4)|p[:,1::2]).tobytes())
 assert base+len(data)<0x1f9c0
 (o/'FONT.BIN').write_bytes(data)
-inv=json.loads(Path('/opt/spacecadet-x16-analysis/evidence/inventory.json').read_text())
+inv=json.loads(Path(os.environ.get('CADET_INVENTORY', '/opt/spacecadet-x16-analysis/evidence/inventory.json')).read_text())
 depths=[]
 for gid in range(108,115):
  p=next(e['values'][1:]for e in inv['groups'][gid]['entries']if e['type']==11 and e['values'][0]==501)

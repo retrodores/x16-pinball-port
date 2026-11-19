@@ -1,15 +1,16 @@
 #!/usr/bin/env python3
 """Recover sound references, convert all source effects, and match the OBS audio."""
 from pathlib import Path
+import os
 import json, wave, hashlib, math, csv, collections, re, zlib
 from fractions import Fraction
 import numpy as np
 from scipy.signal import resample_poly, correlate, find_peaks, butter, sosfiltfilt
 ROOT=Path(__file__).resolve().parents[1]
-SRC=Path('/opt/spacecadet-x16-analysis/input/game')
+SRC=Path(os.environ.get('CADET_INSTALL', '/opt/spacecadet-x16-analysis/input/game'))
 OUT=ROOT/'cadet/build';OUT.mkdir(exist_ok=True)
 PCM=OUT/'PCM';PCM.mkdir(exist_ok=True)
-j=json.loads(Path('/opt/spacecadet-x16-analysis/evidence/inventory.json').read_text())
+j=json.loads(Path(os.environ.get('CADET_INVENTORY', '/opt/spacecadet-x16-analysis/evidence/inventory.json')).read_text())
 groups=j['groups']
 sounds={}
 for g in groups:
@@ -68,6 +69,8 @@ with (OUT/'component-sounds.csv').open('w',newline='')as f:
  c=csv.writer(f);c.writerow(['component_group','component','role','WAV','resource_group','attribute_group','attribute'])
  for row in references:
   for role,a in row['sounds'].items():c.writerow([row['component_group'],row['name'],role,a['wav'],a['group'],a['source_group'],a['field']])
+if os.environ.get('CADET_SKIP_CAPTURE') == '1':
+ raise SystemExit(0)
 capture_path=ROOT/'cadet/capture/obs-audio.s8'
 capture_bytes=capture_path.read_bytes() if capture_path.exists() else zlib.decompress(capture_path.with_suffix('.s8.zlib').read_bytes())
 capture=np.frombuffer(capture_bytes,np.int8).astype(np.float64)

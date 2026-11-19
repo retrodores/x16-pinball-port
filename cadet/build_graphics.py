@@ -1,13 +1,14 @@
 #!/usr/bin/env python3
 """Original-resolution 16x16/4bpp VERA tiles with 16 local color palettes."""
 from pathlib import Path
+import os
 import json,struct,math,sys
 import numpy as np
 from scipy.cluster.vq import kmeans2
 from PIL import Image,ImageDraw,ImageFont
 R=Path(__file__).resolve().parents[1];O=Path(sys.argv[1]) if len(sys.argv)>1 else R/'cadet/build';O.mkdir(exist_ok=True)
-J=json.loads(Path('/opt/spacecadet-x16-analysis/evidence/inventory.json').read_text())
-D=Path('/opt/spacecadet-x16-analysis/input/game/PINBALL.DAT').read_bytes()
+J=json.loads(Path(os.environ.get('CADET_INVENTORY', '/opt/spacecadet-x16-analysis/evidence/inventory.json')).read_text())
+D=Path(os.environ.get('CADET_DAT', '/opt/spacecadet-x16-analysis/input/game/PINBALL.DAT')).read_bytes()
 pe=next(e for g in J['groups']for e in g['entries']if e['type']==5)
 rgb=np.array([(r,g,b)for b,g,r,a in struct.iter_unpack('BBBB',D[pe['offset']:pe['offset']+1024])],dtype=np.uint8)
 rgb[:10]=[(0,0,0),(128,0,0),(0,128,0),(128,128,0),(0,0,128),(128,0,128),(0,128,128),(192,192,192),(192,220,192),(166,202,240)]
@@ -27,7 +28,7 @@ for gid in ([372,380,388,396,405,413,421] if len(sys.argv)>1 else [355,363,372,3
  a,b=bitmap(gid);paste(a,b['x']-tm['x']+8,b['y']-tm['y']+5,True)
 source=Image.fromarray(rgb[screen],'RGB')
 # A bounded audition screen; no suggestion that this is already a playable port.
-d=ImageDraw.Draw(source);f=ImageFont.truetype('/usr/share/fonts/truetype/dejavu/DejaVuSansMono.ttf',10)
+d=ImageDraw.Draw(source);f=ImageFont.truetype(os.environ.get('CADET_FONT', '/usr/share/fonts/truetype/dejavu/DejaVuSansMono.ttf'),10)
 labels=[(410,'CMDRX CADET - 0.3.1 DEV'),(423,'Z / SHIFT: LEFT   /: RIGHT'),(436,'SPACE: PLUNGER   F2: NEW GAME'),(449,'M: MUSIC       ESC: EXIT   8 MHZ')] if len(sys.argv)>1 else [(410,'X16 FIDELITY LAB - NOT GAMEPLAY'),(423,'LEFT/RIGHT: SELECT  SPACE: PLAY'),(436,'M: ORIGINAL THEME  S: STOP'),(449,'ESC: EXIT   65C02 / 8 MHZ')]
 for y,s in labels:d.text((386,y),s,font=f,fill=(187,187,221))
 source.save(O/'original-layout.png')

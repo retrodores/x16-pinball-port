@@ -151,3 +151,19 @@ jackpot/blocker/extra-ball/reflex rules and missing cues, spinner callbacks,
 mission/rank/bonus/message UI, randomized throws and per-lamp phase fidelity.
 Dynamic object depth maps and some multi-frame visual updates remain imperfect.
 Do not describe the development build as a complete or note/pixel-perfect port.
+
+## Engine and local-import checkpoint
+
+The PCM mixer keeps its within-page sample offset in Y. The mixer changes the
+read page only when Y wraps, including the existing bank 30 to 51 transition.
+The strict test on a stock 65C02 at 8 MHz still fails. The updated 12,000-frame
+runs measured 211,209 / 211,215 worst cycles and 90 / 90 over-budget frames at
+512 KB / 2 MB, with zero PCM underruns, music errors, or reported frame-start gaps.
+Mean cost was 67,879 cycles in both modes. The development label remains.
+
+Use `cadet/game/import_local.py` and see `cadet/game/IMPORT.md` for the
+code-only distribution and private asset conversion. The converter uses a
+supported local installation and the existing checkout's two pinned reference
+inputs. Its fresh build reached PLAY READY on Linux at both RAM sizes and all
+32 runtime files matched the developer build byte-for-byte. Windows execution
+has not been verified.

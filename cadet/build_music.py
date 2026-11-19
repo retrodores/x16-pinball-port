@@ -3,9 +3,10 @@
 Notes/onsets and pitch bends are retained; FM/PSG instrument timbres are adaptations.
 """
 from pathlib import Path
+import os
 import mido, collections, json, math, csv, hashlib
 R=Path(__file__).resolve().parents[1];O=R/'cadet/build';O.mkdir(exist_ok=True)
-src=Path('/opt/spacecadet-x16-analysis/input/game/PINBALL.MID')
+src=Path(os.environ.get('CADET_MIDI', '/opt/spacecadet-x16-analysis/input/game/PINBALL.MID'))
 m=mido.MidiFile(src);frames=collections.defaultdict(list);ledger=[];ignored=[]
 groups={1:[0,1],3:[2,3],2:[4,5]};states={v:None for g in groups.values()for v in g};released={v:0 for v in states}
 program={1:38,3:28,2:11};volume=collections.defaultdict(lambda:100);bend=collections.defaultdict(int)

@@ -2,11 +2,12 @@
 Index is bank 10; block data is banks 17,18,45..50. Blocks never cross banks.
 """
 from pathlib import Path
+import os
 import json,struct
 import numpy as np
 r=Path(__file__).resolve().parents[2];o=r/'cadet/play-build'
-j=json.loads(Path('/opt/spacecadet-x16-analysis/evidence/inventory.json').read_text())
-d=Path('/opt/spacecadet-x16-analysis/input/game/PINBALL.DAT').read_bytes()
+j=json.loads(Path(os.environ.get('CADET_INVENTORY', '/opt/spacecadet-x16-analysis/evidence/inventory.json')).read_text())
+d=Path(os.environ.get('CADET_DAT', '/opt/spacecadet-x16-analysis/input/game/PINBALL.DAT')).read_bytes()
 e=next(e for e in j['groups'][107]['entries']if e['type']==12)
 z=np.frombuffer(d[e['offset']+14:e['offset']+e['bytes']],'<u2').reshape(470,368)[::-1,:365]
 q=(z>>8).astype('B')
