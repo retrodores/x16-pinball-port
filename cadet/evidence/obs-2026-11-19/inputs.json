@@ -1,0 +1,15 @@
+{
+  "2026-11-19 00-37-20.mp4": {
+    "sha256": "5538741917baddb21fb46ef5736889864cc225ae20be1d21744a5bc5611652d1",
+    "duration_seconds": 55.133333,
+    "width": 1920,
+    "height": 1080,
+    "fps": 60,
+    "audio_rate": 48000,
+    "audio_channels": 2
+  },
+  "2026-11-17 22-59-31(1).mp4": {
+    "sha256": "732d9350f20403c1d5d173c41cf500d3448d63ca14676a5a42d68ba00ff85405",
+    "role": "original-game comparison"
+  }
+}

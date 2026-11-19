@@ -1,3 +1,17 @@
+# 2026-11-19 — Original Table 0.3.1 development follow-up
+
+- Restore lower slingshot rubber/glow and upper rebounder animations; immediate
+  lower tile-map swaps preserve the original six-frame firing interval.
+- Mix table, flipper and plunger PCM independently at the original sample rate;
+  use a short queue and cumulative underrun diagnostics.
+- Send explicit feed/release cues, support independent plunger input, and avoid
+  duplicated powered-contact sounds while preserving flipper physics.
+- Keep the soundtrack enabled by default with M and a visible music indicator.
+- Force bank-changing trampolines resident/noinline; move event dispatch and the
+  pure speed limiter into bank62 without changing their numerical behavior.
+- Test both RAM sizes and retain the strict failing 133333-cycle budget.
+  See cadet/STATUS-0.3.1-DEV.md for costs and remaining gaps.
+
 # 2026-11-18 — Original Table 0.3 development milestone
 
 - Implement source-derived wormhole/kickout capture, destination, release and

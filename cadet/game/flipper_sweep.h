@@ -35,7 +35,7 @@ static TIP_FN bool paddle_static_tip_core(uint8_t side,uint8_t old,int16_t sx,in
 }
 /* Finish the world sweep only after restoring the caller bank. nearest/edge
  * select geometry banks and must never execute with this overlay on the stack. */
-static bool paddle_static_tip(uint8_t side,uint8_t old,int16_t sx,int16_t sy,uint8_t steps){
+static BANK_TRAMPOLINE bool paddle_static_tip(uint8_t side,uint8_t old,int16_t sx,int16_t sy,uint8_t steps){
 #ifdef __CX16__
  uint8_t saved=*(volatile uint8_t*)0;
  *(volatile uint8_t*)0=62;__asm__ volatile("":::"memory");

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Audit and package a committed CmdrX Cadet 0.3 development build.
+"""Audit and package a committed CmdrX Cadet 0.3.1 development build.
 
 Run --audit-only while integrating. Final packaging requires root's recorded
 validation JSON (tested_commit, native_results for both RAM sizes, changes,
@@ -10,24 +10,24 @@ import argparse, datetime, hashlib, io, json, os, re, subprocess as sp, zipfile
 
 ROOT=Path(__file__).resolve().parents[2]
 BUILD=ROOT/'cadet/play-build'
-VERSION='0.3-dev'
+VERSION='0.3.1-dev'
 RUNTIME=('CADET.PRG','CADET.RUL','CADET.PHY','MAP.BIN','TILES.BIN','PAL.BIN','SPRITES.BIN',
          'FONT.BIN','UI.BIN',*[f'GEOM{i}.BIN' for i in range(3)],
          *[f'MUSIC{i}.BIN' for i in range(2)],*[f'PCM{i}.BIN' for i in range(3)],
-         *[f'DEPTH{i:02}.BIN' for i in range(9)],*[f'DYN{i}.BIN' for i in range(3)])
+         *[f'DEPTH{i:02}.BIN' for i in range(9)],*[f'DYN{i}.BIN' for i in range(4)])
 # Geometry loader temporarily writes padding/obsolete bounds in10,11,17,18.
 # The later UI/depth loads intentionally overwrite those locations.
 LIVE_BANKS={
  'geometry':[1,2,3,4,5,6,7,8,9,12,13,14,15,16],
  'depth_index':[10], 'ui':[11], 'depth_data':[17,18,45,46,47,48,49,50],
  'pcm':list(range(19,31))+list(range(51,58)), 'music_buffer':[31],
- 'music':list(range(32,45)), 'dynamic':[58,59,60], 'rules':[61], 'physics':[62],
+ 'music':list(range(32,45)), 'dynamic':[58,59,60,63], 'rules':[61], 'physics':[62],
 }
 BANK_LOADS={'UI.BIN':11,'CADET.RUL':61,'CADET.PHY':62,
  **{f'MUSIC{i}.BIN':b for i,b in enumerate((32,40))},
  **{f'PCM{i}.BIN':b for i,b in enumerate((19,27,51))},
  **{f'DEPTH{i:02}.BIN':b for i,b in enumerate((10,17,18,45,46,47,48,49,50))},
- **{f'DYN{i}.BIN':58+i for i in range(3)}}
+ **{f'DYN{i}.BIN':b for i,b in enumerate((58,59,60,63))}}
 GENERATED=('MODEL.BIN','THEME.ZSM','MUSIC.LZ','UI-SPR.BIN','DEPTHROW.BIN',
  'model.json','music-pack.json','sprites.json','depth.json','dynamic.json',
  'graphics.json','resident-audio.json','dynamic-rest.png','dynamic-active.png',
@@ -111,8 +111,8 @@ def audit(build=BUILD):
     assert depth['codec_exact_pixels']==365*470
     assert depth['data_bytes']==sum(len(data[f'DEPTH{i:02}.BIN']) for i in range(1,9))
     dynamic=json.loads((build/'dynamic.json').read_text())
-    assert dynamic['bytes']<=3*8192
-    for i in range(3): assert len(data[f'DYN{i}.BIN'])==8192
+    assert dynamic['bytes']<=4*8192
+    for i in range(4): assert len(data[f'DYN{i}.BIN'])==8192
     return {'runtime_files':len(data),'runtime_bytes':sum(map(len,data.values())),
             'live_banks':LIVE_BANKS,'free_banks':[b for b in range(1,64)if b not in seen],
             'sha256':{n:sha(b)for n,b in sorted(data.items())}}
@@ -257,7 +257,7 @@ def main():
     p=argparse.ArgumentParser(description=__doc__)
     p.add_argument('--audit-only',action='store_true')
     p.add_argument('--validation',type=Path)
-    p.add_argument('--output',type=Path,default=ROOT/'cadet/releases/CmdrX_Cadet_0.3_Development.zip')
+    p.add_argument('--output',type=Path,default=ROOT/'cadet/releases/CmdrX_Cadet_0.3.1_Development.zip')
     args=p.parse_args()
     report=audit()
     if args.audit_only:

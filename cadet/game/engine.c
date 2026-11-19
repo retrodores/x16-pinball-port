@@ -24,7 +24,7 @@ typedef struct {
  uint16_t lane_flash[2],hazard_clear[2],bumper_decay[2],kick_timer[2],gate_flash[2];
  uint16_t hazard_flash[6],wormhole_timer,destination_flash,replay,hyper_timer;
  int16_t original_z;
- uint8_t gate_alert[2],blink,blink_clock,bumper_fire[7],bumper_level[2],lane_bits[2],hazard_bits[2],gate[2],kick_phase[2];
+ uint8_t gate_alert[2],blink,blink_clock,bumper_fire[7],rebounder_fire[4],bumper_level[2],lane_bits[2],hazard_bits[2],gate[2],kick_phase[2];
  uint8_t wormhole_dest,wormhole_exit,hyper_count,gravity,capture_group,exit_group,original_mask;
 } RuleState;
 static RuleState rules;
@@ -127,8 +127,13 @@ void add_score(uint16_t n){if(game.overflow)return;game.score_dirty=true;uint16_
  for(uint8_t i=digit;i<40&&carry;++i){uint8_t add;
  if(carry<10){add=carry;carry=0;}else{add=carry%10;carry/=10;}uint8_t d=game.digits[i]+add;if(d>=10){d-=10;++carry;}game.digits[i]=d;}}
 #include "rules.inc"
+/* A bank-changing trampoline must stay resident even when its caller itself
+ * runs in an overlay. Inlining it there would bank out the executing code. */
+#define BANK_TRAMPOLINE __attribute__((section(".text.bank_trampolines"),noinline))
 /* All overlay calls enter from unbanked RAM. Helpers called by the overlay
- * either leave RAM_BANK unchanged or restore it before returning. */
+ * either leave RAM_BANK unchanged or restore it before returning. Resident
+ * wrappers must not inline into an overlay: changing banks there would replace
+ * the instructions currently executing before the nested call can return. */
 #ifdef __CX16__
 #define RULE_ENTER uint8_t rule_saved=*(volatile uint8_t*)0; *(volatile uint8_t*)0=61; __asm__ volatile("":::"memory")
 #define RULE_LEAVE __asm__ volatile("":::"memory"); *(volatile uint8_t*)0=rule_saved
@@ -136,20 +141,34 @@ void add_score(uint16_t n){if(game.overflow)return;game.score_dirty=true;uint16_
 #define RULE_ENTER
 #define RULE_LEAVE
 #endif
-static void rules_reset(void){RULE_ENTER;rule_reset();RULE_LEAVE;}
-static void rules_tick(void){RULE_ENTER;rule_tick();RULE_LEAVE;}
-static void rules_capture(const Edge*e){RULE_ENTER;rule_capture(e);++game.visual_epoch;RULE_LEAVE;}
-static void rules_release(void){RULE_ENTER;rule_release();++game.visual_epoch;RULE_LEAVE;}
-static void rules_lane(uint16_t n){RULE_ENTER;rule_lane(n);++game.visual_epoch;RULE_LEAVE;}
-static void rules_shift(uint8_t n){RULE_ENTER;rule_shift_lanes(n);++game.visual_epoch;RULE_LEAVE;}
-static void rules_hazard(uint16_t n){RULE_ENTER;rule_hazard(n);++game.visual_epoch;RULE_LEAVE;}
-static void rules_destination(bool n){RULE_ENTER;rule_destination(n);++game.visual_epoch;RULE_LEAVE;}
-uint8_t game_lamp(uint16_t n){RULE_ENTER;uint8_t r=rule_lamp(n);RULE_LEAVE;return r;}
-uint8_t game_pose(uint16_t n){RULE_ENTER;uint8_t r=rule_pose(n);RULE_LEAVE;return r;}
-static void serve(){sound(255);rules.gate[0]=rules.gate[1]=1;rules.gate_flash[0]=rules.gate_flash[1]=600;++game.visual_epoch;game.ball_number=4-game.balls;game.state=Serving;game.x=serve_x;game.y=plunger_y-2;game.z=77;game.vx=game.vy=game.remx=game.remy=game.accx=game.accy=0;game.mask=1;game.ramp=false;game.charge=0;game.charge_clock=0;game.flags=0;game.nudges=0;}
+static BANK_TRAMPOLINE void rules_reset(void){RULE_ENTER;rule_reset();RULE_LEAVE;}
+static BANK_TRAMPOLINE void rules_tick(void){RULE_ENTER;rule_tick();RULE_LEAVE;}
+static BANK_TRAMPOLINE void rules_capture(const Edge*e){RULE_ENTER;rule_capture(e);++game.visual_epoch;RULE_LEAVE;}
+static BANK_TRAMPOLINE void rules_release(void){RULE_ENTER;rule_release();++game.visual_epoch;RULE_LEAVE;}
+static BANK_TRAMPOLINE void rules_lane(uint16_t n){RULE_ENTER;rule_lane(n);++game.visual_epoch;RULE_LEAVE;}
+static BANK_TRAMPOLINE void rules_shift(uint8_t n){RULE_ENTER;rule_shift_lanes(n);++game.visual_epoch;RULE_LEAVE;}
+static BANK_TRAMPOLINE void rules_hazard(uint16_t n){RULE_ENTER;rule_hazard(n);++game.visual_epoch;RULE_LEAVE;}
+static BANK_TRAMPOLINE void rules_rebounder(uint8_t n){RULE_ENTER;rule_rebounder(n);RULE_LEAVE;}
+static BANK_TRAMPOLINE void rules_destination(bool n){RULE_ENTER;rule_destination(n);++game.visual_epoch;RULE_LEAVE;}
+BANK_TRAMPOLINE uint8_t game_lamp(uint16_t n){RULE_ENTER;uint8_t r=rule_lamp(n);RULE_LEAVE;return r;}
+BANK_TRAMPOLINE uint8_t game_pose(uint16_t n){RULE_ENTER;uint8_t r=rule_pose(n);RULE_LEAVE;return r;}
+static void serve(){sound(255);rules.gate[0]=rules.gate[1]=1;rules.gate_flash[0]=rules.gate_flash[1]=600;++game.visual_epoch;game.ball_number=4-game.balls;game.state=Serving;game.x=serve_x;game.y=plunger_y-2;game.z=77;game.vx=game.vy=game.remx=game.remy=game.accx=game.accy=0;game.mask=1;game.ramp=false;game.charge=0;game.charge_clock=0;game.flags=0;game.nudges=0;game.last_group=GROUP_473;game.last_kind=Plunger;sound(SoundFeed);}
 void game_start(void){uint8_t epoch=game.visual_epoch;active_count=0;memset(active_flags,0,sizeof active_flags);memset(&game,0,sizeof game);game.visual_epoch=epoch;game.balls=3;game.multiplier=1;game.score_dirty=true;rules_reset();serve();}
 static void drain(){if(game.state!=InPlay)return;game.state=Between;game.wait=120;game.vx=game.vy=0;game.mask=0;game.ramp=false;++game.drains;if(rules.replay)rules.replay=0;else if(game.balls)--game.balls;rules_reset();memset(game.lamps,0,sizeof game.lamps);memset(game.disabled,0,sizeof game.disabled);sound(5);}
-static void limit(){const int16_t cap=15360;int16_t m=ax(game.vx)>ax(game.vy)?ax(game.vx):ax(game.vy);if(m>cap){game.vx=(int32_t)game.vx*cap/m;game.vy=(int32_t)game.vy*cap/m;}}
+#ifdef __CX16__
+__attribute__((section(".physics"),noinline))
+#endif
+static void limit_core(){const int16_t cap=15360;int16_t m=ax(game.vx)>ax(game.vy)?ax(game.vx):ax(game.vy);if(m>cap){game.vx=(int32_t)game.vx*cap/m;game.vy=(int32_t)game.vy*cap/m;}}
+static BANK_TRAMPOLINE void limit(void){
+#ifdef __CX16__
+ uint8_t saved=*(volatile uint8_t*)0;*(volatile uint8_t*)0=62;__asm__ volatile("":::"memory");
+#endif
+ limit_core();
+#ifdef __CX16__
+ __asm__ volatile("":::"memory");*(volatile uint8_t*)0=saved;
+#endif
+}
+
 /* maths::basic_collision expressed in velocity coordinates, Q8. */
 #ifdef __CX16__
 uint16_t ratio12(uint16_t,uint16_t);
@@ -304,7 +323,10 @@ static bool nearest(int16_t dx,int16_t dy,Hit*hit){
  return result;
 }
 static uint8_t bumper_index(uint8_t group){uint16_t g=original_groups[group];return g>=405?4+(g-405)/8:(g-372)/8;}
-static bool event(const Edge*e){
+#ifdef __CX16__
+__attribute__((section(".physics"),noinline))
+#endif
+static bool event_core(const Edge*e){
  uint8_t c=e->group;bool fresh=!game.flash[c];touch(c);game.flash[c]=8;game.last_group=c;game.last_kind=e->kind;++game.events;
  uint16_t original=original_groups[c];
  if(e->kind==Ramp){const Meta*m=&metadata[e->param];uint8_t old=game.mask;
@@ -332,9 +354,21 @@ static bool event(const Edge*e){
   else{sound(2);if(original==466)rules_destination(true);}
  }
  else if(e->kind==Kickback){uint8_t s=c==GROUP_507;if(!rules.kick_phase[s]){rules.kick_phase[s]=1;rules.kick_timer[s]=84;}}
- else if(e->kind==Plunger){game.state=Serving;game.vx=game.vy=0;game.charge=0;game.charge_clock=0;game.flags=0;return true;}
- else if(e->kind!=Bumper&&fresh){if(original==469||original==470)add_score(500);sound(6);}
+ else if(e->kind==Plunger){game.state=Serving;game.vx=game.vy=0;if(!(game.flags&1)){game.charge=0;game.charge_clock=0;}return true;}
+ else if(e->kind!=Bumper&&fresh&&!(c>=GROUP_469&&c<=GROUP_472)){sound(6);}
  return true;
+}
+/* Callers copy the selected banked edge into unbanked RAM before dispatch.
+ * Rules may temporarily select bank61; their wrappers restore our bank62. */
+static BANK_TRAMPOLINE bool event(const Edge*e){
+#ifdef __CX16__
+ uint8_t saved=*(volatile uint8_t*)0;*(volatile uint8_t*)0=62;__asm__ volatile("":::"memory");
+#endif
+ bool result=event_core(e);
+#ifdef __CX16__
+ __asm__ volatile("":::"memory");*(volatile uint8_t*)0=saved;
+#endif
+ return result;
 }
 static int16_t scaled_step(int16_t v,int16_t remain,uint8_t steps){int16_t q=div60(v);uint32_t n=umul(ax(q),remain);int16_t result=(n>>8)/steps;return q<0?-result:result;}
 static void move_time(int16_t dx,int16_t dy,uint8_t steps,uint16_t remaining){ramp_ignore_count=0;
@@ -349,6 +383,9 @@ static void move_time(int16_t dx,int16_t dy,uint8_t steps,uint16_t remaining){ra
     if(e->kind==Bumper){uint8_t b=bumper_index(e->group);if(rules.bumper_fire[b])boost=0;
      if(boost){rules.bumper_fire[b]=12;++game.visual_epoch;++game.bumper_hits;uint8_t level=rules.bumper_level[b>=4];add_score(b>=4?1500+1000*level:500+500*level);sound(2);}
     }else if(e->kind==Kickback){uint8_t s=e->group==GROUP_507;if(rules.kick_phase[s]!=2||inward<=0)boost=0;else{boost=e->boost;rules.kick_phase[s]=3;}}
+    if(e->group>=GROUP_469&&e->group<=GROUP_472){
+     if(inward>e->threshold)rules_rebounder(e->group);else if(inward>51)sound(6);
+    }
     rebound(h.nx,h.ny,e->elastic,e->smooth,boost,inward);
    }
    game.x+=h.nx/64;game.y+=h.ny/64;
@@ -403,11 +440,11 @@ static RULE_FN void paddle_core(uint8_t side,uint8_t old){
   }
   game.vx+=mul(nx,boost);game.vy+=mul(ny,boost);limit();hit=true;
  }else hit=rebound(nx,ny,elastic,128,boost,inward)>0;
- if(hit){++game.flipper_hits;if(phase_delta>0)sound(0);}
+ if(hit)++game.flipper_hits;
 
 }
 #include "flipper_sweep.h"
-static void paddle(uint8_t side,uint8_t old){RULE_ENTER;paddle_core(side,old);RULE_LEAVE;}
+static BANK_TRAMPOLINE void paddle(uint8_t side,uint8_t old){RULE_ENTER;paddle_core(side,old);RULE_LEAVE;}
 static bool well_force(){
  for(uint8_t wi=0;wi<sizeof(wells)/sizeof(wells[0]);++wi){const Well*w=&wells[wi];
   if(!(game.mask&w->mask)||game.disabled[w->group]||(w->group==center_group&&!rules.gravity))continue;
@@ -419,12 +456,33 @@ static bool well_force(){
  }
  return false;
 }
+/* 3D Pinball accepts plunger input regardless of ball location. Only a
+ * ball already resting at the plunger receives the existing launch impulse. */
+static bool plunger_input(bool pull){
+ bool serving=game.state==Serving;
+ if(pull){
+  if(!(game.flags&1)){game.flags|=1;game.charge=1;game.charge_clock=0;game.last_group=GROUP_473;game.last_kind=Plunger;sound(4);}
+  else{game.charge_clock+=2;if(game.charge_clock>=3){game.charge_clock-=3;if(game.charge<100)++game.charge;}}
+ }else if(game.flags&1){
+  game.flags&=~1;
+  if(serving){game.state=InPlay;game.vy=-(int16_t)(game.charge>60?60:game.charge)*256;}
+  game.last_group=GROUP_473;game.last_kind=Plunger;sound(3);
+ }
+ return serving;
+}
 __attribute__((noinline)) static void tick(bool left,bool right,bool pull,bool nudge){
  rules_tick();game.tick+=2;for(uint8_t k=0;k<active_count;){uint8_t i=active[k];if(game.flash[i])game.flash[i]=game.flash[i]>2?game.flash[i]-2:0;if(game.disabled[i])game.disabled[i]=game.disabled[i]>2?game.disabled[i]-2:0;if(!game.flash[i]&&!game.disabled[i]){active_flags[i]=0;active[k]=active[--active_count];}else ++k;}if(game.ignore)game.ignore=game.ignore>2?game.ignore-2:0;
- bool keys[2]={left,right};uint8_t old[2];for(uint8_t i=0;i<2;++i){old[i]=game.phase[i];if(keys[i]){if(game.phase[i]<120)game.phase[i]=game.phase[i]>70?120:game.phase[i]+50;}else if(game.phase[i])game.phase[i]=game.phase[i]<25?0:game.phase[i]-25;if(old[i]==0&&game.phase[i]){rules_shift(i);sound(0);}if(old[i]==120&&game.phase[i]<120)sound(1);}
+ bool keys[2]={left,right};uint8_t old[2],pressed=(left?1:0)|(right?2:0);
+ for(uint8_t i=0;i<2;++i){old[i]=game.phase[i];uint8_t key=1u<<i;
+  if((pressed^game.flipper_keys)&key){if(pressed&key){rules_shift(i);sound(0);}else sound(1);}
+  if(keys[i]){if(game.phase[i]<120)game.phase[i]=game.phase[i]>70?120:game.phase[i]+50;}
+  else if(game.phase[i])game.phase[i]=game.phase[i]<25?0:game.phase[i]-25;
+ }
+ game.flipper_keys=pressed;
+ if(plunger_input(pull))return;
  if(game.state==Between){if(game.wait){game.wait=game.wait>2?game.wait-2:0;}if(!game.wait){if(game.balls)serve();else game.state=GameOver;}return;}
  if(game.state==Captured){if(game.wait){game.wait=game.wait>2?game.wait-2:0;}if(!game.wait)rules_release();return;}
- if(game.state==Serving){if(pull){if(!(game.flags&1))sound(4);game.flags|=1;game.charge_clock+=2;if(game.charge_clock>=3){game.charge_clock-=3;if(game.charge<100)++game.charge;}}else if(game.flags&1){game.state=InPlay;game.vy=-(int16_t)(game.charge>60?60:game.charge)*256;game.flags&=~1;sound(3);}return;}
+
  if(game.state!=InPlay)return;
  if(nudge&&!game.ignore){game.vx+=(game.nudges&1)?768:-768;game.vy-=1536;game.ignore=60;++game.nudges;}
  bool well=well_force();if(game.state!=InPlay)return;

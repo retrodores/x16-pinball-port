@@ -1,0 +1,30 @@
+{
+  "baseline_commit": "08c5843",
+  "stage": "slingshot and input-audio event follow-up",
+  "seeds": 40,
+  "max_frames_per_seed": 18000,
+  "state_hash": "689df8e0",
+  "optimized_exhaustive_equal": true,
+  "asan_ubsan": true,
+  "drains": 117,
+  "escapes": 0,
+  "stalls": 0,
+  "bumpers": 928,
+  "flippers": 918,
+  "ramp_entries": 518,
+  "guard_hits": 7,
+  "returns": 293,
+  "native_routes_checks": 254,
+  "native_tip_checks": 10,
+  "powered_passive_contacts_pass": true,
+  "native_ram_kb": [
+    512,
+    2048
+  ],
+  "sha256": {
+    "cadet/game/engine.c": "b1f81637db21ecea91b7d542cc02d97771e25a7cee8d48849faeaabf64b16e34",
+    "cadet/game/rules.inc": "48bf6f776ab8dbde560430aa70d3b59089a88fab88f3879113046dcb897c4383",
+    "cadet/game/flipper_sweep.h": "ad6364a1b05a5b17d8cc1f959b908e1d70b0b20c9d2641431de4956cf7094d46",
+    "cadet/play-build/MODEL.BIN": "4e0fadf95d1d82585f63d5c0c1fce6c256bc958855dfc294ec6cf91c9e08da99"
+  }
+}

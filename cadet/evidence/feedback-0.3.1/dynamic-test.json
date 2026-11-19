@@ -1,0 +1,27 @@
+{
+  "assets_sha256": {
+    "TILES.BIN": "0f5cbf23dd41122d60da927c68899a55c27f51da0f2159356442d23fe4905d05",
+    "DYN0.BIN": "91ff6f13d5f400003a456c17a3af74a21b9cac98db6c0785f0052c0dd11b64fd",
+    "DYN1.BIN": "6b2fe859745b70c27abcb0e665cb542f0aab9be9649daef76c816d4d00907d03",
+    "DYN2.BIN": "48bbd0ed2fe044593b8237f818d4652c11cb481baa982bb70ab253a03aa96232",
+    "DYN3.BIN": "89e5280efbf3b730d4ddf9617a2097553e1645fa5909b4275c0d98fb8c62486d"
+  },
+  "runs": [
+    {
+      "ram_kb": 512,
+      "checks": 21577,
+      "errors": 0,
+      "max_fast_cycles": 5776,
+      "first_call_with_zero_budget": true,
+      "visible_frames": 6
+    },
+    {
+      "ram_kb": 2048,
+      "checks": 21577,
+      "errors": 0,
+      "max_fast_cycles": 9078,
+      "first_call_with_zero_budget": true,
+      "visible_frames": 6
+    }
+  ]
+}

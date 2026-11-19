@@ -18,8 +18,13 @@ static RULE_FN void rule_upgrade(uint8_t bank){
  }
  rules.bumper_decay[bank]=7200;
 }
+/* TWall::Collision/TimerExpired and FlipperRebounderControl1/2: the
+ * fire bitmap and lower triangular light last 0.1s after a qualifying kick.
+ * Unlike TBumper, the visible fire state does not inhibit another kick. */
+static RULE_FN void rule_rebounder(uint8_t group){rules.rebounder_fire[group-GROUP_469]=12;++game.visual_epoch;add_score(500);rule_sound(2,group,Wall);}
 static RULE_FN void rule_tick(void){
  if(++rules.blink_clock==6){rules.blink_clock=0;rules.blink^=1;if(rules.lane_flash[0]||rules.lane_flash[1]||rules.hazard_clear[0]||rules.hazard_clear[1]||rules.wormhole_timer||rules.destination_flash||rules.gravity||rules.gate_flash[0]||rules.gate_flash[1]||rules.gate_alert[0]||rules.gate_alert[1])++game.visual_epoch;for(uint8_t i=0;i<6;++i)if(rules.hazard_flash[i]){++game.visual_epoch;break;}}
+ for(uint8_t i=0;i<4;++i)if(rules.rebounder_fire[i]){rules.rebounder_fire[i]-=2;if(!rules.rebounder_fire[i])++game.visual_epoch;}
  for(uint8_t i=0;i<7;++i)if(rules.bumper_fire[i]){rules.bumper_fire[i]-=2;if(!rules.bumper_fire[i])++game.visual_epoch;}
  for(uint8_t side=0;side<2;++side){
   if(rules.lane_flash[side]){rules.lane_flash[side]=countdown(rules.lane_flash[side]);if(!rules.lane_flash[side])++game.visual_epoch;}
@@ -99,6 +104,7 @@ static RULE_FN void rule_release(void){
  ++game.returns;rule_sound(SoundRelease,rules.exit_group,game.captured);
 }
 static RULE_FN uint8_t rule_lamp(uint16_t gid){
+ if(gid==180||gid==181)return rules.rebounder_fire[gid-180]!=0;
  if(gid>=128&&gid<=130){uint8_t b=gid-128;return rules.lane_flash[0]?rules.blink:(rules.lane_bits[0]>>b)&1;}
  if(gid>=214&&gid<=216){uint8_t b=gid-214;return rules.lane_flash[1]?rules.blink:(rules.lane_bits[1]>>b)&1;}
  if(gid>=185&&gid<=190){uint8_t i=gid-185;return rules.hazard_clear[i/3]||rules.hazard_flash[i]?rules.blink:(rules.hazard_bits[i/3]>>(i%3))&1;}
@@ -112,6 +118,7 @@ static RULE_FN uint8_t rule_lamp(uint16_t gid){
  return rules.wormhole_dest?4-rules.wormhole_dest:0;
 }
 static RULE_FN uint8_t rule_pose(uint16_t gid){
+ if(gid>=469&&gid<=472)return rules.rebounder_fire[gid-469]!=0;
  uint8_t b=255;if(gid>=372&&gid<=396&&(gid-372)%8==0)b=(gid-372)/8;else if(gid>=405&&gid<=421&&(gid-405)%8==0)b=4+(gid-405)/8;
  if(b<7)return 2*rules.bumper_level[b>=4]+(rules.bumper_fire[b]!=0);
  if(gid==501||gid==502)return rules.gate[gid-501];

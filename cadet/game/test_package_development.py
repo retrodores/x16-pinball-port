@@ -14,7 +14,7 @@ class PackageTests(unittest.TestCase):
           'MUSIC0.BIN':65536,'MUSIC1.BIN':37194,'PCM0.BIN':65536,
           'PCM1.BIN':32768,'PCM2.BIN':49938,
           **{f'DEPTH{i:02}.BIN':(5640 if i==0 else 6825 if i==8 else 8192)for i in range(9)},
-          **{f'DYN{i}.BIN':8192 for i in range(3)}}
+          **{f'DYN{i}.BIN':8192 for i in range(4)}}
         for name,size in sizes.items():
             data=bytes(size)
             if name=='CADET.PRG':data=b'\x01\x08'+data[2:]
@@ -30,7 +30,7 @@ class PackageTests(unittest.TestCase):
     def test_valid_asset_layout(self):
         report=pkg.audit(self.root)
         self.assertEqual(report['runtime_files'],len(pkg.RUNTIME))
-        self.assertEqual(report['free_banks'],[63])
+        self.assertEqual(report['free_banks'],[])
     def test_missing_rules_overlay_rejected(self):
         (self.root/'CADET.RUL').unlink()
         with self.assertRaisesRegex(AssertionError,'Missing runtime'):pkg.audit(self.root)
@@ -54,6 +54,15 @@ class PackageTests(unittest.TestCase):
         with self.assertRaises(AssertionError):pkg.audit(self.root)
     def test_pcm_cannot_overwrite_dynamic_bank58(self):
         (self.root/'PCM2.BIN').write_bytes(bytes(7*8192+1))
+        with self.assertRaises(AssertionError):pkg.audit(self.root)
+    def test_fourth_dynamic_bank_is_required_and_stays_in_512kb(self):
+        self.assertEqual(pkg.BANK_LOADS['DYN3.BIN'],63)
+        (self.root/'DYN3.BIN').unlink()
+        with self.assertRaisesRegex(AssertionError,'Missing runtime'):pkg.audit(self.root)
+        (self.root/'DYN3.BIN').write_bytes(bytes(8193))
+        with self.assertRaises(AssertionError):pkg.audit(self.root)
+    def test_dynamic_storage_cannot_exceed_four_banks(self):
+        p=self.root/'dynamic.json';p.write_text(json.dumps({'bytes':32769}))
         with self.assertRaises(AssertionError):pkg.audit(self.root)
     def test_live_bank_collision_rejected(self):
         pkg.LIVE_BANKS['dynamic'].append(61)
@@ -85,6 +94,16 @@ class PackageTests(unittest.TestCase):
         self.assertEqual(one,two)
         dest=self.root/'synthetic.zip';dest.write_bytes(one)
         self.assertTrue(pkg.verify_archive(dest)['source_matches_runtime'])
+    def test_fourth_dynamic_source_copy_must_match_runtime(self):
+        files={n:(self.root/n).read_bytes()for n in pkg.RUNTIME}
+        source={'source/cadet/play-build/'+n:b for n,b in files.items()}
+        source['source/cadet/play-build/DYN3.BIN']=bytes([1])*8192
+        stamp=(2026,11,18,12,0,0)
+        files['SOURCE.zip']=pkg.zip_bytes(source,stamp)
+        files['MANIFEST.json']=json.dumps({'sha256':{n:pkg.sha(b)for n,b in files.items()}}).encode()
+        files['SHA256SUMS']=''.join(pkg.sha(b)+'  '+n+'\n'for n,b in sorted(files.items())).encode()
+        dest=self.root/'mismatched-source.zip';dest.write_bytes(pkg.zip_bytes(files,stamp))
+        with self.assertRaisesRegex(AssertionError,'DYN3.BIN'):pkg.verify_archive(dest)
     def test_validation_cannot_claim_other_commit_or_short_run(self):
         data={'tested_commit':'abc','native_results':[{'ram':512,'frames':12000},{'ram':2048,'frames':12000}],
               'changes':[],'known_issues':[],'functional_checks':[]}

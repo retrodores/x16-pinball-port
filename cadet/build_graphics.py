@@ -28,7 +28,7 @@ for gid in ([372,380,388,396,405,413,421] if len(sys.argv)>1 else [355,363,372,3
 source=Image.fromarray(rgb[screen],'RGB')
 # A bounded audition screen; no suggestion that this is already a playable port.
 d=ImageDraw.Draw(source);f=ImageFont.truetype('/usr/share/fonts/truetype/dejavu/DejaVuSansMono.ttf',10)
-labels=[(410,'CMDRX CADET - 0.3 DEV'),(423,'Z / SHIFT: LEFT   /: RIGHT'),(436,'SPACE: PLUNGER   F2: NEW GAME'),(449,'M: MUSIC   ESC: EXIT   8 MHZ')] if len(sys.argv)>1 else [(410,'X16 FIDELITY LAB - NOT GAMEPLAY'),(423,'LEFT/RIGHT: SELECT  SPACE: PLAY'),(436,'M: ORIGINAL THEME  S: STOP'),(449,'ESC: EXIT   65C02 / 8 MHZ')]
+labels=[(410,'CMDRX CADET - 0.3.1 DEV'),(423,'Z / SHIFT: LEFT   /: RIGHT'),(436,'SPACE: PLUNGER   F2: NEW GAME'),(449,'M: MUSIC       ESC: EXIT   8 MHZ')] if len(sys.argv)>1 else [(410,'X16 FIDELITY LAB - NOT GAMEPLAY'),(423,'LEFT/RIGHT: SELECT  SPACE: PLAY'),(436,'M: ORIGINAL THEME  S: STOP'),(449,'ESC: EXIT   65C02 / 8 MHZ')]
 for y,s in labels:d.text((386,y),s,font=f,fill=(187,187,221))
 source.save(O/'original-layout.png')
 # Reduce only colors to VERA 12-bit; retain every spatial pixel.

@@ -22,7 +22,10 @@ with log.open('w')as f:
 s=log.read_text(errors='replace')
 v=[int(n,16)for n in re.search(r'# RESULT ([0-9a-f ]+)',s)[1].split()]
 report=dict(zip(['frames','max_cycles','mean_cycles','over_budget','missed_frame_starts','irq_max','music_errors'],v));report.update(ram=int(ram),mhz=int(mhz),expected_frames=expected,program=program)
+pcm=re.search(r'# PCM UNDERRUNS ([0-9a-f]+)',s)
+assert pcm,'missing cumulative PCM telemetry'
+report['pcm_underruns']=int(pcm[1],16)
 report['budget_pass']=report['max_cycles']<=133333 if mhz=='8' else None
 (o/(tag+'.json')).write_text(json.dumps(report,indent=2)+'\n');print(report)
-assert report['frames']==expected and report['music_errors']==0
+assert report['frames']==expected and report['music_errors']==0 and report['pcm_underruns']==0
 if mhz=='8':assert report['max_cycles']<=133333,report

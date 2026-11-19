@@ -1,0 +1,43 @@
+{
+  "sample_rate": 11062.6220703125,
+  "vga_rate": 59.523809523809526,
+  "inputs": {
+    "AUDIO-MIX": "9195a22d379f9c20c70e3214908012e6f9bf236daf1189b8882b27939be9ad86",
+    "AUDIO-MIX-SOAK": "b088e6a7d481d22b967a38f4d656d74a60a12d5ef975da9885bffb0defba2017"
+  },
+  "ram": {
+    "2048": {
+      "exact_bytes": 19369,
+      "mix_cycles_256_max_by_voice_count": [
+        16957,
+        28820,
+        42709
+      ],
+      "isolated_release_correlation": 0.9972685488957312,
+      "mixed_waveform_correlation": 0.986957152954391,
+      "mixed_voice_gains": [
+        181.4071505723932,
+        181.37958588093727,
+        183.37397598499325
+      ],
+      "flipper_onset_latency_ms": 23.37657845385488,
+      "tight_cues": 128,
+      "first_prime_period_ms": 23.121979192266732,
+      "tight_steady_period_range_ms": [
+        16.711722782010323,
+        16.814123044154993
+      ],
+      "wormhole_lead_correlation": 0.9846693414949961,
+      "music_only_rms": 415.35755918658674,
+      "music_off_rms": 2.281201661506041,
+      "capture_pcm_underruns": 0,
+      "soak": {
+        "complete": false,
+        "frames_observed_at_least": 20000,
+        "music_errors_at_checkpoint": 0,
+        "pcm_underruns_at_checkpoint": 0,
+        "reason": "Additional 2MB full-theme repetition stopped after the completed 512KB full loop and both-RAM capture/integrated checks."
+      }
+    }
+  }
+}

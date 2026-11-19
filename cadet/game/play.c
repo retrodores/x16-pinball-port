@@ -19,10 +19,10 @@ static int16_t projected(int16_t value,uint16_t scale){uint32_t p=fastmul16(valu
 #include <cbm.h>
 #include <stdint.h>
 extern void music_prefetch(void);
-extern void lab_install(void),lab_uninstall(void),pcm_start(uint16_t),pcm_stop(void),music_start(void),music_stop(void);
+extern void lab_install(void),lab_uninstall(void),pcm_start(uint16_t),pcm_flipper_start(uint16_t),pcm_plunger_start(uint16_t),pcm_stop(void),music_start(void),music_stop(void);
 extern uint16_t lab_clock(void);
 extern volatile uint8_t pcm_select_bank,music_enabled,music_error,music_loops;
-extern volatile uint16_t pcm_select_ptr,pcm_remaining;
+extern volatile uint16_t pcm_select_ptr,pcm_remaining,pcm_underruns;
 extern volatile uint32_t irq_max,irq_start;
 __attribute__((used)) volatile uint8_t keys[128];
 __attribute__((naked,used)) void keyboard(void){__asm__ volatile(
@@ -31,6 +31,7 @@ static volatile uint8_t *const v=(volatile uint8_t*)0x9f20;
 static uint8_t priority,previous_state=255,phase_cache[2]={255,255},plunger_cache=255;
 static uint8_t score_cache[9],ball_cache=255,status_cache[40];
 static bool wide_score;
+static uint8_t music_cache=255;
 static void addr(uint32_t a){v[5]=0;v[0]=a;v[1]=a>>8;v[2]=0x10|(a>>16);}
 static void word(uint16_t a){v[3]=a;v[3]=a>>8;}
 static void hide(uint8_t n){addr(0x1fc06UL+(uint16_t)n*8);v[3]=0;}
@@ -46,15 +47,22 @@ static void print(const char*s){while(*s)cbm_k_bsout(*s++);}
 static void echo(const char*s){while(*s)*(volatile uint8_t*)0x9fbb=*s++;}
 static void hex(uint32_t a){for(uint8_t i=0;i<8;++i){*(volatile uint8_t*)0x9fbb="0123456789abcdef"[a>>28];a<<=4;}}
 static uint32_t cycles(void){uint8_t a=*(volatile uint8_t*)0x9fb8,b=*(volatile uint8_t*)0x9fb9,c=*(volatile uint8_t*)0x9fba,d=*(volatile uint8_t*)0x9fbb;return(uint32_t)a|((uint32_t)b<<8)|((uint32_t)c<<16)|((uint32_t)d<<24);}
-static void effect(uint8_t id,uint8_t rank){
+static void effect(uint8_t id,uint8_t rank,uint8_t voice){
  if(id==255)return;
- if(pcm_remaining&&rank<priority)return;
- const Effect*e=effects+id;pcm_select_bank=e->bank;pcm_select_ptr=e->ptr;priority=rank;pcm_start(e->length);
+ if(!voice){
+  uint16_t remaining;__asm__ volatile("php\nsei":::"memory");remaining=pcm_remaining;__asm__ volatile("plp":::"memory");
+  if(remaining&&rank<priority)return;
+ }
+ const Effect*e=effects+id;pcm_select_bank=e->bank;pcm_select_ptr=e->ptr;
+ if(voice==1)pcm_flipper_start(e->length);
+ else if(voice==2)pcm_plunger_start(e->length);
+ else{priority=rank;pcm_start(e->length);}
 }
 void audio_stop(void){pcm_stop();priority=0;}
 void audio_effect(uint8_t id){
  uint16_t e=audio_event_sample(id,game.last_group,game.last_kind,game.sound_value);
- effect((uint8_t)e,(uint8_t)(e>>8));
+ uint8_t voice=id<=1?1:(id==3||id==4||id==16)?2:0;
+ effect((uint8_t)e,(uint8_t)(e>>8),voice);
 }
 
 static void status(const char*s){
@@ -107,7 +115,7 @@ static void display(bool update_panel){
  for(uint8_t i=0;i<2;++i){uint8_t pose=phase_pose[game.phase[i]];
   if(pose!=phase_cache[i]){f=i*8+pose;frame(1+i*9,f,sprites[f].x,sprites[f].y,9);phase_cache[i]=pose;}
  }
- uint8_t pose=game.state==Serving?charge_pose[game.charge]:0;
+ uint8_t pose=(game.flags&1)?charge_pose[game.charge]:0;
  if(pose!=plunger_cache){f=16+pose;frame(19,f,sprites[f].x,sprites[f].y,3);plunger_cache=pose;}
  if(game.score_dirty&&update_panel){uint8_t hi=39;while(hi&&!game.digits[hi])--hi;
   for(uint8_t i=0;i<9;++i){uint8_t digit=i<=hi?game.digits[i]:255;if(digit==score_cache[i])continue;score_cache[i]=digit;
@@ -121,9 +129,13 @@ static void display(bool update_panel){
  if(update_panel&&previous_state!=game.state){
   static const char*const labels[]={"F2: NEW GAME","HOLD SPACE TO LAUNCHRELEASE TO FIRE","BALL IN PLAY","CAPTURE / RETURN","NEXT BALL","GAME OVER           F2: NEW GAME"};
   status(labels[game.state]);previous_state=game.state;
-  if(game.state==Serving)effect(SOUND4,3);
  }
- if(update_panel)dynamic_update(128);
+ if(update_panel&&music_cache!=music_enabled){
+  const char*label=music_enabled==0?"OFF":music_enabled==1?"ON ":"...";
+  for(uint8_t i=0;i<3;++i)tile(73+i,FONT_BASE/32+label[i]-32,439+i*8,451,FONT_BANK);
+  music_cache=music_enabled;
+ }
+ dynamic_update(update_panel?128:0);
  /* 128-bit score remains exact. Flag a panel overflow instead of silently truncating. */
  if(update_panel&&wide_score)status("SCORE EXCEEDS PANEL  SEE EXACT SCORE LOG");
 }
@@ -135,7 +147,7 @@ int main(void){
  for(uint8_t i=0;i<2;++i){char n[]="MUSIC0.BIN";n[5]+=i;*(volatile uint8_t*)0=32+i*8;if(!load(n,0,0xa000))goto fail;}
  for(uint8_t i=0;i<PCM_PARTS;++i){char n[]="PCM0.BIN";n[3]+=i;*(volatile uint8_t*)0=pcm_load_banks[i];if(!load(n,0,0xa000))goto fail;}
  for(uint8_t i=0;i<9;++i){char n[]="DEPTH00.BIN";n[6]+=i;*(volatile uint8_t*)0=i==0?10:i<3?16+i:i+42;if(!load(n,0,0xa000))goto fail;}
- for(uint8_t i=0;i<3;++i){char n[]="DYN0.BIN";n[3]+=i;*(volatile uint8_t*)0=58+i;if(!load(n,0,0xa000))goto fail;}
+ for(uint8_t i=0;i<DYNAMIC_BANK_COUNT;++i){char n[]="DYN0.BIN";n[3]+=i;*(volatile uint8_t*)0=dynamic_load_banks[i];if(!load(n,0,0xa000))goto fail;}
  *(volatile uint8_t*)0=11;if(!load("UI.BIN",0,0xa000))goto fail;
  for(uint8_t i=0;i<128;++i)hide(i);
  for(uint8_t i=0;i<9;++i)score_cache[i]=254;
@@ -197,7 +209,7 @@ int main(void){
   if(count>=TEST_FRAMES)break;
 #endif
  }
- echo("# RESULT ");hex(count);echo(" ");hex(maximum);echo(" ");hex(total/count);echo(" ");hex(over);echo(" ");hex(gaps);echo(" ");hex(irq_max);echo(" ");hex(music_error);echo("\n# DONE\n");
+ echo("# RESULT ");hex(count);echo(" ");hex(maximum);echo(" ");hex(total/count);echo(" ");hex(over);echo(" ");hex(gaps);echo(" ");hex(irq_max);echo(" ");hex(music_error);echo("\n# PCM UNDERRUNS ");hex(pcm_underruns);echo("\n# DONE\n");
  lab_uninstall();__asm__ volatile("sei");*(volatile uint16_t*)0x032e=oldkey;__asm__ volatile("cli");
  *(volatile uint8_t*)0=oldbank;
 #ifdef GAME_TEST

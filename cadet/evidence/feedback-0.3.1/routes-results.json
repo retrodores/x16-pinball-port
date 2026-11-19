@@ -1,0 +1,26 @@
+[
+  {
+    "fixture": "ROUTES",
+    "ram_kb": 512,
+    "result": "# ROUTES 00fe 0000 PASS",
+    "host_native_equal": true
+  },
+  {
+    "fixture": "ROUTES",
+    "ram_kb": 2048,
+    "result": "# ROUTES 00fe 0000 PASS",
+    "host_native_equal": true
+  },
+  {
+    "fixture": "TIP",
+    "ram_kb": 512,
+    "result": "# TIP 000a 0000 PASS",
+    "host_native_equal": true
+  },
+  {
+    "fixture": "TIP",
+    "ram_kb": 2048,
+    "result": "# TIP 000a 0000 PASS",
+    "host_native_equal": true
+  }
+]

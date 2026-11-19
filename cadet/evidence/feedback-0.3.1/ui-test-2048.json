@@ -1,0 +1,15 @@
+{
+  "ram_kb": 2048,
+  "music_restart_seconds": 1.6000696080736816,
+  "audio_rms": 4153.271058938778,
+  "peak": 24919.0,
+  "samples": 1228514,
+  "inputs_sha256": {
+    "CADET.PRG": "a1ed8860a3d311f0cf29a2e77514dc96ad7bc71405ac44670c57d10ad17b925a",
+    "CADET.RUL": "b52301ea64e9fd41ce97844518aeff2b593f102f615ad5e13d7541c82039392d",
+    "CADET.PHY": "d5235ba87adf7aeea5055fd245b545a583ca41da3eb348ee2f189cf1077f2a3d"
+  },
+  "reported_frame": 729,
+  "worst_cycles": 159100,
+  "mean_cycles": 57196
+}

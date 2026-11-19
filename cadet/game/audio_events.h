@@ -1,6 +1,7 @@
 /* Original component-specific sample routing.
  * Include after engine.h and generated audio.h. 255 means intentional silence.
- * High byte is the single-PCM-channel priority, low byte is the resident effect.
+ * High byte is table-voice priority, low byte is the resident effect.
+ * Flippers and the main plunger have independent voices in play.c.
  */
 #ifndef CADET_AUDIO_EVENTS_H
 #define CADET_AUDIO_EVENTS_H
@@ -10,9 +11,14 @@ static uint16_t audio_event_sample(uint8_t event,uint8_t group,uint8_t kind,uint
  switch(event){
  case 0:sample=SOUND104;rank=1;break;
  case 1:sample=SOUND105;rank=1;break;
- case 2:case 6:sample=contact_sound[group];break;
+ case 2:sample=contact_sound[group];break;
+ case 6:sample=kind==Wall?255:contact_sound[group];break;
  /* Launch is its own event now; prior return-count test muted later plunges. */
  case 3:sample=SOUND22;rank=3;break;
+ /* DAT group59 literally names SOUND62.WAV for pull. That file is absent
+    even from the supplied original archive; keep this event silent. */
+ case 4:break;
+ case 16:sample=SOUND4;rank=3;break;
  case 7:
   sample=capture_sound[group];rank=3;
   /* Advanced hyperspace cues are not resident. Keep them explicitly silent;

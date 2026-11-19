@@ -1,0 +1,26 @@
+[
+  {
+    "program": "CADET",
+    "checked_sections": [
+      ".basic_header",
+      ".text",
+      ".rodata",
+      ".rules",
+      ".physics"
+    ],
+    "overlays_distinct": true,
+    "llvm_extract_matches": true
+  },
+  {
+    "program": "TEST",
+    "checked_sections": [
+      ".basic_header",
+      ".text",
+      ".rodata",
+      ".rules",
+      ".physics"
+    ],
+    "overlays_distinct": true,
+    "llvm_extract_matches": true
+  }
+]

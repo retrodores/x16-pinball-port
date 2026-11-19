@@ -39,7 +39,17 @@ with (output('ui.log')).open('w')as f:
   assert ImageChops.difference(ready.crop((120,355,260,420)),raised.crop((120,355,260,420))).getbbox(),'flippers not animated'
   action('keyup','z');action('keyup','slash');time.sleep(8);shot('playing')
   action('key','F2');time.sleep(.5);shot('new-game')
-  action('key','m');time.sleep(.3);action('key','Escape');time.sleep(.4)
+  music_on=shot('music-on')
+  action('key','m');time.sleep(.3);music_off=shot('music-off')
+  box=(439,451,463,459)
+  assert ImageChops.difference(music_on.crop(box),music_off.crop(box)).getbbox(),'music OFF indicator unchanged'
+  restart_started=time.monotonic();action('key','m')
+  while True:
+   time.sleep(.1);music_again=shot('music-restarted')
+   if ImageChops.difference(music_on.crop(box),music_again.crop(box)).getbbox()is None:break
+   assert time.monotonic()-restart_started<5,'music ON indicator did not recover within five seconds'
+  music_restart_seconds=time.monotonic()-restart_started
+  action('key','Escape');time.sleep(.4)
   assert '# DONE'in(output('ui.log')).read_text(errors='replace'),'exit failed'
  finally:
   p.terminate()
@@ -47,7 +57,7 @@ with (output('ui.log')).open('w')as f:
   except sp.TimeoutExpired:p.kill();p.wait()
 with wave.open(str(output('ui.wav')))as f:
  a=np.frombuffer(f.readframes(f.getnframes()),'<i2').astype(float)
- report={'ram_kb':int(ram),'audio_rms':float(np.sqrt(np.mean(a*a))),'peak':float(np.max(np.abs(a))),'samples':len(a)}
+ report={'ram_kb':int(ram),'music_restart_seconds':music_restart_seconds,'audio_rms':float(np.sqrt(np.mean(a*a))),'peak':float(np.max(np.abs(a))),'samples':len(a)}
 assert report['audio_rms']>20,report
 report['inputs_sha256']=inputs
 result=re.findall(r'# RESULT ([0-9a-f ]+)',output('ui.log').read_text(errors='replace'))

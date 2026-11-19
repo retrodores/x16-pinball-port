@@ -27,6 +27,12 @@ int main(void){
  assert(sample(14,454,Target)==SOUND49D);
  assert(sample(15,466,Target)==SOUND55);
  assert(sample(3,338,Sink)==SOUND22);
+ assert(sample(3,473,Plunger)==SOUND22);
+ assert(sample(16,473,Plunger)==SOUND4);
+ assert(sample(4,473,Plunger)==255); /* Original upload lacks SOUND62.WAV. */
+ assert(sample(0,473,Plunger)==SOUND104);
+ assert(sample(1,473,Plunger)==SOUND105);
+ for(uint16_t wall=469;wall<=472;++wall){assert(sample(2,wall,Wall)==SOUND5);assert(sample(6,wall,Wall)==255);}
  assert((audio_event_sample(9,group(505),Kickback,0)>>8)==3);
  assert((uint8_t)audio_event_sample(7,255,Sink,0)==255);
  assert((uint8_t)audio_event_sample(14,group(454),Target,1)==SOUND14);

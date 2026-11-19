@@ -1,14 +1,14 @@
-# Resume CmdrX Cadet — 0.3 development milestone
+# Resume CmdrX Cadet — 0.3.1 development follow-up
 
-Author: Codex, working with Brett Estrade. Session date: November 18, 2026 (America/Chicago).
+Author: Codex, working with Brett Estrade. Session date: November 19, 2026 (America/Chicago).
 
 ## Checkout and preservation
 
 Use Desktop Commander on the authorized VM. Repository:
 `/opt/cmdrx-cadet-fidelity`, branch `spacecadet-fidelity`.
 This milestone started from verified clean commit
-`ecd54e999853b82b5c55a716394d99943b60da83`.
-Read root/cadet AGENTS.md, this file, OBS-REVIEW.md and STATUS-0.3-WIP.md.
+`08c5843429210f6e558a347bc8551164962a7916`.
+Read root/cadet AGENTS.md, this file, OBS-REVIEW.md and STATUS-0.3.1-DEV.md.
 
 Original Table 0.2 remains preserved at tag `table-test-v0.2`
 (`c8312addc4c05994ae8a3de400a2d1d7dac8aeab`) and
@@ -17,11 +17,25 @@ byte-for-byte with the delivered ZIP. Wireframe 0.2 remains unchanged in
 `/opt/cmdrx-cadet-direct`, clean at `51149308b350ca485d36ec73713c6bbf2cba5e41`.
 Vendor source is unchanged. This is a separately labeled DEVELOPMENT build.
 
+## Latest feedback corrections
+
+Lower slingshots now switch a depth-composited rubber/glow image immediately
+through 27 private VERA map entries; upper rebounders also flash. DYN3 uses
+bank63. Alternate fire patterns use 3456 VRAM bytes after the font/ball buffer.
+Three PCM voices keep table, flipper and plunger effects independent.
+A bounded 256-sample initial queue then follows 185/186 samples per VBL.
+Track cumulative pcm_underruns and music_error; game restarts must not erase them.
+Music starts enabled, with M and a visible ON/OFF/priming indicator.
+
+Bank-switching trampolines MUST be resident and noinline. LLVM otherwise inlined
+a bank61 switch into event_core executing in bank62, banking out its own code.
+Final native event/award fixtures and ELF checks guard this boundary.
+
 ## What is implemented
 
 Source-derived wormhole destinations/awards/replay and capture/release timing;
 kickout hold, return and component-specific reset; both kickbacks and hazard gates;
-yellow three-lane banks, flipper lane rotation, bumper upgrades/decay; 35 original
+yellow three-lane banks, flipper lane rotation, bumper upgrades/decay; 39 original
 lamp/bumper/gate/kicker visual components driven by events and timers.
 Wormhole/kickback/hazard/hyperspace base PCM effects are resident. Music startup
 primes in bounded interruptible batches instead of blocking for a full refill.
@@ -74,10 +88,9 @@ Main RAM must leave at least 1 KB below the 9f00 software-stack start.
 | 19..30,51..57 | 17 PCM samples |
 | 31 A000..AFFF | Music dictionary/read-ahead |
 | 32..44 | Losslessly compressed theme commands |
-| 58..60 | Original dynamic visual patches |
+| 58..60,63 | Dynamic patches and instant slingshot composites |
 | 61 | Rules and powered-paddle code (.RUL) |
-| 62 | Stationary tip-sweep core (.PHY) |
-| 63 | Unallocated |
+| 62 | Tip sweep, event dispatch and speed limiter (.PHY) |
 
 Geometry loading temporarily writes obsolete padding into 10/11/17/18; later
 loaders replace it before gameplay. All live banks fit 512 KB.
@@ -88,6 +101,9 @@ preserve neighboring nibbles and write at most 128 bytes per permitted update.
 
 ```sh
 python3 cadet/game/test_build_native.py CADET TEST
+python3 cadet/game/test_feedback_events.py
+python3 cadet/game/test_slingshot_render.py
+python3 cadet/game/test_audio_mix.py
 python3 cadet/game/test_mechanisms.py
 python3 cadet/game/test_large_award.py
 python3 cadet/game/test_routes.py
@@ -110,8 +126,8 @@ and decimal digits atomically on overflow. test_award_large.c adds sanitized
 carry/limit regression; test_large_award.py exercises real banked hyperspace awards.
 Host score tests cover every
 uint16 award and all 128-bit carries. Host optimized and exhaustive 40-seed soaks
-now agree at hash `0cfd4551`, with zero escapes/stalls; some games reach the
-18000-frame cap. Eleven contact-guard uses still need investigation.
+now agree at hash `689df8e0`, with zero escapes/stalls; some games reach the
+18000-frame cap. Seven contact-guard uses still need investigation.
 The integrated TEST includes measured music restarts/cancellation after frame6100
 and 19 deliberate source-geometry placements at frames7000..10900. These placements
 exercise cost and mechanisms, not proof of legal player routes.
@@ -119,7 +135,7 @@ exercise cost and mechanisms, not proof of legal player routes.
 The strict budget remains 133333 cycles. Measurement includes physics, rendering
 and music prefetch, including IRQ costs. Do not move work outside the measured
 interval or relax the threshold. The current development build does not pass
-the sustained-60-FPS gate. See STATUS-0.3-WIP.md and evidence/milestone-0.3.
+the sustained-60-FPS gate. See STATUS-0.3.1-DEV.md and evidence/feedback-0.3.1.
 
 ## Packaging and next work
 

@@ -1,0 +1,60 @@
+{
+  "recording": "2026-11-19 00-37-20.mp4",
+  "recording_sha256": "5538741917baddb21fb46ef5736889864cc225ae20be1d21744a5bc5611652d1",
+  "recording_seconds": 55.133333,
+  "source_archive": "/opt/spacecadet-x16-analysis/input/space-cadet-upload.exe",
+  "source_archive_sha256": "d479594426e1bec7a2a628717e10dcc171d6a68bfbd8e323fcbe3a04a605ffdb",
+  "source_archive_entries": 67,
+  "source_archive_wav_count": 60,
+  "source_archive_has_sound62": false,
+  "pull_reference": {
+    "component": 473,
+    "field": 406,
+    "sound_group": 59,
+    "literal_filename": "sound62.wav"
+  },
+  "method": "Normalized cross-correlation of original converted signed PCM resampled to recording44100Hz; playback speed scanned0.5..1.5 step0.002; music remains in OBS mix. Peak onset is template-origin alignment, not first audible sample.",
+  "release": {
+    "sample": "SOUND22",
+    "native_bytes": 7260,
+    "native_rate_hz": 11062.6220703125,
+    "native_duration_seconds": 0.6562639448275862,
+    "source_rate_hz": 11025,
+    "source_frames": 7235,
+    "source_seconds": 0.6562358276643991,
+    "best_playback_speed": 1.0,
+    "recording_template_origin_seconds": 8.23281179138322,
+    "correlation": 0.36448358117636553,
+    "visual_snapback_seconds": 8.1166666667,
+    "template_origin_lag_seconds": 0.11614512468321969,
+    "chunk_origin_range_seconds": [
+      8.23271,
+      8.232868
+    ],
+    "sample_quiet_lead_approx_seconds": 0.05
+  },
+  "feed": {
+    "sample": "SOUND4",
+    "native_bytes": 16426,
+    "native_rate_hz": 11062.6220703125,
+    "native_duration_seconds": 1.4848197737931035,
+    "source_rate_hz": 11025,
+    "source_frames": 16370,
+    "source_seconds": 1.4848072562358277,
+    "best_playback_speed": 1.0,
+    "recording_template_origins_seconds": [
+      4.703968253968254,
+      52.742086
+    ],
+    "correlations": [
+      0.38139569764241593,
+      0.4711
+    ]
+  },
+  "conclusion": "No evidence of slowed plunger sample playback rate. Keep original pitch/duration. Missing SOUND62 is absent in supplied original archive, so do not substitute slingshot SOUND5. Fix event/overlap independently.",
+  "limitations": [
+    "OBS mixes music with effects, and short similar effects can cross-correlate.",
+    "No attribution of observed116msA/Vlag to FIFO versus emulatorSDL/OBS capture latency.",
+    "Tail masked by music; no complete waveform fidelity claim."
+  ]
+}

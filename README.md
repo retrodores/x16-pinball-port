@@ -1,16 +1,17 @@
-# Current development build: Original Table 0.3-dev
+# Current development build: Original Table 0.3.1-dev
 
 This branch restores Space Cadet mechanisms and original visuals/audio on the
-integer-only stock 65C02 engine. The 0.3 development package targets 8 MHz and
+integer-only stock 65C02 engine. The 0.3.1 development package targets 8 MHz and
 512 KB, and is also tested with 2 MB. It is not a stable or sustained-60-FPS release.
 
-See [cadet/STATUS-0.3-WIP.md](cadet/STATUS-0.3-WIP.md) for actual results and
+See [cadet/STATUS-0.3.1-DEV.md](cadet/STATUS-0.3.1-DEV.md) for actual results and
 remaining gaps, and [cadet/RESUME.md](cadet/RESUME.md) for recovery/build details.
 The flat package contains CADET.PRG plus required .RUL/.PHY overlays and BIN assets;
 RUN-WINDOWS.bat expects x16emu.exe and rom.bin in the parent folder, keeps the
 game directory current, and uses -c02 -mhz 8 -ram 512 -scale 2.
 
-Original Table 0.2 and Wireframe 0.2 are preserved. The sections below describe
+Music starts enabled; M toggles it with a visible ON/OFF indicator.
+Original Table 0.2, Wireframe 0.2 and the prior 0.3 package are preserved. The sections below describe
 historical prototypes; their CPU, controls and performance claims do not apply
 to the current development build.
 

@@ -1,0 +1,7 @@
+{
+  "complete": false,
+  "frames_observed_at_least": 20000,
+  "music_errors_at_checkpoint": 0,
+  "pcm_underruns_at_checkpoint": 0,
+  "reason": "Additional 2MB full-theme repetition stopped after the completed 512KB full loop and both-RAM capture/integrated checks."
+}

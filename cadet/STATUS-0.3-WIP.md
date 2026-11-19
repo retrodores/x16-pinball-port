@@ -1,3 +1,5 @@
+> Historical 0.3 milestone. Current follow-up: STATUS-0.3.1-DEV.md.
+
 # CmdrX Cadet 0.3-dev — playable development milestone
 
 Author: Codex, working with Brett Estrade. Session date: November 18, 2026 (America/Chicago).
