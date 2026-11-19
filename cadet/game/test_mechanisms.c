@@ -50,10 +50,15 @@ static void captures(void){
   CHECK(score()==(dest?(exit==entry?5000:7500):2500));CHECK(game.last_sound==SoundCapture);CHECK(rules.wormhole_dest==0);
   if(dest&&exit==entry){CHECK(rules.replay==1);timers(600);CHECK(rules.replay==1);}
   uint16_t guard=0;while(game.state==Captured&&guard++<121)game_frame(0,0,0,0);
-  CHECK(guard==120&&game.state==InPlay);const Meta*m=&metadata[game.param];CHECK(game.x==m->x&&game.y==m->y&&game.vx==m->vx&&game.vy==m->vy);
+  CHECK(guard==120&&game.state==InPlay);const Meta*m=&metadata[game.param];CHECK(game.x==m->x&&game.y==m->y&&game.vx==m->vx&&game.vy==(exit==1?-7168:m->vy));
   CHECK(game.last_sound==SoundRelease&&game.last_group==rules.exit_group);CHECK(game.ignore==0);
   for(uint8_t k=0;k<6;++k)game_frame(0,0,0,0);CHECK(game.returns==1);
  }
+ /* Exercise the recorded repeat through the real sweep and timers. */
+ game_start();game.state=InPlay;hit(340);
+ for(uint16_t i=0;i<450&&game.state!=Between;++i)game_frame(0,0,0,0);
+ CHECK(game.state==InPlay||game.state==Between);
+ CHECK(game.returns==1&&game.escapes==0);
  game_start();game_place(1007,-69,0,0,1);game.z=123;CHECK(well_force());CHECK(game.state==Captured&&game.z==0&&game.wait==180);CHECK(score()==20000);
  for(uint8_t i=0;i<89;++i)game_frame(0,0,0,0);CHECK(game.state==Captured);game_frame(0,0,0,0);CHECK(game.state==InPlay&&game.z==123&&game.vx==-8960&&game.vy==-8960);CHECK(game.disabled[GROUP_514]==6);
  game_start();static const uint16_t holds[5]={211,367,211,140,306};static const uint32_t awards[5]={10000,20000,20000,50000,150000};

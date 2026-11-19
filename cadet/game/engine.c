@@ -465,7 +465,7 @@ static bool plunger_input(bool pull){
  bool serving=game.state==Serving;
  if(pull){
   if(!(game.flags&1)){game.flags|=1;game.charge=1;game.charge_clock=0;game.last_group=GROUP_473;game.last_kind=Plunger;sound(4);}
-  else{game.charge_clock+=2;if(game.charge_clock>=3){game.charge_clock-=3;if(game.charge<100)++game.charge;}}
+  else{game.charge_clock+=2;if(game.charge_clock>=3){game.charge_clock-=3;if(game.charge<99)game.charge+=2;else game.charge=100;}}
  }else if(game.flags&1){
   game.flags&=~1;
   if(serving){game.state=InPlay;game.vy=-(int16_t)(game.charge>60?60:game.charge)*256;}

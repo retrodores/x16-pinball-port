@@ -34,9 +34,9 @@ static void input_events(void){
  game_start();CHECK(game.last_sound==SoundFeed&&original_groups[game.last_group]==473&&game.last_kind==Plunger);
  game.last_sound=255;game_frame(0,0,1,0);CHECK(game.charge==1&&game.last_sound==4&&original_groups[game.last_group]==473);
  game.last_sound=255;game_frame(0,0,1,0);CHECK(game.charge==1&&game.last_sound==255);
- game_frame(0,0,1,0);CHECK(game.charge==2&&game.last_sound==255);
- game_frame(0,0,1,0);CHECK(game.charge==3);
- for(uint8_t i=0;i<146;++i)game_frame(0,0,1,0);CHECK(game.charge==100&&game.last_sound==255);
+ game_frame(0,0,1,0);CHECK(game.charge==3&&game.last_sound==255);
+ game_frame(0,0,1,0);CHECK(game.charge==5);
+ for(uint8_t i=0;i<73;++i)game_frame(0,0,1,0);CHECK(game.charge==100&&game.last_sound==255);
  game_frame(0,0,0,0);CHECK(game.state==InPlay&&game.last_sound==3&&original_groups[game.last_group]==473);
  /* Source extend/retract cues follow input transitions, including reversal
     before an endpoint and while the ball is held by a wormhole. */
@@ -53,13 +53,13 @@ static void input_events(void){
  game_frame(0,0,0,0);CHECK(game.state==InPlay&&!(game.flags&1)&&game.last_sound==3&&game.vy>=0);
  game.state=Captured;game.wait=240;game_frame(0,0,1,0);
  CHECK(game.state==Captured&&(game.flags&1)&&game.charge==1&&game.last_sound==4);
- for(uint8_t i=0;i<30;++i)game_frame(0,0,1,0);CHECK(game.charge==21&&game.state==Captured);
+ for(uint8_t i=0;i<30;++i)game_frame(0,0,1,0);CHECK(game.charge==41&&game.state==Captured);
  game_frame(0,0,0,0);CHECK(game.state==Captured&&!(game.flags&1)&&game.last_sound==3);
  /* A ball returning while the user is still pulling retains the held charge. */
  game.state=InPlay;game_frame(0,0,1,0);game.charge=40;game.charge_clock=1;
  Edge plunger=wall(473);event(&plunger);CHECK(game.state==Serving&&(game.flags&1)&&game.charge==40&&game.charge_clock==1);
- game.last_sound=255;game_frame(0,0,1,0);CHECK(game.charge==41&&game.last_sound==255);
- game_frame(0,0,0,0);CHECK(game.state==InPlay&&game.vy==-41*256&&game.last_sound==3);
+ game.last_sound=255;game_frame(0,0,1,0);CHECK(game.charge==42&&game.last_sound==255);
+ game_frame(0,0,0,0);CHECK(game.state==InPlay&&game.vy==-42*256&&game.last_sound==3);
  game_start();CHECK(!(game.flags&1)&&game.charge==0&&game.flipper_keys==0);
  /* Existing powered impulse remains, but does not replay the input cue. */
  game_start();game.state=InPlay;game.mask=1;game.phase[0]=25;

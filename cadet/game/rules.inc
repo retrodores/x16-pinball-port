@@ -98,6 +98,9 @@ static RULE_FN void rule_release(void){
  const Meta*m=&metadata[game.param];game.state=InPlay;game.ramp=false;game.remx=game.remy=game.accx=game.accy=0;
  if(game.captured==Hole){game.mask=m->mask;game.z=m->az;game.vx=0;game.vy=256;}
  else{game.x=m->x;game.y=m->y;game.vx=m->vx;game.vy=m->vy;game.mask=game.captured==Kickout?rules.original_mask:1;game.z=game.captured==Kickout?rules.original_z:77;}
+ /* The unadjusted upper exit bounces straight back into the same sink.
+    Aim its vertical component lower to clear the return path. */
+ if(game.captured==Sink&&rules.exit_group==GROUP_340)game.vy=-7168;
  /* A kickout resets only itself after 0.05 s. A sink receives one integration
     step of exclusion, matching throw_ball's collision-disabled release step. */
  game.disabled[rules.exit_group]=game.captured==Kickout?6:2;touch(rules.exit_group);

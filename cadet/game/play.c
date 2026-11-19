@@ -144,6 +144,12 @@ int main(void){
  print("\x93" "CMDRX CADET - ORIGINAL TABLE\rLOADING...\r");v[5]=0;v[9]=1;
  if(!game_load()||!load("MAP.BIN",2,0)||!load("TILES.BIN",2,0x1000)||!load("PAL.BIN",3,0xfa00)||
  !load("SPRITES.BIN",3,SPRITE_BASE&65535)||!load("FONT.BIN",3,FONT_BASE&65535))goto fail;
+ /* Clear the spill below the cabinet using the existing blank map tile. */
+ addr(29u*128+39*2);uint8_t blank_lo=v[3],blank_hi=v[3];
+ for(uint8_t row=27;row<30;++row){
+  addr((uint16_t)row*128);
+  for(uint8_t col=0;col<24;++col){v[3]=blank_lo;v[3]=blank_hi;}
+ }
  for(uint8_t i=0;i<2;++i){char n[]="MUSIC0.BIN";n[5]+=i;*(volatile uint8_t*)0=32+i*8;if(!load(n,0,0xa000))goto fail;}
  for(uint8_t i=0;i<PCM_PARTS;++i){char n[]="PCM0.BIN";n[3]+=i;*(volatile uint8_t*)0=pcm_load_banks[i];if(!load(n,0,0xa000))goto fail;}
  for(uint8_t i=0;i<9;++i){char n[]="DEPTH00.BIN";n[6]+=i;*(volatile uint8_t*)0=i==0?10:i<3?16+i:i+42;if(!load(n,0,0xa000))goto fail;}
