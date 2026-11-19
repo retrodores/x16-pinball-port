@@ -4,9 +4,6 @@
   "emulator": "r49 Pyrite af102408",
   "rom_sha256": "b81654cc8c87ed96e3ffc7c8e7c312c9f3b7b870c7bb34de61e61eac931b819a",
   "platform": "Linux Xvfb; stock 65C02 8 MHz",
-  "windows_first_launch_tested": false,
-  "windows_relaunch_without_zip_tested": false,
-  "powershell_importer_executed": false,
   "tests_passed": [
     "reference SHA-256",
     "explicit ZIP allowlists and CRC",
@@ -19,10 +16,15 @@
     "music toggle/restart",
     "nonzero recorded audio",
     "new game and normal exit",
-    "512 and 2048 KB for both editions"
+    "512 and 2048 KB for both editions",
+    "All 30 runtime files bundled and matched byte-for-byte",
+    "Both complete ZIPs launched from fresh extractions without any asset ZIP",
+    "No PowerShell/import dependency"
   ],
-  "note": "Asset import and patch equivalence checked using Python; this is not execution of the Windows PowerShell importer. Interactive tests are short smoke tests, not full gameplay or 60 FPS certification.",
-  "runs": {
+  "note": "Fresh complete-ZIP extractions run without an asset archive. All 30 game files match the previously tested 512/2048 KB runtime bytes. Windows launcher untested; short smoke tests do not certify 60 FPS.",
+  "rom_version": "Not independently identified; exact SHA-256 recorded",
+  "packaging": "Complete runtime; all assets bundled, no import or patch step",
+  "prior_identical_runtime_tests": {
     "SpaceCadet-X16": {
       "512": {
         "ram_kb": 512,
@@ -88,5 +90,37 @@
       }
     }
   },
-  "rom_version": "Not independently identified; exact SHA-256 recorded"
+  "windows_launcher_tested": false,
+  "fresh_archive_extraction_tests": {
+    "SpaceCadet-X16": {
+      "ram_kb": 512,
+      "music_restart_seconds": 1.7351847561076283,
+      "audio_rms": 4073.512045165798,
+      "peak": 25007.0,
+      "samples": 785772,
+      "inputs_sha256": {
+        "CADET.PRG": "4aa2a2583002cd66e44de07e1e718ec593253cecd108d48153f177b1aae762c6",
+        "CADET.RUL": "def7687c6af596bb6ad67bfbdf645d1093dc291f5ff67beb33a42c79c59e9e7e",
+        "CADET.PHY": "728da432a76b24808e976504ddfaff2c6f84bda62b9de65370662854ef49fcaf"
+      },
+      "reported_frame": 465,
+      "worst_cycles": 160189,
+      "mean_cycles": 61008
+    },
+    "SpaceCmdr2D": {
+      "ram_kb": 512,
+      "music_restart_seconds": 1.9277892457321286,
+      "audio_rms": 3946.5240040874337,
+      "peak": 24641.0,
+      "samples": 856216,
+      "inputs_sha256": {
+        "CADET.PRG": "4aa2a2583002cd66e44de07e1e718ec593253cecd108d48153f177b1aae762c6",
+        "CADET.RUL": "def7687c6af596bb6ad67bfbdf645d1093dc291f5ff67beb33a42c79c59e9e7e",
+        "CADET.PHY": "728da432a76b24808e976504ddfaff2c6f84bda62b9de65370662854ef49fcaf"
+      },
+      "reported_frame": 505,
+      "worst_cycles": 163114,
+      "mean_cycles": 59257
+    }
+  }
 }

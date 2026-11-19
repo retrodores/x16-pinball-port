@@ -35,7 +35,7 @@ jobs:
           assert r['isDraft'], 'Refusing to change a published release'
           assert '<!-- p8inball-runtime-beta -->' in r['body'], 'Refusing to replace an unrelated draft'
           PY
-            gh release edit "$tag" --draft --prerelease --notes-file releases/1.0-Beta/RELEASE-NOTES.md
+            gh release edit "$tag" --draft --prerelease --target "$TARGET_COMMIT" --notes-file releases/1.0-Beta/RELEASE-NOTES.md
           else
             gh release create "$tag" --draft --prerelease --target "$TARGET_COMMIT" --title "1.0 Beta — Space Cadet X16 and Space CmdrX16" --notes-file releases/1.0-Beta/RELEASE-NOTES.md
           fi
