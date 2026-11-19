@@ -132,12 +132,46 @@ static void display(bool update_panel){
  }
  if(update_panel&&music_cache!=music_enabled){
   const char*label=music_enabled==0?"OFF":music_enabled==1?"ON ":"...";
-  for(uint8_t i=0;i<3;++i)tile(73+i,FONT_BASE/32+label[i]-32,439+i*8,451,FONT_BANK);
+  for(uint8_t i=0;i<3;++i)tile(73+i,FONT_BASE/32+label[i]-32,530+i*8,421,FONT_BANK);
   music_cache=music_enabled;
  }
  dynamic_update(update_panel?128:0);
  /* 128-bit score remains exact. Flag a panel overflow instead of silently truncating. */
  if(update_panel&&wide_score)status("SCORE EXCEEDS PANEL  SEE EXACT SCORE LOG");
+}
+static void compact_footer(void){
+ /* Row 25 contains the bottom of the backbox frame and the first line of
+  * old footer text. Copy its 13 right-side tiles, blanking only y >= 406.
+  * These replacement patterns occupy the gap after the fast dynamic tiles. */
+ const uint16_t first=960;
+ for(uint8_t col=0;col<13;++col){
+  uint16_t cell=25u*128+(24+col)*2;
+  addr(cell);uint8_t lo=v[3],hi=v[3];
+  uint16_t tile_index=lo|((uint16_t)(hi&3)<<8);
+  uint32_t source=4096UL+(uint32_t)tile_index*128;
+  uint32_t dest=4096UL+(uint32_t)(first+col)*128;
+  uint8_t data[128];
+  addr(source);
+  for(uint8_t i=0;i<128;++i){
+   uint8_t pixel=v[3];
+   bool keep=(hi&8)?i>=80:i<48;
+   data[i]=keep?pixel:0;
+  }
+  addr(dest);for(uint8_t i=0;i<128;++i)v[3]=data[i];
+  addr(cell);v[3]=(uint8_t)(first+col);v[3]=(hi&0xfc)|((first+col)>>8);
+ }
+ addr(29u*128+39*2);uint8_t lo=v[3],hi=v[3];
+ for(uint8_t row=26;row<30;++row){
+  addr((uint16_t)row*128+48);
+  for(uint8_t col=0;col<13;++col){v[3]=lo;v[3]=hi;}
+ }
+}
+static void footer_labels(void){
+ const char* labels[]={"Z /: FLIPS SPACE: FIRE","F2 RESET ESC  M:"};
+ uint8_t sprite=76;
+ for(uint8_t row=0;row<2;++row)
+  for(uint8_t i=0;labels[row][i];++i)
+   tile(sprite++,FONT_BASE/32+labels[row][i]-32,402+i*8,410+row*11,FONT_BANK);
 }
 int main(void){
  uint8_t oldbank=*(volatile uint8_t*)0;uint16_t oldkey=*(volatile uint16_t*)0x032e;
@@ -157,7 +191,10 @@ int main(void){
  *(volatile uint8_t*)0=11;if(!load("UI.BIN",0,0xa000))goto fail;
  for(uint8_t i=0;i<128;++i)hide(i);
  for(uint8_t i=0;i<9;++i)score_cache[i]=254;
- v[5]=0;v[9]=0x51;v[10]=v[11]=128;v[12]=0;
+ compact_footer();footer_labels();
+ /* Fill the 640x480 signal with the playable viewport. Keep the backbox
+  * entirely visible while reducing the empty strip below the cabinet. */
+ v[5]=0;v[9]=0x51;v[10]=138;v[11]=140;v[12]=0;
  v[13]=0x12;v[14]=0;v[15]=0x0b;v[16]=v[17]=v[18]=v[19]=0;
  __asm__ volatile("sei");*(volatile uint16_t*)0x032e=(uint16_t)(uintptr_t)keyboard;__asm__ volatile("cli");
  lab_install();game_start();dynamic_init();frame(31,32,403,197,1);display(true);
