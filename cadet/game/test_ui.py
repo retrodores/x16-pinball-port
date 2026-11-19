@@ -19,11 +19,18 @@ with (output('ui.log')).open('w')as f:
   def action(cmd,key):sp.run(['xdotool',cmd,'--window',w,key],check=True)
   def shot(n):
    dest=output(n+'.png');sp.run(['import','-window',w,str(dest)],check=True);return Image.open(dest).convert('RGB')
+  def scaled(box):
+   x1,y1,x2,y2=box
+   return x1*128//119,y1*128//117,x2*128//119,y2*128//117
   ready=shot('ready')
+  margin=480-ready.crop((0,0,400,480)).getbbox()[3]
+  assert 4<=margin<=12,('cabinet bottom margin',margin)
   packed=Image.open(o/'dynamic-rest.png').convert('RGB')
   # Original new-ball gate lamps flash; compare the static region independently.
-  actual=ready.crop((0,0,320,340));expected=packed.crop((0,0,320,340))
-  blink_boxes=[(298,348,310,362),(51,328,63,342),(290,210,299,220),(50,257,60,268)]
+  actual=ready.crop((0,0,340,372))
+  x=np.arange(340)*119//128;y=np.arange(372)*117//128
+  expected=Image.fromarray(np.asarray(packed)[y[:,None],x])
+  blink_boxes=[scaled(box) for box in ((298,348,311,363),(51,328,64,343),(290,210,300,221),(50,257,61,269))]
   for box in blink_boxes:
    ImageDraw.Draw(actual).rectangle(box,fill=0);ImageDraw.Draw(expected).rectangle(box,fill=0)
   assert ImageChops.difference(actual,expected).getbbox()is None,'static background differs from packed pixels'
@@ -33,15 +40,15 @@ with (output('ui.log')).open('w')as f:
    flashed|=any(ImageChops.difference(ready.crop(box),lamp.crop(box)).getbbox()is not None for box in blink_boxes)
   assert flashed,'original new-ball gate lamps do not animate'
   action('keydown','space');time.sleep(2);pulled=shot('pulled')
-  assert ImageChops.difference(ready.crop((320,375,370,470)),pulled.crop((320,375,370,470))).getbbox(),'plunger not animated'
+  assert ImageChops.difference(ready.crop(scaled((320,375,370,437))),pulled.crop(scaled((320,375,370,437)))).getbbox(),'plunger not animated'
   action('keyup','space');time.sleep(.8);shot('launched')
   action('keydown','z');action('keydown','slash');time.sleep(.3);raised=shot('flippers')
-  assert ImageChops.difference(ready.crop((120,355,260,420)),raised.crop((120,355,260,420))).getbbox(),'flippers not animated'
+  assert ImageChops.difference(ready.crop(scaled((120,355,260,420))),raised.crop(scaled((120,355,260,420)))).getbbox(),'flippers not animated'
   action('keyup','z');action('keyup','slash');time.sleep(8);shot('playing')
   action('key','F2');time.sleep(.5);shot('new-game')
   music_on=shot('music-on')
   action('key','m');time.sleep(.3);music_off=shot('music-off')
-  box=(439,451,463,459)
+  box=scaled((530,421,554,429))
   assert ImageChops.difference(music_on.crop(box),music_off.crop(box)).getbbox(),'music OFF indicator unchanged'
   restart_started=time.monotonic();action('key','m')
   while True:
