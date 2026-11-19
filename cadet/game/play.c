@@ -194,7 +194,7 @@ int main(void){
  compact_footer();footer_labels();
  /* Fill the 640x480 signal with the playable viewport. Keep the backbox
   * entirely visible while reducing the empty strip below the cabinet. */
- v[5]=0;v[9]=0x51;v[10]=138;v[11]=140;v[12]=0;
+ v[5]=0;v[9]=0x51;v[10]=119;v[11]=117;v[12]=0;
  v[13]=0x12;v[14]=0;v[15]=0x0b;v[16]=v[17]=v[18]=v[19]=0;
  __asm__ volatile("sei");*(volatile uint16_t*)0x032e=(uint16_t)(uintptr_t)keyboard;__asm__ volatile("cli");
  lab_install();game_start();dynamic_init();frame(31,32,403,197,1);display(true);
