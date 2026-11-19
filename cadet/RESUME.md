@@ -154,16 +154,42 @@ Do not describe the development build as a complete or note/pixel-perfect port.
 
 ## Engine and local-import checkpoint
 
-The PCM mixer keeps its within-page sample offset in Y. The mixer changes the
-read page only when Y wraps, including the existing bank 30 to 51 transition.
-The strict test on a stock 65C02 at 8 MHz still fails. The updated 12,000-frame
-runs measured 211,209 / 211,215 worst cycles and 90 / 90 over-budget frames at
-512 KB / 2 MB, with zero PCM underruns, music errors, or reported frame-start gaps.
-Mean cost was 67,879 cycles in both modes. The development label remains.
+Source commit `1dd5007` defers the squared ray length until an applicable circle
+candidate needs it. The PCM mixer keeps its within-page sample offset in Y and
+changes the read page only on wrap, including the bank 30 to 51 transition.
+The optimized and exhaustive ASan/UBSan host runs each used 40 seeds and matched
+the previous state hash `689df8e0`, with zero escapes or stalls and seven
+collision-guard hits. The native route, powered/passive flipper, mechanism,
+128-bit award and overlay extraction fixtures passed.
 
-Use `cadet/game/import_local.py` and see `cadet/game/IMPORT.md` for the
-code-only distribution and private asset conversion. The converter uses a
-supported local installation and the existing checkout's two pinned reference
-inputs. Its fresh build reached PLAY READY on Linux at both RAM sizes and all
-30 runtime files matched the developer build byte-for-byte. Windows execution
-has not been verified.
+The strict 12,000-frame workload on a stock 65C02 at 8 MHz still fails:
+
+| RAM | Prior maximum | Current maximum | Current mean | Prior over budget | Current over budget |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| 512 KB | 214329 | 211847 | 67549 | 94 | 89 |
+| 2 MB | 214193 | 211825 | 67548 | 95 | 89 |
+
+Both runs reported zero PCM underruns, music errors and frame-start gaps.
+A separate instrumented mixer-only build attributed 181939 of 211363 cycles at
+frame 5363 to the interval through the physics update. This interval includes
+the initial IRQ. The remaining 29424 cycles cover display and prefetch work.
+The probe adds a cycle read before display and logs the split for new maxima.
+The production linker stack guard and 133333-cycle gate remain in place.
+
+Use `cadet/game/import_local.py` and see `cadet/game/IMPORT.md`.
+The code-only ZIP is `cadet/releases/CmdrX-Cadet-engine-import-dev.zip`,
+SHA-256 `364edc8fb0b435391c15f78cdec990e64ffbe61fd954e26404a88e3dccd54f81`.
+The converter reads a supported local installation and the existing checkout's
+two pinned reference files. Missing and truncated DAT inputs failed before
+publishing outputs. A fresh extraction under a path with spaces and non-ASCII
+characters accepted lowercase installation filenames and reproduced all 30
+runtime files byte-for-byte. The resulting game passed the interactive render,
+plunger, flipper, reset, music toggle and quit fixture at both RAM sizes.
+The Linux launcher booted from a different working directory. Native Windows
+conversion and Windows launcher execution remain unverified.
+
+The exact-byte/three-voice capture and 32050-VBL mixed soundtrack-loop tests
+passed at both 512 KB and 2 MB with zero PCM underruns. Each recorded one full
+loop, 47594 FM writes and 42256 PSG writes. Measured flipper cue onset was
+23.34 ms at 512 KB and 23.32 ms at 2 MB. See the current
+`cadet/play-build/audio-mix-validation.json` for capture metrics.
