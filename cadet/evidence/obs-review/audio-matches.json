@@ -1,0 +1,289 @@
+{
+  "original": {
+    "SOUND43": [
+      {
+        "seconds": 56.148,
+        "normalized_correlation": 0.7404
+      },
+      {
+        "seconds": 20.342,
+        "normalized_correlation": 0.7389
+      },
+      {
+        "seconds": 22.316,
+        "normalized_correlation": 0.7307
+      },
+      {
+        "seconds": 58.145,
+        "normalized_correlation": 0.7029
+      },
+      {
+        "seconds": 15.052,
+        "normalized_correlation": 0.1687
+      },
+      {
+        "seconds": 61.335,
+        "normalized_correlation": 0.164
+      },
+      {
+        "seconds": 78.709,
+        "normalized_correlation": 0.132
+      },
+      {
+        "seconds": 36.315,
+        "normalized_correlation": 0.1309
+      }
+    ],
+    "SOUND17": [
+      {
+        "seconds": 75.559,
+        "normalized_correlation": 0.3774
+      },
+      {
+        "seconds": 30.166,
+        "normalized_correlation": 0.2962
+      },
+      {
+        "seconds": 71.272,
+        "normalized_correlation": 0.2808
+      },
+      {
+        "seconds": 35.746,
+        "normalized_correlation": 0.2698
+      },
+      {
+        "seconds": 40.982,
+        "normalized_correlation": 0.2588
+      },
+      {
+        "seconds": 62.216,
+        "normalized_correlation": 0.2551
+      },
+      {
+        "seconds": 52.649,
+        "normalized_correlation": 0.2526
+      },
+      {
+        "seconds": 67.185,
+        "normalized_correlation": 0.2504
+      }
+    ],
+    "SOUND12": [
+      {
+        "seconds": 39.685,
+        "normalized_correlation": 0.4461
+      },
+      {
+        "seconds": 15.883,
+        "normalized_correlation": 0.4396
+      },
+      {
+        "seconds": 35.342,
+        "normalized_correlation": 0.4335
+      },
+      {
+        "seconds": 10.148,
+        "normalized_correlation": 0.4311
+      },
+      {
+        "seconds": 14.002,
+        "normalized_correlation": 0.4165
+      },
+      {
+        "seconds": 26.193,
+        "normalized_correlation": 0.4113
+      },
+      {
+        "seconds": 12.377,
+        "normalized_correlation": 0.4042
+      },
+      {
+        "seconds": 33.229,
+        "normalized_correlation": 0.382
+      }
+    ],
+    "SOUND57": [
+      {
+        "seconds": 65.622,
+        "normalized_correlation": 0.2358
+      },
+      {
+        "seconds": 18.228,
+        "normalized_correlation": 0.1349
+      }
+    ],
+    "SOUND104": [
+      {
+        "seconds": 52.038,
+        "normalized_correlation": 0.4854
+      },
+      {
+        "seconds": 61.977,
+        "normalized_correlation": 0.4809
+      },
+      {
+        "seconds": 30.675,
+        "normalized_correlation": 0.467
+      },
+      {
+        "seconds": 17.625,
+        "normalized_correlation": 0.4618
+      },
+      {
+        "seconds": 73.68,
+        "normalized_correlation": 0.4612
+      },
+      {
+        "seconds": 38.709,
+        "normalized_correlation": 0.4608
+      },
+      {
+        "seconds": 64.67,
+        "normalized_correlation": 0.4591
+      },
+      {
+        "seconds": 6.223,
+        "normalized_correlation": 0.4569
+      }
+    ]
+  },
+  "x16": {
+    "SOUND43": [
+      {
+        "seconds": 9.89,
+        "normalized_correlation": 0.1676
+      },
+      {
+        "seconds": 33.565,
+        "normalized_correlation": 0.1466
+      },
+      {
+        "seconds": 44.123,
+        "normalized_correlation": 0.1426
+      },
+      {
+        "seconds": 13.093,
+        "normalized_correlation": 0.1298
+      },
+      {
+        "seconds": 110.853,
+        "normalized_correlation": 0.1284
+      },
+      {
+        "seconds": 49.781,
+        "normalized_correlation": 0.1278
+      },
+      {
+        "seconds": 61.831,
+        "normalized_correlation": 0.1277
+      },
+      {
+        "seconds": 67.117,
+        "normalized_correlation": 0.1235
+      }
+    ],
+    "SOUND17": [
+      {
+        "seconds": 96.464,
+        "normalized_correlation": 0.2705
+      },
+      {
+        "seconds": 38.821,
+        "normalized_correlation": 0.267
+      },
+      {
+        "seconds": 37.695,
+        "normalized_correlation": 0.2622
+      },
+      {
+        "seconds": 34.518,
+        "normalized_correlation": 0.2608
+      },
+      {
+        "seconds": 78.507,
+        "normalized_correlation": 0.2452
+      },
+      {
+        "seconds": 31.163,
+        "normalized_correlation": 0.2417
+      },
+      {
+        "seconds": 58.899,
+        "normalized_correlation": 0.2324
+      },
+      {
+        "seconds": 82.403,
+        "normalized_correlation": 0.232
+      }
+    ],
+    "SOUND12": [
+      {
+        "seconds": 111.785,
+        "normalized_correlation": 0.4734
+      },
+      {
+        "seconds": 50.95,
+        "normalized_correlation": 0.3127
+      },
+      {
+        "seconds": 68.289,
+        "normalized_correlation": 0.2795
+      },
+      {
+        "seconds": 62.738,
+        "normalized_correlation": 0.2601
+      },
+      {
+        "seconds": 13.927,
+        "normalized_correlation": 0.2543
+      },
+      {
+        "seconds": 44.993,
+        "normalized_correlation": 0.2528
+      },
+      {
+        "seconds": 4.134,
+        "normalized_correlation": 0.2418
+      },
+      {
+        "seconds": 34.618,
+        "normalized_correlation": 0.2234
+      }
+    ],
+    "SOUND57": [],
+    "SOUND104": [
+      {
+        "seconds": 39.728,
+        "normalized_correlation": 0.4988
+      },
+      {
+        "seconds": 17.92,
+        "normalized_correlation": 0.496
+      },
+      {
+        "seconds": 83.644,
+        "normalized_correlation": 0.4895
+      },
+      {
+        "seconds": 104.46,
+        "normalized_correlation": 0.4873
+      },
+      {
+        "seconds": 108.106,
+        "normalized_correlation": 0.4854
+      },
+      {
+        "seconds": 12.684,
+        "normalized_correlation": 0.4854
+      },
+      {
+        "seconds": 25.565,
+        "normalized_correlation": 0.4829
+      },
+      {
+        "seconds": 114.91,
+        "normalized_correlation": 0.4828
+      }
+    ]
+  }
+}

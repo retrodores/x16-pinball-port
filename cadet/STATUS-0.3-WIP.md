@@ -1,3 +1,19 @@
+## Latest OBS review and flipper correction
+
+See cadet/OBS-REVIEW.md (OBS-REVIEW.md relative to this directory) and
+cadet/evidence/obs-review for the latest results. Powered flippers now impart
+an impulse to stationary and slowly separating balls on the front face.
+New focused native fixtures pass at 512/2048 KB; host/native paths agree.
+Host optimized/exhaustive soak hash is now 768b50ac (intentional physics change),
+with 120 drains and no escapes/stalls across 40 games. This supersedes the prior
+91cbf84c expectation below. Nine five-contact guard uses remain to investigate.
+The integrated 6000-frame budget still FAILS: 158182/158318 worst cycles at
+512/2048 KB, three overruns each. The music restart hitch is unchanged.
+Original Table 0.2 remains the accepted runnable build. No new release.
+Priority now includes original wormhole audio/rules, kickback/gate timers,
+lane/target lamps and bumper animation; these remain unimplemented.
+The supplied human log reached frame 6405, beyond the scripted test horizon.
+
 # CmdrX Cadet — 0.3 work in progress, 2026-11-18
 
 **This is a source/recovery checkpoint, not a new recommended game release.**

@@ -1,0 +1,17 @@
+{
+  "2026-11-17 22-59-31(1).mp4": {
+    "bytes": 8172512,
+    "sha256": "732d9350f20403c1d5d173c41cf500d3448d63ca14676a5a42d68ba00ff85405"
+  },
+  "2026-11-18 23-02-35.mp4": {
+    "bytes": 9759041,
+    "sha256": "b2f9c7cecfc7a50bb2bce37834518905e0d52a532623e0972ec0da746c1e7c2d"
+  },
+  "user_log": {
+    "worst_frame_hex": "00001905",
+    "worst_frame_decimal": 6405,
+    "cycles_hex": "000263bb",
+    "cycles_decimal": 156603,
+    "milliseconds_at_8mhz": 19.575375
+  }
+}

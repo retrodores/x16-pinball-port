@@ -326,7 +326,23 @@ static void paddle(uint8_t side,uint8_t old){
    }else elastic=distance>=603?0:(603-distance)*192/603;
   }
  }
- if(rebound(nx,ny,elastic,128,boost,-dot(game.vx,game.vy,nx,ny))>0){++game.flipper_hits;if(phase_delta>0)sound(0);}
+ /* The original powered flipper applies its impulse even when the ball is
+    stationary or already travelling along the contact normal. A wall-style
+    inward<=0 early return incorrectly let the paddle push it without a hit.
+    Keep passive contacts unchanged; only the moving, front-face boost enters
+    this branch. See TFlipperEdge::EdgeCollision and maths::basic_collision. */
+ int16_t inward=-dot(game.vx,game.vy,nx,ny);bool hit;
+ if(boost&&inward<=0){
+  uint16_t speed=isqrt(mul(game.vx,game.vx)+mul(game.vy,game.vy));
+  if(speed&&inward<0){
+   uint16_t loss=umul(ax(inward),256-elastic)>>8;
+   uint16_t keep=loss<speed?speed-loss:0;
+   uint16_t scale=fraction_wide(keep,speed);
+   game.vx=mul(game.vx,scale)/256;game.vy=mul(game.vy,scale)/256;
+  }
+  game.vx+=mul(nx,boost);game.vy+=mul(ny,boost);limit();hit=true;
+ }else hit=rebound(nx,ny,elastic,128,boost,inward)>0;
+ if(hit){++game.flipper_hits;if(phase_delta>0)sound(0);}
 
 }
 static bool well_force(){
