@@ -14,6 +14,11 @@ assert len(runtime)==30
 specnames=['ENGINE-SPEC.md','engine-contract.json','engine-contract.schema.json','reference-data.json']
 sha=lambda b:hashlib.sha256(b).hexdigest()
 source='9534fb8ed127092b0e9580ab75bfaf5d010e9b94'
+music_source='7f6edd77f3665c0f167fb983b784c242f82cce47'
+music_pinned={
+ 'MUSIC0.BIN':'d73e67d4a41a3946c697171b6c77ef77e842c01ab55a9afa8fcece772b9e00b5',
+ 'MUSIC1.BIN':'771273719e81d71c90271664b10f5effb5938b94ec0f719fa0c98d9be2cf224d',
+}
 spec_commit='898276b21c124afddbb242fb4dba0ff933feb049'
 contract=json.loads((spec/'engine-contract.json').read_text())
 pinned={Path(x['path']).name:x['sha256'] for x in contract['runtime_files']}
@@ -37,7 +42,7 @@ pause
 exit /b 1
 '''
 manifest={'label':'1.0 Beta','packaging':'complete runtime with all 30 game files; no asset import',
-'engine_source_commit':source,'specification_commit':spec_commit,
+'engine_source_commit':source,'music_source_commit':music_source,'specification_commit':spec_commit,
 'reference_sha256':'7f2984ab9939b5ec8ffa828cdd2423c16c4faa3e3bf2afb3881fb47acf87b72b',
 'windows_interactive_tested':False,'archives':[]}
 for title,folder,stem in [('Space Cadet - original presentation on X16',original,'SpaceCadet-X16'),
@@ -45,6 +50,7 @@ for title,folder,stem in [('Space Cadet - original presentation on X16',original
  files={n:(folder/n).read_bytes() for n in runtime}
  for n in ['CADET.PRG','CADET.PHY','CADET.RUL','FONT.BIN']:
   assert sha(files[n])==pinned[n],n
+ for n,digest in music_pinned.items():assert sha(files[n])==digest,n
  for n in ['LICENSE','ENGINE-THIRD-PARTY-LICENSE']:files[n]=(folder/n).read_bytes()
  files['RUN-WINDOWS.bat']=launcher.replace('FILES',' '.join(runtime)).replace('\n','\r\n').encode()
  files['README.txt']=f'''{title} -- 1.0 Beta
@@ -57,11 +63,14 @@ The emulator and ROM are the only external prerequisites.
 
 Use separate folders for the two editions.
 Flippers: Z and /. Plunger: hold/release Space. New game: F2.
-Music: M. Exit: Escape.
+Music: M. Exit: Escape. This refresh raises the music level by about 6 dB.
 
 Engine source commit: {source}
+Music source commit: {music_source}
 Specification commit: {spec_commit}
-Human and machine-readable engine specifications are in specs/.
+Human and machine-readable engine specifications are in specs/. They document
+the reference snapshot. See the release's PACKAGE-MANIFEST.json for current
+runtime file hashes.
 This package contains the complete game runtime, not standalone game/build source.
 The machine reference documentation includes geometry and policy excerpts.
 
