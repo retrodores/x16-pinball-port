@@ -1,0 +1,52 @@
+{
+  "label": "1.0 Beta",
+  "engine_source_commit": "9534fb8ed127092b0e9580ab75bfaf5d010e9b94",
+  "specification_commit": "898276b21c124afddbb242fb4dba0ff933feb049",
+  "reference_sha256": "7f2984ab9939b5ec8ffa828cdd2423c16c4faa3e3bf2afb3881fb47acf87b72b",
+  "archives": [
+    {
+      "filename": "SpaceCadet-X16-1.0-Beta-Runtime.zip",
+      "sha256": "ca7345bcb5c4e819a398aaa6654bd72e807d1adacc4a2f702253bb28360bf118",
+      "bytes": 208744,
+      "allowlist": [
+        "CADET.PHY",
+        "CADET.PRG",
+        "CADET.RUL",
+        "COPY-031-FILES.txt",
+        "ENGINE-THIRD-PARTY-LICENSE",
+        "FONT.BIN",
+        "IMPORT-ORIGINAL.ps1",
+        "LICENSE",
+        "README.txt",
+        "RUN-WINDOWS.bat",
+        "specs/ENGINE-SPEC.md",
+        "specs/engine-contract.json",
+        "specs/engine-contract.schema.json",
+        "specs/reference-data.json"
+      ]
+    },
+    {
+      "filename": "SpaceCmdr2D-1.0-Beta-Runtime.zip",
+      "sha256": "c24e65d4fe87fb8e4ce0ebb129a96dab48b9e4637464a97cefe46279af475271",
+      "bytes": 216306,
+      "allowlist": [
+        "2D-PATCH.json",
+        "APPLY-2D.ps1",
+        "CADET.PHY",
+        "CADET.PRG",
+        "CADET.RUL",
+        "COPY-031-FILES.txt",
+        "ENGINE-THIRD-PARTY-LICENSE",
+        "FONT.BIN",
+        "LICENSE",
+        "README.txt",
+        "RUN-WINDOWS.bat",
+        "specs/ENGINE-SPEC.md",
+        "specs/engine-contract.json",
+        "specs/engine-contract.schema.json",
+        "specs/reference-data.json"
+      ]
+    }
+  ],
+  "windows_interactive_tested": false
+}

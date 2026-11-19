@@ -1,0 +1,92 @@
+{
+  "engine_source_commit": "9534fb8ed127092b0e9580ab75bfaf5d010e9b94",
+  "specification_commit": "898276b21c124afddbb242fb4dba0ff933feb049",
+  "emulator": "r49 Pyrite af102408",
+  "rom_sha256": "b81654cc8c87ed96e3ffc7c8e7c312c9f3b7b870c7bb34de61e61eac931b819a",
+  "platform": "Linux Xvfb; stock 65C02 8 MHz",
+  "windows_first_launch_tested": false,
+  "windows_relaunch_without_zip_tested": false,
+  "powershell_importer_executed": false,
+  "tests_passed": [
+    "reference SHA-256",
+    "explicit ZIP allowlists and CRC",
+    "no nested archives or standalone game/build source",
+    "beta PRG/PHY/RUL hashes match pinned engine snapshot",
+    "patch before/after hashes match supplied beta artwork",
+    "isolated asset preparation",
+    "playfield pixel comparison",
+    "plunger/flipper animation",
+    "music toggle/restart",
+    "nonzero recorded audio",
+    "new game and normal exit",
+    "512 and 2048 KB for both editions"
+  ],
+  "note": "Asset import and patch equivalence checked using Python; this is not execution of the Windows PowerShell importer. Interactive tests are short smoke tests, not full gameplay or 60 FPS certification.",
+  "runs": {
+    "SpaceCadet-X16": {
+      "512": {
+        "ram_kb": 512,
+        "music_restart_seconds": 1.9389851628802717,
+        "audio_rms": 3907.8725735593403,
+        "peak": 24569.0,
+        "samples": 1007048,
+        "inputs_sha256": {
+          "CADET.PRG": "4aa2a2583002cd66e44de07e1e718ec593253cecd108d48153f177b1aae762c6",
+          "CADET.RUL": "def7687c6af596bb6ad67bfbdf645d1093dc291f5ff67beb33a42c79c59e9e7e",
+          "CADET.PHY": "728da432a76b24808e976504ddfaff2c6f84bda62b9de65370662854ef49fcaf"
+        },
+        "reported_frame": 594,
+        "worst_cycles": 158465,
+        "mean_cycles": 58188
+      },
+      "2048": {
+        "ram_kb": 2048,
+        "music_restart_seconds": 1.570853428915143,
+        "audio_rms": 3957.086482911431,
+        "peak": 24891.0,
+        "samples": 884142,
+        "inputs_sha256": {
+          "CADET.PRG": "4aa2a2583002cd66e44de07e1e718ec593253cecd108d48153f177b1aae762c6",
+          "CADET.RUL": "def7687c6af596bb6ad67bfbdf645d1093dc291f5ff67beb33a42c79c59e9e7e",
+          "CADET.PHY": "728da432a76b24808e976504ddfaff2c6f84bda62b9de65370662854ef49fcaf"
+        },
+        "reported_frame": 523,
+        "worst_cycles": 158261,
+        "mean_cycles": 58110
+      }
+    },
+    "SpaceCmdr2D": {
+      "512": {
+        "ram_kb": 512,
+        "music_restart_seconds": 2.166430744342506,
+        "audio_rms": 3936.002203513074,
+        "peak": 24744.0,
+        "samples": 826730,
+        "inputs_sha256": {
+          "CADET.PRG": "4aa2a2583002cd66e44de07e1e718ec593253cecd108d48153f177b1aae762c6",
+          "CADET.RUL": "def7687c6af596bb6ad67bfbdf645d1093dc291f5ff67beb33a42c79c59e9e7e",
+          "CADET.PHY": "728da432a76b24808e976504ddfaff2c6f84bda62b9de65370662854ef49fcaf"
+        },
+        "reported_frame": 484,
+        "worst_cycles": 160847,
+        "mean_cycles": 59783
+      },
+      "2048": {
+        "ram_kb": 2048,
+        "music_restart_seconds": 1.3134495629929006,
+        "audio_rms": 4101.728619863134,
+        "peak": 24854.0,
+        "samples": 813342,
+        "inputs_sha256": {
+          "CADET.PRG": "4aa2a2583002cd66e44de07e1e718ec593253cecd108d48153f177b1aae762c6",
+          "CADET.RUL": "def7687c6af596bb6ad67bfbdf645d1093dc291f5ff67beb33a42c79c59e9e7e",
+          "CADET.PHY": "728da432a76b24808e976504ddfaff2c6f84bda62b9de65370662854ef49fcaf"
+        },
+        "reported_frame": 477,
+        "worst_cycles": 167700,
+        "mean_cycles": 60708
+      }
+    }
+  },
+  "rom_version": "Not independently identified; exact SHA-256 recorded"
+}

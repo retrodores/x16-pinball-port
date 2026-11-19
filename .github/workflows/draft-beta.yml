@@ -1,0 +1,60 @@
+name: Prepare 1.0 Beta draft
+on:
+  push:
+    branches: [spacecadet-fidelity]
+    paths:
+      - 'releases/1.0-Beta/**'
+      - '.github/workflows/draft-beta.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: draft-1.0-beta
+  cancel-in-progress: false
+jobs:
+  draft:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify archive checksums
+        working-directory: releases/1.0-Beta
+        run: sha256sum -c SHA256SUMS
+      - name: Create or refresh draft only
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          TARGET_COMMIT: ${{ github.sha }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          tag=v1.0-beta
+          if gh release view "$tag" --json isDraft,body > /tmp/p8inball-release.json 2>/dev/null; then
+            python3 - <<'PY'
+          import json
+          r=json.load(open('/tmp/p8inball-release.json'))
+          assert r['isDraft'], 'Refusing to change a published release'
+          assert '<!-- p8inball-runtime-beta -->' in r['body'], 'Refusing to replace an unrelated draft'
+          PY
+            gh release edit "$tag" --draft --prerelease --notes-file releases/1.0-Beta/RELEASE-NOTES.md
+          else
+            gh release create "$tag" --draft --prerelease --target "$TARGET_COMMIT" --title "1.0 Beta — Space Cadet X16 and Space CmdrX16" --notes-file releases/1.0-Beta/RELEASE-NOTES.md
+          fi
+          gh release upload "$tag" releases/1.0-Beta/SpaceCadet-X16-1.0-Beta-Runtime.zip releases/1.0-Beta/SpaceCmdr2D-1.0-Beta-Runtime.zip releases/1.0-Beta/SHA256SUMS releases/1.0-Beta/PACKAGE-MANIFEST.json releases/1.0-Beta/VALIDATION.json --clobber
+          mkdir -p docs/release-status
+          gh release view "$tag" --json url,isDraft,isPrerelease,tagName,targetCommitish,assets > docs/release-status/1.0-beta.json
+          python3 - <<'PY'
+          import json
+          r=json.load(open('docs/release-status/1.0-beta.json'))
+          assert r['isDraft'] and r['isPrerelease']
+          names={a['name'] for a in r['assets']}
+          assert {'SpaceCadet-X16-1.0-Beta-Runtime.zip','SpaceCmdr2D-1.0-Beta-Runtime.zip'} <= names
+          PY
+      - name: Record verified draft status
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs/release-status/1.0-beta.json
+          if ! git diff --cached --quiet; then
+            git commit -m "Record 1.0 Beta draft release assets"
+            git push origin HEAD:spacecadet-fidelity
+          fi
