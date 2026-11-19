@@ -165,5 +165,5 @@ Use `cadet/game/import_local.py` and see `cadet/game/IMPORT.md` for the
 code-only distribution and private asset conversion. The converter uses a
 supported local installation and the existing checkout's two pinned reference
 inputs. Its fresh build reached PLAY READY on Linux at both RAM sizes and all
-32 runtime files matched the developer build byte-for-byte. Windows execution
+30 runtime files matched the developer build byte-for-byte. Windows execution
 has not been verified.
