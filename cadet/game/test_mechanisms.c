@@ -40,6 +40,32 @@ static void kickbacks(void){
   timers(120);CHECK(rules.hazard_bits[side]==0);CHECK(game_pose(gate)==1);
  }
 }
+/* Each shot starts above its outlane rollover. After that, the normal
+ * frame loop alone must carry it into the kicker and back up the table. */
+static void outlane_returns(void){
+ static const int16_t x[2]={1685,-1580},vx[2]={-900,0},vy[2]={5000,3000};
+ for(uint8_t side=0;side<2;++side){
+  uint16_t gate=side?502:501;
+  uint8_t entry=0,armed=0,boosted=0,closed=0;
+  game_start();
+  game_place(x[side],1935,vx[side],vy[side],1);
+  for(uint8_t frame=1;frame<=120&&game.state==InPlay;++frame){
+   game_frame(0,0,0,0);
+   if(!entry&&rules.gate_alert[side])entry=frame;
+   if(!armed&&rules.kick_phase[side]==1)armed=frame;
+   if(!boosted&&rules.kick_phase[side]==3){
+    boosted=frame;
+    CHECK(game.vy<-10000);
+   }
+   if(boosted&&!game_pose(gate)){closed=frame;break;}
+  }
+  CHECK(entry&&entry<armed);
+  CHECK(boosted&&boosted-armed>=42);
+  CHECK(closed>boosted&&closed-boosted<=6);
+  CHECK(game.state==InPlay&&game.escapes==0&&game.balls==3);
+  CHECK(game_pose(side?501:502)==1);
+ }
+}
 static void captures(void){
  static const uint16_t sink[3]={338,340,342};
  for(uint8_t entry=0;entry<3;++entry)for(uint8_t dest=0;dest<4;++dest){
@@ -76,6 +102,7 @@ int main(void){
 #endif
 #if TEST_PART==0 || TEST_PART==2
  kickbacks();
+ outlane_returns();
 #endif
 #if TEST_PART==0 || TEST_PART==3
  captures();
