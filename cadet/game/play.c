@@ -127,12 +127,12 @@ static void display(bool update_panel){
  }
  uint8_t number=game.ball_number;if(update_panel&&number!=ball_cache){frame(32,31+number,553,152,1);ball_cache=number;}
  if(update_panel&&previous_state!=game.state){
-  static const char*const labels[]={"F2: NEW GAME","HOLD SPACE TO LAUNCHRELEASE TO FIRE","BALL IN PLAY","CAPTURE / RETURN","NEXT BALL","GAME OVER           F2: NEW GAME"};
+  static const char*const labels[]={"F2: NEW GAME","HOLD SPACE          " "RELEASE TO LAUNCH","BALL IN PLAY","CAPTURE / RETURN","NEXT BALL","GAME OVER           F2: NEW GAME"};
   status(labels[game.state]);previous_state=game.state;
  }
  if(update_panel&&music_cache!=music_enabled){
   const char*label=music_enabled==0?"OFF":music_enabled==1?"ON ":"...";
-  for(uint8_t i=0;i<3;++i)tile(73+i,FONT_BASE/32+label[i]-32,530+i*8,421,FONT_BANK);
+  for(uint8_t i=0;i<3;++i)tile(73+i,FONT_BASE/32+label[i]-32,533+i*8,372,FONT_BANK);
   music_cache=music_enabled;
  }
  dynamic_update(update_panel?128:0);
@@ -166,12 +166,20 @@ static void compact_footer(void){
   for(uint8_t col=0;col<13;++col){v[3]=lo;v[3]=hi;}
  }
 }
-static void footer_labels(void){
- const char* labels[]={"Z /: FLIPS SPACE: FIRE","F2 RESET ESC  M:"};
+static void controls_panel(void){
+ static const char*const labels[]={
+  "FLIPPERS  Z /",
+  "PLUNGER   SPACE",
+  "NEW GAME  F2",
+  "EXIT      ESC",
+  "MUSIC     M",
+ };
  uint8_t sprite=76;
- for(uint8_t row=0;row<2;++row)
-  for(uint8_t i=0;labels[row][i];++i)
-   tile(sprite++,FONT_BASE/32+labels[row][i]-32,402+i*8,410+row*11,FONT_BANK);
+ for(uint8_t row=0;row<sizeof(labels)/sizeof(labels[0]);++row)
+  for(uint8_t i=0;labels[row][i];++i){
+   uint8_t c=labels[row][i];
+   if(c!=' ')tile(sprite++,FONT_BASE/32+c-32,405+i*8,308+row*16,FONT_BANK);
+  }
 }
 int main(void){
  uint8_t oldbank=*(volatile uint8_t*)0;uint16_t oldkey=*(volatile uint16_t*)0x032e;
@@ -191,7 +199,7 @@ int main(void){
  *(volatile uint8_t*)0=11;if(!load("UI.BIN",0,0xa000))goto fail;
  for(uint8_t i=0;i<128;++i)hide(i);
  for(uint8_t i=0;i<9;++i)score_cache[i]=254;
- compact_footer();footer_labels();
+ compact_footer();controls_panel();
  /* Fill the 640x480 signal with the playable viewport. Keep the backbox
   * entirely visible while reducing the empty strip below the cabinet. */
  v[5]=0;v[9]=0x51;v[10]=119;v[11]=117;v[12]=0;

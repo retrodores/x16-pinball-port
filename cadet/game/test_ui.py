@@ -25,6 +25,8 @@ with (output('ui.log')).open('w')as f:
   ready=shot('ready')
   margin=480-ready.crop((0,0,400,480)).getbbox()[3]
   assert 4<=margin<=12,('cabinet bottom margin',margin)
+  assert ready.crop(scaled((405,308,530,379))).getbbox(), 'controls panel is empty'
+  assert ready.crop(scaled((398,407,583,433))).getbbox() is None, 'stray footer text'
   packed=Image.open(o/'dynamic-rest.png').convert('RGB')
   # Original new-ball gate lamps flash; compare the static region independently.
   actual=ready.crop((0,0,340,372))
@@ -48,7 +50,7 @@ with (output('ui.log')).open('w')as f:
   action('key','F2');time.sleep(.5);shot('new-game')
   music_on=shot('music-on')
   action('key','m');time.sleep(.3);music_off=shot('music-off')
-  box=scaled((530,421,554,429))
+  box=scaled((533,372,557,380))
   assert ImageChops.difference(music_on.crop(box),music_off.crop(box)).getbbox(),'music OFF indicator unchanged'
   restart_started=time.monotonic();action('key','m')
   while True:
