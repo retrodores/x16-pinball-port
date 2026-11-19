@@ -220,7 +220,13 @@ int main(void){
   uint32_t before=irq_start;
 #ifdef GAME_TEST
 #ifdef MILESTONE_INPUT
-  milestone_setup(count);
+  if(count>=MILESTONE_FIRST_TICK){
+   volatile uint8_t *const ram_bank=(volatile uint8_t*)0;
+   uint8_t saved=*ram_bank;
+   *ram_bank=62;__asm__ volatile("":::"memory");
+   milestone_setup(count);
+   __asm__ volatile("":::"memory");*ram_bank=saved;
+  }
   /* Measured restart and cancellation while the music buffer is priming. */
   if(count==6100||count==6500||count==6502)music_stop();
   if(count==6101||count==6501||count==6503)music_start();
