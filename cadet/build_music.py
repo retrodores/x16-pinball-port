@@ -25,9 +25,13 @@ def pitch_voice(t,v,n,ch):
 patch={38:([1,1,2,3],[28,42,47,53],31,10,1,5,6),
        28:([1,2,3,4],[30,44,52,59],31,13,7,6,8),
        11:([1,3,4,7],[30,47,57,64],31,8,4,7,6)}
+# Raise the generated soundtrack by approximately 6 dB without changing effects,
+# note timing, or the native player's per-frame workload.
+FM_GAIN_STEPS=8  # YM2151 total level is in 0.75 dB steps.
+PSG_GAIN=2
 def levels(t,v,ch,vel):
  add=round(-20*math.log10(max(1,vel)/127*volume[ch]/127)/.75)
- for op,base in enumerate(patch[program[ch]][1]):fm(t,0x60+op*8+v,min(127,base+add))
+ for op,base in enumerate(patch[program[ch]][1]):fm(t,0x60+op*8+v,max(0,min(127,base+add-FM_GAIN_STEPS)))
 for ch,voices in groups.items():
  mul,tl,ar,dr,sr,sl,rr=patch[program[ch]]
  for v in voices:
@@ -36,7 +40,7 @@ for ch,voices in groups.items():
    for reg,val in [(0x40,mul[op]),(0x60,127),(0x80,ar),(0xa0,dr),(0xc0,sr),(0xe0,sl*16+rr)]:fm(0,reg+op*8+v,val)
 psg_free={v:0 for v in range(4,16)};drum_allocations=0;max_voices=0;note_ons=0;melodic_ons=0;drum_ons=0
 lut=[0,4,8,12,16,17,18,20,21,22,23,25,26,28,30,31,33,35,37,40,42,45,47,50,53,56,60,63,67,71,75,80,85,90,95,101,107,113,120,127,135,143,151,160,170,180,191,202,214,227,241,255,270,286,303,321,341,361,382,405,429,455,482,511]
-def volume_psg(vel,gain=1):return min(range(64),key=lambda i:abs(lut[i]-70*(vel/127)*gain))
+def volume_psg(vel,gain=1):return min(range(64),key=lambda i:abs(lut[i]-70*(vel/127)*gain*PSG_GAIN))
 time=0
 for msg in m:
  time+=msg.time;t=round(time*60)
@@ -116,6 +120,7 @@ report={'source':src.name,'source_sha256':hashlib.sha256(src.read_bytes()).hexdi
  'timbre':'new YM2151 additive patches and PSG percussion; not Windows General MIDI timbre',
  'percussion':'source onset and velocity retained; one-shot PSG envelopes replace drum samples',
  'unsupported_expression':ignored,'PINBALL2.MID':'bitmap font, not a second music track',
+ 'fm_gain_db':FM_GAIN_STEPS*.75,'psg_gain':PSG_GAIN,
  'max_register_writes_per_tick':max(len(v)for v in frames.values())}
 (O/'music.json').write_text(json.dumps(report,indent=2)+'\n')
 with (O/'music-notes.csv').open('w',newline='')as f:
