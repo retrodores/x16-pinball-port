@@ -1,6 +1,6 @@
 ; Original PCM + standard ZSM v1 player. No compiler or KERNAL zero page.
 ; Compressed music: banks 32..44; dictionary/read-ahead: bank 31 A000..AFFF.
-; Resident PCM effects: banks 19..30. Decompression runs in bounded main-thread batches.
+; Resident PCM effects: banks 19..30 then 51..57. Decompression runs in bounded main-thread batches.
 .section .text.lab,"ax",@progbits
 .globl lab_install,lab_uninstall,pcm_start,pcm_stop,music_start,music_stop,lab_clock
 lab_install:
@@ -113,13 +113,10 @@ music_start:
  jsr music_reset
  stz music_delay
  stz music_phase
- lda #1
+ ; State 2 requests bounded main-thread priming. Do not decode 2048 bytes
+ ; while IRQs are masked: that froze physics/input on every M-key restart.
+ lda #2
  sta music_enabled
- ldy #32
-1:
- jsr music_prefetch
- dey
- bne 1b
  plp
  rts
 music_stop:
@@ -263,6 +260,11 @@ pcm_read:
  sta pcm_read+2
  inc pcm_bank
  lda pcm_bank
+ cmp #31
+ bne 1f
+ lda #51
+ sta pcm_bank
+1:
  sta $00
 pcm_next:
  dex
@@ -296,7 +298,8 @@ restore_address:
  rts
 music_service:
  lda music_enabled
- bne 1f
+ cmp #1
+ beq 1f
  rts
 1:
  lda music_delay

@@ -163,6 +163,21 @@ prefetch_next:
  dex
  bne prefetch_next
 prefetch_done:
+ ; Publish ready only after a full lead buffer exists. IRQ never consumes
+ ; a partial restart buffer. M can cancel state 2 through music_stop.
+ lda music_enabled
+ cmp #2
+ bne 2f
+ lda music_buffered+1
+ cmp #8
+ bcc 2f
+ php
+ sei
+ stz music_phase
+ lda #1
+ sta music_enabled
+ plp
+2:
  pla
  sta $00
 prefetch_return:

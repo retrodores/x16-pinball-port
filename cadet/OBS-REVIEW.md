@@ -1,3 +1,8 @@
+> Historical review of the pre-milestone build. The subsequent 0.3 development
+> implementation and current results are in STATUS-0.3-WIP.md and RESUME.md.
+> Its original findings remain evidence; the missing-feature status below is
+> intentionally retained as a dated record, not the current implementation list.
+
 # CmdrX Cadet: OBS comparison and first flipper correction
 
 Review: Codex, with Brett Estrade. Session date: November 18, 2026 (America/Chicago).

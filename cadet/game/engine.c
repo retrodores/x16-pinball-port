@@ -20,6 +20,14 @@ static uint8_t model[180000];
 uint32_t cost[3];
 static uint32_t cycles(void){uint8_t a=*(volatile uint8_t*)0x9fb8,b=*(volatile uint8_t*)0x9fb9,c=*(volatile uint8_t*)0x9fba,d=*(volatile uint8_t*)0x9fbb;return(uint32_t)a|((uint32_t)b<<8)|((uint32_t)c<<16)|((uint32_t)d<<24);}
 #endif
+typedef struct {
+ uint16_t lane_flash[2],hazard_clear[2],bumper_decay[2],kick_timer[2],gate_flash[2];
+ uint16_t hazard_flash[6],wormhole_timer,destination_flash,replay,hyper_timer;
+ int16_t original_z;
+ uint8_t gate_alert[2],blink,blink_clock,bumper_fire[7],bumper_level[2],lane_bits[2],hazard_bits[2],gate[2],kick_phase[2];
+ uint8_t wormhole_dest,wormhole_exit,hyper_count,gravity,capture_group,exit_group,original_mask;
+} RuleState;
+static RuleState rules;
 Game game;static uint16_t ramp_ignored[8];static uint8_t ramp_ignore_count;
 static uint8_t active[160],active_flags[160],active_count;
 static void touch(uint8_t c){if(!active_flags[c]){active_flags[c]=1;active[active_count++]=c;}}
@@ -88,6 +96,14 @@ bool game_load(void){cell_id=65535;
 #endif
 #ifdef __CX16__
  uint8_t saved=*(volatile uint8_t*)0;bool ok=true;char name[]="GEOM0.BIN";
+#ifndef RULES_FILE
+#define RULES_FILE "CADET.RUL"
+#endif
+#ifndef PHYSICS_FILE
+#define PHYSICS_FILE "CADET.PHY"
+#endif
+ *(volatile uint8_t*)0=62;cbm_k_setnam(PHYSICS_FILE);cbm_k_setlfs(1,8,2);ok=(uintptr_t)cbm_k_load(0,(void*)0xa000)>255;
+ *(volatile uint8_t*)0=61;cbm_k_setnam(RULES_FILE);cbm_k_setlfs(1,8,2);ok=ok&&((uintptr_t)cbm_k_load(0,(void*)0xa000)>255);
  for(uint8_t i=0;i<3;++i){name[4]='0'+i;*(volatile uint8_t*)0=1+i*8;cbm_k_setnam(name);cbm_k_setlfs(1,8,2);ok=ok&&((uintptr_t)cbm_k_load(0,(void*)0xa000)>255);}
  *(volatile uint8_t*)0=saved;return ok;
 #else
@@ -110,9 +126,29 @@ void add_score(uint16_t n){if(game.overflow)return;game.score_dirty=true;uint16_
  case 50000:carry=5;digit=4;break;default:break;}
  for(uint8_t i=digit;i<40&&carry;++i){uint8_t add;
  if(carry<10){add=carry;carry=0;}else{add=carry%10;carry/=10;}uint8_t d=game.digits[i]+add;if(d>=10){d-=10;++carry;}game.digits[i]=d;}}
-static void serve(){sound(255);game.ball_number=4-game.balls;game.state=Serving;game.x=serve_x;game.y=plunger_y-2;game.z=77;game.vx=game.vy=game.remx=game.remy=game.accx=game.accy=0;game.mask=1;game.ramp=false;game.charge=0;game.charge_clock=0;game.flags=0;game.nudges=0;}
-void game_start(void){active_count=0;memset(active_flags,0,sizeof active_flags);memset(&game,0,sizeof game);game.balls=3;game.multiplier=1;game.score_dirty=true;serve();}
-static void drain(){if(game.state!=InPlay)return;game.state=Between;game.wait=120;game.vx=game.vy=0;game.mask=0;game.ramp=false;++game.drains;if(game.balls)--game.balls;sound(5);}
+#include "rules.inc"
+/* All overlay calls enter from unbanked RAM. Helpers called by the overlay
+ * either leave RAM_BANK unchanged or restore it before returning. */
+#ifdef __CX16__
+#define RULE_ENTER uint8_t rule_saved=*(volatile uint8_t*)0; *(volatile uint8_t*)0=61; __asm__ volatile("":::"memory")
+#define RULE_LEAVE __asm__ volatile("":::"memory"); *(volatile uint8_t*)0=rule_saved
+#else
+#define RULE_ENTER
+#define RULE_LEAVE
+#endif
+static void rules_reset(void){RULE_ENTER;rule_reset();RULE_LEAVE;}
+static void rules_tick(void){RULE_ENTER;rule_tick();RULE_LEAVE;}
+static void rules_capture(const Edge*e){RULE_ENTER;rule_capture(e);++game.visual_epoch;RULE_LEAVE;}
+static void rules_release(void){RULE_ENTER;rule_release();++game.visual_epoch;RULE_LEAVE;}
+static void rules_lane(uint16_t n){RULE_ENTER;rule_lane(n);++game.visual_epoch;RULE_LEAVE;}
+static void rules_shift(uint8_t n){RULE_ENTER;rule_shift_lanes(n);++game.visual_epoch;RULE_LEAVE;}
+static void rules_hazard(uint16_t n){RULE_ENTER;rule_hazard(n);++game.visual_epoch;RULE_LEAVE;}
+static void rules_destination(bool n){RULE_ENTER;rule_destination(n);++game.visual_epoch;RULE_LEAVE;}
+uint8_t game_lamp(uint16_t n){RULE_ENTER;uint8_t r=rule_lamp(n);RULE_LEAVE;return r;}
+uint8_t game_pose(uint16_t n){RULE_ENTER;uint8_t r=rule_pose(n);RULE_LEAVE;return r;}
+static void serve(){sound(255);rules.gate[0]=rules.gate[1]=1;rules.gate_flash[0]=rules.gate_flash[1]=600;++game.visual_epoch;game.ball_number=4-game.balls;game.state=Serving;game.x=serve_x;game.y=plunger_y-2;game.z=77;game.vx=game.vy=game.remx=game.remy=game.accx=game.accy=0;game.mask=1;game.ramp=false;game.charge=0;game.charge_clock=0;game.flags=0;game.nudges=0;}
+void game_start(void){uint8_t epoch=game.visual_epoch;active_count=0;memset(active_flags,0,sizeof active_flags);memset(&game,0,sizeof game);game.visual_epoch=epoch;game.balls=3;game.multiplier=1;game.score_dirty=true;rules_reset();serve();}
+static void drain(){if(game.state!=InPlay)return;game.state=Between;game.wait=120;game.vx=game.vy=0;game.mask=0;game.ramp=false;++game.drains;if(rules.replay)rules.replay=0;else if(game.balls)--game.balls;rules_reset();memset(game.lamps,0,sizeof game.lamps);memset(game.disabled,0,sizeof game.disabled);sound(5);}
 static void limit(){const int16_t cap=15360;int16_t m=ax(game.vx)>ax(game.vy)?ax(game.vx):ax(game.vy);if(m>cap){game.vx=(int32_t)game.vx*cap/m;game.vy=(int32_t)game.vy*cap/m;}}
 /* maths::basic_collision expressed in velocity coordinates, Q8. */
 #ifdef __CX16__
@@ -212,11 +248,12 @@ __attribute__((noinline)) static bool nearest_core(int16_t dx,int16_t dy,Hit*hit
  for(CandidateIndex i=0;i<cell[0];++i){uint16_t id=cell[i+1];
 const Edge*e=bounded_edge(id);if(!e)continue;
   uint8_t mask=e->mask,kind=e->kind,group=e->group;
-  if(!(e->flags&2))continue;
+  if(e->flags&4){if((bool)(e->flags&8)!=(bool)game.lamps[group])continue;}
+  else if(!(e->flags&2)&&group!=center_group)continue;
+  if(kind==Gate&&rules.gate[group==GROUP_502])continue;
   if(!(mask&layer)||game.disabled[group])continue;
   if(kind==Ramp){bool ignored=false;for(uint8_t k=0;k<ramp_ignore_count;++k)if(ramp_ignored[k]==id)ignored=true;if(ignored)continue;}
-  if(group==center_group&&!(game.flags&2))continue;
-  if(game.ignore&&(kind==Sink||kind==Kickout||kind==Hole))continue;
+  if(group==center_group&&!rules.gravity)continue;
   int16_t t,nx,ny,px,py;
   if(!(e->flags&1)){
    int16_t delta=dot(dx,dy,e->nx,e->ny);if(delta>=0)continue;
@@ -266,31 +303,54 @@ static bool nearest(int16_t dx,int16_t dy,Hit*hit){
 #endif
  return result;
 }
+static uint8_t bumper_index(uint8_t group){uint16_t g=original_groups[group];return g>=405?4+(g-405)/8:(g-372)/8;}
 static bool event(const Edge*e){
  uint8_t c=e->group;bool fresh=!game.flash[c];touch(c);game.flash[c]=8;game.last_group=c;game.last_kind=e->kind;++game.events;
+ uint16_t original=original_groups[c];
  if(e->kind==Ramp){const Meta*m=&metadata[e->param];uint8_t old=game.mask;
   if(m->action==1){game.ramp=true;game.param=e->param;game.mask=m->mask;++game.ramp_entries;}
   else if(m->action>=2){game.ramp=false;game.mask=m->mask;if(m->zflag)game.z=m->az+77;}
   if(game.mask!=old)++game.layer_changes;return false;}
- if(e->kind==Pass||e->kind==Sensor||e->kind==Spinner){if(fresh){if(e->kind==Sensor)game.lamps[c]^=1;if(e->kind==Spinner)add_score(initial_award[c]);sound(6);}return false;}
+ if(e->kind==Pass||e->kind==Sensor||e->kind==Spinner){
+  if(e->flags&4){
+   if(e->flags&8){game.lamps[c]=0;game.disabled[c]=12;return false;}
+   game.lamps[c]=1;fresh=true;
+  }
+  if(fresh){
+   add_score(initial_award[c]);
+   if((original>=520&&original<=522)||(original>=528&&original<=530))rules_lane(original);
+   if(e->kind==Spinner)rules_destination(false);
+   if(original==523||original==527){uint8_t side=original==527;if(rules.gate[side]){rules.gate_alert[side]=1;++game.visual_epoch;}}
+   game.last_group=c;game.last_kind=e->kind;sound(e->kind==Sensor?SoundLane:6);
+  }return false;
+ }
  if(e->kind==Drain){drain();return false;}
- if(e->kind==Sink||e->kind==Kickout||e->kind==Hole){game.captured=e->kind;game.param=e->param;game.state=Captured;game.wait=metadata[e->param].delay;game.vx=game.vy=0;sound(2);return false;}
+ if(e->kind==Sink||e->kind==Kickout||e->kind==Hole){rules_capture(e);return false;}
  if(e->kind==Drop){game.disabled[c]=1200;if(fresh){++game.target_hits;add_score(initial_award[c]);sound(2);game.lamps[c]=1;}}
- else if(e->kind==Target&&fresh){++game.target_hits;add_score(initial_award[c]);sound(2);}
- else if(e->kind==Bumper&&fresh){++game.bumper_hits;add_score(e->mask==4?1500:500);sound(2);}
+ else if(e->kind==Target&&fresh){++game.target_hits;add_score(initial_award[c]);
+  if(original>=454&&original<=464)rules_hazard(original);
+  else{sound(2);if(original==466)rules_destination(true);}
+ }
+ else if(e->kind==Kickback){uint8_t s=c==GROUP_507;if(!rules.kick_phase[s]){rules.kick_phase[s]=1;rules.kick_timer[s]=84;}}
  else if(e->kind==Plunger){game.state=Serving;game.vx=game.vy=0;game.charge=0;game.charge_clock=0;game.flags=0;return true;}
- else if(fresh){if(original_groups[c]==469||original_groups[c]==470)add_score(500);sound(6);}
+ else if(e->kind!=Bumper&&fresh){if(original==469||original==470)add_score(500);sound(6);}
  return true;
 }
 static int16_t scaled_step(int16_t v,int16_t remain,uint8_t steps){int16_t q=div60(v);uint32_t n=umul(ax(q),remain);int16_t result=(n>>8)/steps;return q<0?-result:result;}
-static void move(int16_t dx,int16_t dy,uint8_t steps){int16_t remaining=256;ramp_ignore_count=0;
+static void move_time(int16_t dx,int16_t dy,uint8_t steps,uint16_t remaining){ramp_ignore_count=0;
  for(uint8_t guard=0;guard<5&&(dx||dy);++guard){Hit h;if(!nearest(dx,dy,&h)){game.x+=dx;game.y+=dy;return;}Edge copied=*edge(h.id);const Edge*e=&copied;game.x=h.x;game.y=h.y;++game.contacts;
-  bool ready=!game.flash[e->group];bool solid=event(e);if(game.state!=InPlay)return;
+  bool solid=event(e);if(game.state!=InPlay)return;
   remaining=remaining==256?256-h.t:((uint16_t)remaining*(uint16_t)(256-h.t))/256;
-  if(!solid){if(e->kind==Ramp){if(ramp_ignore_count<8)ramp_ignored[ramp_ignore_count++]=h.id;}else game.disabled[e->group]=2;game.x+=dx>0?1:dx<0?-1:0;game.y+=dy>0?1:dy<0?-1:0;}
+  if(!solid){if(e->kind==Ramp){if(ramp_ignore_count<8)ramp_ignored[ramp_ignore_count++]=h.id;}else if(!(e->flags&4))game.disabled[e->group]=2;game.x+=dx>0?1:dx<0?-1:0;game.y+=dy>0?1:dy<0?-1:0;}
   else{
    ramp_ignore_count=0;bool boosted=e->kind==Plunger;
-   if(!boosted){uint8_t boost=e->kind==Bumper&&!ready?0:e->boost;int16_t inward=-dot(game.vx,game.vy,h.nx,h.ny);if(inward<e->threshold)boost=0;rebound(h.nx,h.ny,e->elastic,e->smooth,boost,inward);}
+   if(!boosted){uint8_t boost=e->boost;int16_t inward=-dot(game.vx,game.vy,h.nx,h.ny);
+    if(inward<e->threshold)boost=0;
+    if(e->kind==Bumper){uint8_t b=bumper_index(e->group);if(rules.bumper_fire[b])boost=0;
+     if(boost){rules.bumper_fire[b]=12;++game.visual_epoch;++game.bumper_hits;uint8_t level=rules.bumper_level[b>=4];add_score(b>=4?1500+1000*level:500+500*level);sound(2);}
+    }else if(e->kind==Kickback){uint8_t s=e->group==GROUP_507;if(rules.kick_phase[s]!=2||inward<=0)boost=0;else{boost=e->boost;rules.kick_phase[s]=3;}}
+    rebound(h.nx,h.ny,e->elastic,e->smooth,boost,inward);
+   }
    game.x+=h.nx/64;game.y+=h.ny/64;
   }
   dx=scaled_step(game.vx,remaining,steps);dy=scaled_step(game.vy,remaining,steps);
@@ -298,7 +358,8 @@ static void move(int16_t dx,int16_t dy,uint8_t steps){int16_t remaining=256;ramp
   if(guard==4)++game.guard_hits;
  }
 }
-static void paddle(uint8_t side,uint8_t old){
+static void move(int16_t dx,int16_t dy,uint8_t steps){move_time(dx,dy,steps,256);}
+static RULE_FN void paddle_core(uint8_t side,uint8_t old){
  if(game.mask!=1||game.state!=InPlay)return;const Vec*p=&pivots[side];const Vec*t=&tips[side][game.phase[side]];
 #ifndef PIN_REFERENCE
  // Reject outside the actual capsule before the closest-point division.
@@ -345,28 +406,24 @@ static void paddle(uint8_t side,uint8_t old){
  if(hit){++game.flipper_hits;if(phase_delta>0)sound(0);}
 
 }
+#include "flipper_sweep.h"
+static void paddle(uint8_t side,uint8_t old){RULE_ENTER;paddle_core(side,old);RULE_LEAVE;}
 static bool well_force(){
- if(game.ignore)return false;
  for(uint8_t wi=0;wi<sizeof(wells)/sizeof(wells[0]);++wi){const Well*w=&wells[wi];
-  if(!(game.mask&w->mask)||(w->group==center_group&&!(game.flags&2)))continue;
+  if(!(game.mask&w->mask)||game.disabled[w->group]||(w->group==center_group&&!rules.gravity))continue;
   int16_t dx=w->x-game.x,dy=w->y-game.y;if(ax(dx)>w->r||ax(dy)>w->r)continue;
   uint32_t sq=mul(dx,dx)+mul(dy,dy);if(sq>=(uint32_t)w->r*w->r)continue;
   uint16_t d=isqrt(sq);
-  if(d<34){Edge obj={0};Edge*e=&obj;e->kind=w->kind;e->group=w->group;e->param=w->param;game.x=w->x;game.y=w->y;event(e);return true;}
-  game.fx=(int32_t)dx*2560/d-game.vx;game.fy=(int32_t)dy*2560/d-game.vy;return true;
+  if(d<=w->capture){Edge obj={0};Edge*e=&obj;e->kind=w->kind;e->group=w->group;e->param=w->param;game.x=w->x;game.y=w->y;event(e);return true;}
+  game.fx=(int32_t)dx*w->force/d-game.vx;game.fy=(int32_t)dy*w->force/d-game.vy;return true;
  }
  return false;
 }
-static void release_capture(){const Meta*m=&metadata[game.param];game.state=InPlay;game.ramp=false;game.ignore=90;game.remx=game.remy=0;
- if(game.captured==Hole){game.mask=m->mask;game.z=m->az;game.vx=0;game.vy=256;}
- else{game.x=m->x;game.y=m->y;game.vx=m->vx;game.vy=m->vy;game.mask=1;game.z=77;}
- ++game.returns;sound(3);
-}
 __attribute__((noinline)) static void tick(bool left,bool right,bool pull,bool nudge){
- game.tick+=2;for(uint8_t k=0;k<active_count;){uint8_t i=active[k];if(game.flash[i])game.flash[i]=game.flash[i]>2?game.flash[i]-2:0;if(game.disabled[i])game.disabled[i]=game.disabled[i]>2?game.disabled[i]-2:0;if(!game.flash[i]&&!game.disabled[i]){active_flags[i]=0;active[k]=active[--active_count];}else ++k;}if(game.ignore)game.ignore=game.ignore>2?game.ignore-2:0;
- bool keys[2]={left,right};uint8_t old[2];for(uint8_t i=0;i<2;++i){old[i]=game.phase[i];if(keys[i]){if(game.phase[i]<120)game.phase[i]=game.phase[i]>70?120:game.phase[i]+50;}else if(game.phase[i])game.phase[i]=game.phase[i]<25?0:game.phase[i]-25;if(old[i]==0&&game.phase[i])sound(0);if(old[i]==120&&game.phase[i]<120)sound(1);}
+ rules_tick();game.tick+=2;for(uint8_t k=0;k<active_count;){uint8_t i=active[k];if(game.flash[i])game.flash[i]=game.flash[i]>2?game.flash[i]-2:0;if(game.disabled[i])game.disabled[i]=game.disabled[i]>2?game.disabled[i]-2:0;if(!game.flash[i]&&!game.disabled[i]){active_flags[i]=0;active[k]=active[--active_count];}else ++k;}if(game.ignore)game.ignore=game.ignore>2?game.ignore-2:0;
+ bool keys[2]={left,right};uint8_t old[2];for(uint8_t i=0;i<2;++i){old[i]=game.phase[i];if(keys[i]){if(game.phase[i]<120)game.phase[i]=game.phase[i]>70?120:game.phase[i]+50;}else if(game.phase[i])game.phase[i]=game.phase[i]<25?0:game.phase[i]-25;if(old[i]==0&&game.phase[i]){rules_shift(i);sound(0);}if(old[i]==120&&game.phase[i]<120)sound(1);}
  if(game.state==Between){if(game.wait){game.wait=game.wait>2?game.wait-2:0;}if(!game.wait){if(game.balls)serve();else game.state=GameOver;}return;}
- if(game.state==Captured){if(game.wait){game.wait=game.wait>2?game.wait-2:0;}if(!game.wait)release_capture();return;}
+ if(game.state==Captured){if(game.wait){game.wait=game.wait>2?game.wait-2:0;}if(!game.wait)rules_release();return;}
  if(game.state==Serving){if(pull){if(!(game.flags&1))sound(4);game.flags|=1;game.charge_clock+=2;if(game.charge_clock>=3){game.charge_clock-=3;if(game.charge<100)++game.charge;}}else if(game.flags&1){game.state=InPlay;game.vy=-(int16_t)(game.charge>60?60:game.charge)*256;game.flags&=~1;sound(3);}return;}
  if(game.state!=InPlay)return;
  if(nudge&&!game.ignore){game.vx+=(game.nudges&1)?768:-768;game.vy-=1536;game.ignore=60;++game.nudges;}
@@ -376,9 +433,16 @@ __attribute__((noinline)) static void tick(bool left,bool right,bool pull,bool n
  game.remx+=game.vx;game.remy+=game.vy;int16_t dx=div60(game.remx),dy=div60(game.remy);game.remx-=dx*60;game.remy-=dy*60;
  if(game.y>1800&&game.mask==1){
   uint8_t final[2]={game.phase[0],game.phase[1]};for(uint8_t i=0;i<2;++i)game.phase[i]=(old[i]+final[i])/2;
-  int16_t before_vx=game.vx,before_vy=game.vy;move(dx/2,dy/2,2);paddle(0,old[0]);paddle(1,old[1]);
+  int16_t before_vx=game.vx,before_vy=game.vy;
+  int16_t sx=game.x,sy=game.y;uint16_t contacts=game.contacts;
+  move(dx/2,dy/2,2);
+  if(game.contacts==contacts){if(!paddle_static_tip(0,old[0],sx,sy,2))paddle_static_tip(1,old[1],sx,sy,2);}
+  paddle(0,old[0]);paddle(1,old[1]);
   old[0]=game.phase[0];old[1]=game.phase[1];game.phase[0]=final[0];game.phase[1]=final[1];
-  if(game.state==InPlay){move(game.vx==before_vx?dx-dx/2:div120(game.vx),game.vy==before_vy?dy-dy/2:div120(game.vy),2);paddle(0,old[0]);paddle(1,old[1]);}
+  if(game.state==InPlay){sx=game.x;sy=game.y;contacts=game.contacts;
+   move(game.vx==before_vx?dx-dx/2:div120(game.vx),game.vy==before_vy?dy-dy/2:div120(game.vy),2);
+   if(game.contacts==contacts){if(!paddle_static_tip(0,old[0],sx,sy,2))paddle_static_tip(1,old[1],sx,sy,2);}
+   paddle(0,old[0]);paddle(1,old[1]);}
  }else move(dx,dy,1);
  if(game.ramp){const Meta*m=&metadata[game.param];game.z=dot(game.x,game.y,m->ax,m->ay)+m->az+77;}
  if(game.x< -3072||game.x>3072||game.y>3900||game.y< -4352){++game.escapes;drain();}

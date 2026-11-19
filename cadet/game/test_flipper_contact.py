@@ -4,7 +4,8 @@ import subprocess as sp, os, time
 r=Path(__file__).resolve().parents[2];o=r/'cadet/play-build'
 cc='/opt/llvm-mos-sdk-23.4.0/llvm-mos/bin/mos-cx16-clang'
 sources=['wireframe/widemul.s','wireframe/sqrt.s','wireframe/narrowmul_shared.s','cadet/game/signedmul.s','cadet/game/fraction.s','cadet/game/ratio.s','cadet/game/bounds.s','cadet/game/test_flipper_contact.c']
-sp.run([cc,'-Os','-Icadet/play-build',*sources,'-o',str(o/'FLIPPER-CONTACT.PRG')],cwd=r,check=True)
+from build_native import build_native
+build_native('FLIPPER-CONTACT',sources)
 for ram in ('512','2048'):
  log=o/f'flipper-contact-{ram}.log'
  with log.open('w') as f:

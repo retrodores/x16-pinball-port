@@ -1,0 +1,7 @@
+{
+  "ram_kb": 512,
+  "rectangles": 384,
+  "rows": 6144,
+  "max_rectangle_cycles": 35980,
+  "mean_rectangle_cycles": 16898
+}

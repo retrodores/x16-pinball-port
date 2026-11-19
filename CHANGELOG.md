@@ -1,3 +1,25 @@
+# 2026-11-18 — Original Table 0.3 development milestone
+
+- Implement source-derived wormhole/kickout capture, destination, release and
+  scoring subsets; both kickbacks, hazard gates, yellow lane banks and upgrades.
+- Connect 35 original visual components to gameplay events and timers. Retain
+  original artwork, eight-pose main plunger, exact 128-bit score and numeric UI.
+- Add five original PCM effects and bounded music-start priming; retain explicit
+  gaps for advanced hyperspace/gravity cues and multichannel mixing.
+- Compress original quantized depth without loss to free banked RAM. Load rules
+  and paddle code in bank61, stationary tip sweep in62. Keep stock 65C02/512 KB.
+- Preserve powered flipper contact and fix stationary tip grazing; moving-tip
+  continuous contact and tapered face normals remain unfinished.
+- Preflight large awards across all 128 score bits before chunked addition; preserve
+  binary and decimal score atomically on overflow.
+- Add source-derived mechanism/topology tests and a 12000-frame workload with
+  deliberate captures, kickbacks and music restarts beyond frame 6000.
+- Correct overlapping-VMA overlay extraction; verify .RUL/.PHY against named
+  ELF sections independently before packaging.
+- Deliver a flat development ZIP with source and parent-emulator launchers.
+  Strict 133333-cycle timing remains failing; see cadet/STATUS-0.3-WIP.md.
+  Neither accepted 0.2 release nor recovered vendor source is changed.
+
 # 2026-11-16 — Collision and audio preview 3
 
 - Reject deeply backward wall-circle contacts that undo bumper rebounds; consume

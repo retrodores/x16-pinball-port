@@ -1,5 +1,5 @@
 from pathlib import Path
-import json,struct,random,subprocess as sp,os,time,sys
+import json,struct,random,subprocess as sp,os,time,sys,re
 import numpy as np
 r=Path(__file__).resolve().parents[2];o=r/'cadet/play-build'
 inv=json.loads(Path('/opt/spacecadet-x16-analysis/evidence/inventory.json').read_text())
@@ -30,4 +30,7 @@ with log.open('w')as f:
   try:p.wait(timeout=5)
   except sp.TimeoutExpired:p.kill();p.wait()
 s=log.read_text(errors='replace');assert '# DEPTH PASS'in s,s
-print('Depth native PASS',ram,'KB: 384 rectangles, 6144 rows, bank preservation')
+metrics=re.search(r'# DEPTH CYCLES ([0-9a-f]+) ([0-9a-f]+)',s)
+report={'ram_kb':int(ram),'rectangles':384,'rows':6144,'max_rectangle_cycles':int(metrics[1],16),'mean_rectangle_cycles':int(metrics[2],16)}
+(o/f'depth-test-{ram}.json').write_text(json.dumps(report,indent=2)+'\n')
+print('Depth native PASS',report)

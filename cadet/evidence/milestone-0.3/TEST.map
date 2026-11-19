@@ -1,0 +1,493 @@
+     VMA      LMA     Size Align Out     In      Symbol
+       0        0        0     1 __basic_zp_start = 0x0002
+       0        0        0     1 __basic_zp_end = 0x0080
+       0        0        0     1 __rc0 = __basic_zp_start
+       0        0        0     1 __r0 = 0x0002
+       0        0        0     1 __r1 = 0x0004
+       0        0        0     1 __r2 = 0x0006
+       0        0        0     1 __r3 = 0x0008
+       0        0        0     1 __r4 = 0x000a
+       0        0        0     1 __r5 = 0x000c
+       0        0        0     1 __r6 = 0x000e
+       0        0        0     1 __r7 = 0x0010
+       0        0        0     1 __r8 = 0x0012
+       0        0        0     1 __r9 = 0x0014
+       0        0        0     1 __r10 = 0x0016
+       0        0        0     1 __r11 = 0x0018
+       0        0        0     1 __r12 = 0x001a
+       0        0        0     1 __r13 = 0x001c
+       0        0        0     1 __r14 = 0x001e
+       0        0        0     1 __r15 = 0x0020
+       0        0        0     1 __rc2 = __r0
+       0        0        0     1 __rc4 = __r1
+       0        0        0     1 __rc6 = __r2
+       0        0        0     1 __rc8 = __r3
+       0        0        0     1 __rc10 = __r11
+       0        0        0     1 __rc12 = __r12
+       0        0        0     1 __rc14 = __r13
+       0        0        0     1 __rc16 = __r14
+       0        0        0     1 __rc18 = __r15
+       0        0        0     1 __rc20 = __r6
+       0        0        0     1 __rc22 = __r7
+       0        0        0     1 __rc24 = __r8
+       0        0        0     1 __rc26 = __r9
+       0        0        0     1 __rc28 = __r10
+       0        0        0     1 __rc0 = 0x0022
+       0        0        0     1 __rc30 = 0x0024
+       0        0        0     1 __rc1 = __rc0 + 1
+       0        0        0     1 __rc3 = __rc2 + 1
+       0        0        0     1 __rc5 = __rc4 + 1
+       0        0        0     1 __rc7 = __rc6 + 1
+       0        0        0     1 __rc9 = __rc8 + 1
+       0        0        0     1 __rc11 = __rc10 + 1
+       0        0        0     1 __rc13 = __rc12 + 1
+       0        0        0     1 __rc15 = __rc14 + 1
+       0        0        0     1 __rc17 = __rc16 + 1
+       0        0        0     1 __rc19 = __rc18 + 1
+       0        0        0     1 __rc21 = __rc20 + 1
+       0        0        0     1 __rc23 = __rc22 + 1
+       0        0        0     1 __rc25 = __rc24 + 1
+       0        0        0     1 __rc27 = __rc26 + 1
+       0        0        0     1 __rc29 = __rc28 + 1
+       0        0        0     1 __rc31 = __rc30 + 1
+       0        0        0     1 __basic_zp_size = __basic_zp_end - __basic_zp_start
+     801      801        c     1 .basic_header
+     801      801        c     1         /opt/llvm-mos-sdk-23.4.0/llvm-mos/bin/../mos-platform/cx16/lib/basic-header.o:(.basic_header)
+     80b      80b        0     1                 next_line
+      26      80d       33     1 .zp.data
+      26      80d        0     1         __zp_data_start = .
+      26      80d       33     1         /opt/cmdrx-cadet-fidelity/cadet/play-build/TEST.image.lto.o:(.zp.data)
+      26      80d        2     1                 cell_id
+      28      80f        1     1                 active.1
+      38      81f       1c     1                 ball_depth_squared
+      54      83b        2     1                 phase_cache
+      56      83d        1     1                 plunger_cache
+      57      83e        1     1                 ball_cache
+      58      83f        1     1                 previous_state
+      59      840        0     1 __zp_data_load_start = LOADADDR(.zp.data)
+      59      840        0     1 __zp_data_size = SIZEOF(.zp.data)
+      59       59       1d     1 .zp.bss
+      59       59        0     1         __zp_bss_start = .
+      59       59       1d     1         /opt/cmdrx-cadet-fidelity/cadet/play-build/TEST.image.lto.o:(.zp.bss)
+      59       59        1     1                 active_count
+      5a       5a        1     1                 ramp_ignore_count
+      5b       5b        2     1                 tip_remaining
+      5d       5d        1     1                 shown_epoch
+      5e       5e        1     1                 next_component
+      5f       5f        1     1                 target
+      60       60        1     1                 runs_left
+      61       61        2     1                 run_ptr
+      63       63        2     1                 mask_ptr
+      65       65        2     1                 value_ptr
+      67       67        1     1                 run_left
+      68       68        2     1                 address
+      6a       6a        1     1                 address_bank
+      6b       6b        1     1                 priority
+      6c       6c        9     1                 score_cache
+      75       75        1     1                 wide_score
+      76       76        0     1 __zp_bss_size = SIZEOF(.zp.bss)
+      76       76        a     1 .zp
+      76       76        a     1         /opt/cmdrx-cadet-fidelity/cadet/play-build/TEST.image.lto.o:(.zp.noinit)
+     840      840     7265     1 .text
+     840      840        0     1         _init = .
+     840      840        0     1         _start = .
+     840      840        8     1         /opt/llvm-mos-sdk-23.4.0/llvm-mos/bin/../mos-platform/cx16/lib/libcrt0.a(init-stack.S.obj):(.init.100)
+     840      840        0     1                 __do_init_stack
+     848      848        4     1         /opt/llvm-mos-sdk-23.4.0/llvm-mos/bin/../mos-platform/cx16/lib/libcrt0.a(_Exit.S.obj):(.init.100)
+     84c      84c        3     1         /opt/llvm-mos-sdk-23.4.0/llvm-mos/bin/../mos-platform/cx16/lib/libcrt0.a(zero-bss.c.obj):(.init.200)
+     84c      84c        0     1                 __do_zero_bss
+     84f      84f        3     1         /opt/llvm-mos-sdk-23.4.0/llvm-mos/bin/../mos-platform/cx16/lib/libcrt0.a(zero-zp-bss.c.obj):(.init.200)
+     84f      84f        0     1                 __do_zero_zp_bss
+     852      852        3     1         /opt/llvm-mos-sdk-23.4.0/llvm-mos/bin/../mos-platform/cx16/lib/libcrt0.a(copy-zp-data.c.obj):(.init.200)
+     852      852        0     1                 __do_copy_zp_data
+     855      855        5     1         /opt/cmdrx-cadet-fidelity/cadet/play-build/TEST.image.lto.o:(.init.250)
+     855      855        0     1                 shift
+     85a      85a        3     1         /opt/llvm-mos-sdk-23.4.0/llvm-mos/bin/../mos-platform/common/lib/crt0.o:(.call_main)
+     85d      85d        3     1         /opt/llvm-mos-sdk-23.4.0/llvm-mos/bin/../mos-platform/cx16/lib/libcrt0.a(exit-return.c.obj):(.after_main)
+     85d      85d        0     1                 __after_main
+     860      860        0     1         _fini = .
+     860      860        1     1         /opt/llvm-mos-sdk-23.4.0/llvm-mos/bin/../mos-platform/common/lib/crt0.o:(.fini_rts)
+     861      861       9b     1         /tmp/widemul-31c27e.o:(.text.fastmul16)
+     861      861        0     1                 fastmul16
+     8b6      8b6        0     1                 fm_byte
+     8d2      8d2        0     1                 fm_high
+     8da      8da        0     1                 fm_diff
+     8e6      8e6        0     1                 fm_positive
+     8f8      8f8        0     1                 fm_zero
+     8fc      8fc       80     1         /tmp/sqrt-36ae3b.o:(.text.fastsqrt)
+     8fc      8fc        0     1                 fastsqrt
+     97c      97c       7c     1         /tmp/narrowmul_shared-dff944.o:(.text.fastmul8)
+     97c      97c        0     1                 fastmul8
+     9b2      9b2        0     1                 nm_byte
+     9ce      9ce        0     1                 nm_high
+     9d6      9d6        0     1                 nm_diff
+     9e2      9e2        0     1                 nm_positive
+     9f4      9f4        0     1                 nm_zero
+     9f8      9f8       70     1         /tmp/signedmul-31127c.o:(.text.signedmul)
+     9f8      9f8        0     1                 signedmul
+     a32      a32        0     1                 swap
+     a3f      a3f        0     1                 narrow
+     a46      a46        0     1                 sign
+     a65      a65        0     1                 positive
+     a68      a68       45     1         /tmp/fraction-a8b488.o:(.text.fraction8)
+     a68      a68        0     1                 fraction8
+     a79      a79        0     1                 full
+     a7e      a7e        0     1                 begin
+     aad      aad       6a     1         /tmp/ratio-1b9de0.o:(.text.ratio12)
+     aad      aad        0     1                 ratio12
+     ac1      ac1        0     1                 whole_loop
+     acf      acf        0     1                 subtract_whole
+     ae5      ae5        0     1                 fractional
+     b17      b17       75     1         /tmp/ratio-1b9de0.o:(.text.fraction32)
+     b17      b17        0     1                 fraction32
+     b39      b39        0     1                 fraction_full
+     b3e      b3e        0     1                 fraction_begin
+     b8c      b8c       71     1         /tmp/bounds-b1750a.o:(.text.bounded_edge)
+     b8c      b8c        0     1                 bounded_edge
+     bf8      bf8        0     1                 rejected
+     bfd      bfd      490     1         /tmp/audio-0d906e.o:(.text.lab)
+     bfd      bfd        0     1                 lab_install
+     c62      c62        0     1                 lab_uninstall
+     c9a      c9a        0     1                 lab_clock
+     ca4      ca4        0     1                 pcm_stop
+     cb6      cb6        0     1                 pcm_start
+     cda      cda        0     1                 music_start
+     cef      cef        0     1                 music_stop
+     d2f      d2f        0     1                 lab_irq
+     da5      da5        0     1                 irq_end
+     dab      dab        0     1                 pcm_service
+     dc2      dc2        0     1                 pcm_done
+     dc3      dc3        0     1                 pcm_pending
+     dde      dde        0     1                 pcm_partial
+     de4      de4        0     1                 pcm_read
+     de4      de4        0     1                 pcm_loop
+     e0f      e0f        0     1                 pcm_next
+     e1b      e1b        0     1                 save_address
+     e39      e39        0     1                 restore_address
+     e52      e52        0     1                 music_service
+     e6f      e6f        0     1                 music_command
+     e9c      e9c        0     1                 music_fm
+     ea3      ea3        0     1                 music_fm_loop
+     ed0      ed0        0     1                 music_extension
+     ee4      ee4        0     1                 music_wait
+     eed      eed        0     1                 music_eof
+     ef5      ef5        0     1                 music_return
+     efc      efc        0     1                 music_reset
+     f10      f10        0     1                 lz_restart
+     f33      f33        0     1                 lz_byte
+     f56      f56        0     1                 lz_flag
+     f63      f63        0     1                 lz_token
+     f98      f98        0     1                 lz_match
+     f9f      f9f        0     1                 lz_read
+     fb6      fb6        0     1                 lz_emit
+     fbc      fbc        0     1                 lz_write
+     fd3      fd3        0     1                 lz_done
+     feb      feb        0     1                 music_raw
+     ff0      ff0        0     1                 music_read
+    1017     1017        0     1                 raw_restore
+    1018     1018        0     1                 raw_done
+    101b     101b        0     1                 music_prefetch
+    1025     1025        0     1                 prefetch_next
+    103d     103d        0     1                 prefetch_done
+    1059     1059        0     1                 prefetch_return
+    105a     105a        0     1                 music_byte
+    1073     1073        0     1                 music_consume
+    108a     108a        0     1                 consumer_done
+    108d     108d       58     1         /tmp/depth_quant-26feb7.o:(.text.depth_quant)
+    108d     108d        0     1                 depth_quant
+    10e5     10e5       58     1         /tmp/mask_pixels-6c3091.o:(.text.mask_pixels)
+    10e5     10e5        0     1                 mask_pixels
+    113d     113d      120     1         /tmp/depth_rect-0427a2.o:(.text.depth_decode)
+    113d     113d        0     1                 depth_decode
+    11a5     11a5        0     1                 depth_token
+    11bf     11bf        0     1                 depth_literal_partial
+    11cd     11cd        0     1                 depth_literal_emit
+    11e5     11e5        0     1                 depth_repeat
+    11fd     11fd        0     1                 depth_repeat_partial
+    1206     1206        0     1                 depth_repeat_emit
+    121d     121d        0     1                 depth_nextblock
+    1232     1232        0     1                 depth_done
+    123a     123a        0     1                 depth_getblock
+    125d     125d       87     1         /tmp/depth_rect-0427a2.o:(.text.depth_masks)
+    125d     125d        0     1                 depth_masks
+    1289     1289        0     1                 rect_row
+    12e4     12e4       13     1         /opt/llvm-mos-sdk-23.4.0/llvm-mos/bin/../mos-platform/cx16/lib/libcrt0.a(zero-bss.c.obj):(.text.__zero_bss)
+    12e4     12e4       13     1                 __zero_bss
+    12f7     12f7       16     1         /opt/llvm-mos-sdk-23.4.0/llvm-mos/bin/../mos-platform/cx16/lib/libcrt0.a(exit-return.c.obj):(.text.__exit_return)
+    12f7     12f7       16     1                 __exit_return
+    130d     130d        5     1         /opt/llvm-mos-sdk-23.4.0/llvm-mos/bin/../mos-platform/cx16/lib/libc.a(cbm_k_setlfs.s.obj):(.text)
+    130d     130d        0     1                 cbm_k_setlfs
+    1312     1312       14     1         /opt/llvm-mos-sdk-23.4.0/llvm-mos/bin/../mos-platform/cx16/lib/libc.a(cbm_k_setnam.s.obj):(.text)
+    1312     1312        0     1                 cbm_k_setnam
+    1326     1326        9     1         /opt/llvm-mos-sdk-23.4.0/llvm-mos/bin/../mos-platform/cx16/lib/libcrt0.a(_Exit.S.obj):(.text._Exit)
+    1326     1326        0     1                 _Exit
+    132f     132f       13     1         /opt/llvm-mos-sdk-23.4.0/llvm-mos/bin/../mos-platform/cx16/lib/libcrt0.a(zero-zp-bss.c.obj):(.text.__zero_zp_bss)
+    132f     132f       13     1                 __zero_zp_bss
+    1342     1342       17     1         /opt/llvm-mos-sdk-23.4.0/llvm-mos/bin/../mos-platform/cx16/lib/libcrt0.a(copy-zp-data.c.obj):(.text.__copy_zp_data)
+    1342     1342       17     1                 __copy_zp_data
+    1359     1359      1f3     1         /opt/cmdrx-cadet-fidelity/cadet/play-build/TEST.image.lto.o:(.text.add_score)
+    1359     1359      1f3     1                 add_score
+    154c     154c       5e     1         /opt/cmdrx-cadet-fidelity/cadet/play-build/TEST.image.lto.o:(.text.game_start)
+    154c     154c       5e     1                 game_start
+    15aa     15aa       81     1         /opt/cmdrx-cadet-fidelity/cadet/play-build/TEST.image.lto.o:(.text.serve)
+    15aa     15aa       81     1                 serve
+    162b     162b       12     1         /opt/cmdrx-cadet-fidelity/cadet/play-build/TEST.image.lto.o:(.text.game_frame)
+    162b     162b       12     1                 game_frame
+    163d     163d      dc8     1         /opt/cmdrx-cadet-fidelity/cadet/play-build/TEST.image.lto.o:(.text.tick)
+    163d     163d      dc8     1                 tick
+    2405     2405      4fe     1         /opt/cmdrx-cadet-fidelity/cadet/play-build/TEST.image.lto.o:(.text.event)
+    2405     2405      4fe     1                 event
+    2903     2903       64     1         /opt/cmdrx-cadet-fidelity/cadet/play-build/TEST.image.lto.o:(.text.div60)
+    2903     2903       64     1                 div60
+    2967     2967       41     1         /opt/cmdrx-cadet-fidelity/cadet/play-build/TEST.image.lto.o:(.text.div300)
+    2967     2967       41     1                 div300
+    29a8     29a8      1ad     1         /opt/cmdrx-cadet-fidelity/cadet/play-build/TEST.image.lto.o:(.text.limit)
+    29a8     29a8      1ad     1                 limit
+    2b55     2b55      742     1         /opt/cmdrx-cadet-fidelity/cadet/play-build/TEST.image.lto.o:(.text.move_time)
+    2b55     2b55      742     1                 move_time
+    3297     3297       b9     1         /opt/cmdrx-cadet-fidelity/cadet/play-build/TEST.image.lto.o:(.text.paddle_static_tip)
+    3297     3297       b9     1                 paddle_static_tip
+    3350     3350       5a     1         /opt/cmdrx-cadet-fidelity/cadet/play-build/TEST.image.lto.o:(.text.div120)
+    3350     3350       5a     1                 div120
+    33aa     33aa      148     1         /opt/cmdrx-cadet-fidelity/cadet/play-build/TEST.image.lto.o:(.text.dot)
+    33aa     33aa      148     1                 dot
+    34f2     34f2       7b     1         /opt/cmdrx-cadet-fidelity/cadet/play-build/TEST.image.lto.o:(.text.drain)
+    34f2     34f2       7b     1                 drain
+    356d     356d       2b     1         /opt/cmdrx-cadet-fidelity/cadet/play-build/TEST.image.lto.o:(.text.normal)
+    356d     356d       2b     1                 normal
+    3598     3598       67     1         /opt/cmdrx-cadet-fidelity/cadet/play-build/TEST.image.lto.o:(.text.fraction_wide)
+    3598     3598       67     1                 fraction_wide
+    35ff     35ff      422     1         /opt/cmdrx-cadet-fidelity/cadet/play-build/TEST.image.lto.o:(.text.rebound)
+    35ff     35ff      422     1                 rebound
+    3a21     3a21       7a     1         /opt/cmdrx-cadet-fidelity/cadet/play-build/TEST.image.lto.o:(.text.scaled_step)
+    3a21     3a21       7a     1                 scaled_step
+    3a9b     3a9b     1087     1         /opt/cmdrx-cadet-fidelity/cadet/play-build/TEST.image.lto.o:(.text.nearest_core)
+    3a9b     3a9b     1087     1                 nearest_core
+    4b22     4b22      9ab     1         /opt/cmdrx-cadet-fidelity/cadet/play-build/TEST.image.lto.o:(.text.circle_hit)
+    4b22     4b22      9ab     1                 circle_hit
+    54cd     54cd      394     1         /opt/cmdrx-cadet-fidelity/cadet/play-build/TEST.image.lto.o:(.text.dynamic_update)
+    54cd     54cd      394     1                 dynamic_update
+    5861     5861       15     1         /opt/cmdrx-cadet-fidelity/cadet/play-build/TEST.image.lto.o:(.text.keyboard)
+    5861     5861       15     1                 keyboard
+    5876     5876       83     1         /opt/cmdrx-cadet-fidelity/cadet/play-build/TEST.image.lto.o:(.text.audio_effect)
+    5876     5876       83     1                 audio_effect
+    58f9     58f9       8a     1         /opt/cmdrx-cadet-fidelity/cadet/play-build/TEST.image.lto.o:(.text.effect)
+    58f9     58f9       8a     1                 effect
+    5983     5983      d7b     1         /opt/cmdrx-cadet-fidelity/cadet/play-build/TEST.image.lto.o:(.text.main)
+    5983     5983      d7b     1                 main
+    66fe     66fe       2f     1         /opt/cmdrx-cadet-fidelity/cadet/play-build/TEST.image.lto.o:(.text.load)
+    66fe     66fe       2f     1                 load
+    672d     672d      1ad     1         /opt/cmdrx-cadet-fidelity/cadet/play-build/TEST.image.lto.o:(.text.frame)
+    672d     672d      1ad     1                 frame
+    68da     68da      aea     1         /opt/cmdrx-cadet-fidelity/cadet/play-build/TEST.image.lto.o:(.text.display)
+    68da     68da      aea     1                 display
+    73c4     73c4       59     1         /opt/cmdrx-cadet-fidelity/cadet/play-build/TEST.image.lto.o:(.text.projected)
+    73c4     73c4       59     1                 projected
+    741d     741d       db     1         /opt/cmdrx-cadet-fidelity/cadet/play-build/TEST.image.lto.o:(.text.status)
+    741d     741d       db     1                 status
+    74f8     74f8       2c     1         /opt/cmdrx-cadet-fidelity/cadet/play-build/TEST.image.lto.o:(.text.memcpy)
+    74f8     74f8       2c     1                 memcpy
+    7524     7524       20     1         /opt/cmdrx-cadet-fidelity/cadet/play-build/TEST.image.lto.o:(.text.__memset)
+    7524     7524       20     1                 __memset
+    7544     7544       39     1         /opt/cmdrx-cadet-fidelity/cadet/play-build/TEST.image.lto.o:(.text.strlen)
+    7544     7544       39     1                 strlen
+    757d     757d        b     1         /opt/cmdrx-cadet-fidelity/cadet/play-build/TEST.image.lto.o:(.text.__ashlqi3)
+    757d     757d        b     1                 __ashlqi3
+    7588     7588       13     1         /opt/cmdrx-cadet-fidelity/cadet/play-build/TEST.image.lto.o:(.text.__ashlhi3)
+    7588     7588       13     1                 __ashlhi3
+    759b     759b        b     1         /opt/cmdrx-cadet-fidelity/cadet/play-build/TEST.image.lto.o:(.text.__lshrqi3)
+    759b     759b        b     1                 __lshrqi3
+    75a6     75a6       13     1         /opt/cmdrx-cadet-fidelity/cadet/play-build/TEST.image.lto.o:(.text.__lshrhi3)
+    75a6     75a6       13     1                 __lshrhi3
+    75b9     75b9       b9     1         /opt/cmdrx-cadet-fidelity/cadet/play-build/TEST.image.lto.o:(.text.__udivhi3)
+    75b9     75b9       b9     1                 __udivhi3
+    7672     7672      15f     1         /opt/cmdrx-cadet-fidelity/cadet/play-build/TEST.image.lto.o:(.text.__udivsi3)
+    7672     7672      15f     1                 __udivsi3
+    77d1     77d1       a5     1         /opt/cmdrx-cadet-fidelity/cadet/play-build/TEST.image.lto.o:(.text.__umodhi3)
+    77d1     77d1       a5     1                 __umodhi3
+    7876     7876       d7     1         /opt/cmdrx-cadet-fidelity/cadet/play-build/TEST.image.lto.o:(.text.__udivmodhi4)
+    7876     7876       d7     1                 __udivmodhi4
+    794d     794d       b6     1         /opt/cmdrx-cadet-fidelity/cadet/play-build/TEST.image.lto.o:(.text.__divsi3)
+    794d     794d       b6     1                 __divsi3
+    7a03     7a03       32     1         /opt/cmdrx-cadet-fidelity/cadet/play-build/TEST.image.lto.o:(.text.__mulhi3)
+    7a03     7a03       32     1                 __mulhi3
+    7a35     7a35       70     1         /opt/cmdrx-cadet-fidelity/cadet/play-build/TEST.image.lto.o:(.text.__mulsi3)
+    7a35     7a35       70     1                 __mulsi3
+    7aa5     7aa5        0     1         __init_array_start = .
+    7aa5     7aa5        0     1         __init_array_end = .
+    7aa5     7aa5        0     1         __fini_array_start = .
+    7aa5     7aa5        0     1         __fini_array_end = .
+    7b00     7b00     1529   256 .rodata
+    7b00     7b00      400   256         /tmp/widemul-31c27e.o:(.rodata.fastmul)
+    7b00     7b00        0     1                 fm_sqlo
+    7d00     7d00        0     1                 fm_sqhi
+    7f00     7f00        4     1         /tmp/mask_pixels-6c3091.o:(.rodata.pixel_keep)
+    7f00     7f00        0     1                 pixel_keep
+    7f04     7f04        8     1         /tmp/depth_rect-0427a2.o:(.rodata.depth_banks)
+    7f04     7f04        0     1                 depth_banks
+    7f0c     7f0c       22     1         /tmp/depth_rect-0427a2.o:(.rodata.rect_bits)
+    7f0c     7f0c        0     1                 rect_bits_low
+    7f1d     7f1d        0     1                 rect_bits_high
+    7f2e     7f2e        1     1         /opt/llvm-mos-sdk-23.4.0/llvm-mos/bin/../mos-platform/common/lib/libcrt.a(const.S.obj):(.rodata)
+    7f2e     7f2e        0     1                 __set_v
+    7f2f     7f2f        8     1         /opt/cmdrx-cadet-fidelity/cadet/play-build/TEST.image.lto.o:(.rodata.tick)
+    7f37     7f37       1c     1         /opt/cmdrx-cadet-fidelity/cadet/play-build/TEST.image.lto.o:(.rodata.event)
+    7f53     7f53       1e     1         /opt/cmdrx-cadet-fidelity/cadet/play-build/TEST.image.lto.o:(.rodata.audio_effect)
+    7f71     7f71        8     1         /opt/cmdrx-cadet-fidelity/cadet/play-build/TEST.image.lto.o:(.rodata.main)
+    7f79     7f79      1a5     1         <internal>:(.rodata.str1.1)
+    811e     811e      2f7     1         /opt/cmdrx-cadet-fidelity/cadet/play-build/TEST.image.lto.o:(.rodata.metadata)
+    811e     811e      2f7     1                 metadata
+    8415     8415       38     1         /opt/cmdrx-cadet-fidelity/cadet/play-build/TEST.image.lto.o:(.rodata.wells)
+    8415     8415       38     1                 wells
+    844d     844d      120     1         /opt/cmdrx-cadet-fidelity/cadet/play-build/TEST.image.lto.o:(.rodata.original_groups)
+    844d     844d      120     1                 original_groups
+    856d     856d      120     1         /opt/cmdrx-cadet-fidelity/cadet/play-build/TEST.image.lto.o:(.rodata.initial_award)
+    856d     856d      120     1                 initial_award
+    868d     868d      3c8     1         /opt/cmdrx-cadet-fidelity/cadet/play-build/TEST.image.lto.o:(.rodata.tips)
+    868d     868d      3c8     1                 tips
+    8a55     8a55        8     1         <internal>:(.rodata.cst8)
+    8a5d     8a5d        4     1         <internal>:(.rodata.cst4)
+    8a61     8a61       d2     1         /opt/cmdrx-cadet-fidelity/cadet/play-build/TEST.image.lto.o:(.rodata.dynamic_desc)
+    8a61     8a61       d2     1                 dynamic_desc
+    8b33     8b33        3     1         /opt/cmdrx-cadet-fidelity/cadet/play-build/TEST.image.lto.o:(.rodata.pcm_load_banks)
+    8b33     8b33        3     1                 pcm_load_banks
+    8b36     8b36       90     1         /opt/cmdrx-cadet-fidelity/cadet/play-build/TEST.image.lto.o:(.rodata.contact_sound)
+    8b36     8b36       90     1                 contact_sound
+    8bc6     8bc6       90     1         /opt/cmdrx-cadet-fidelity/cadet/play-build/TEST.image.lto.o:(.rodata.capture_sound)
+    8bc6     8bc6       90     1                 capture_sound
+    8c56     8c56       90     1         /opt/cmdrx-cadet-fidelity/cadet/play-build/TEST.image.lto.o:(.rodata.release_sound)
+    8c56     8c56       90     1                 release_sound
+    8ce6     8ce6       90     1         /opt/cmdrx-cadet-fidelity/cadet/play-build/TEST.image.lto.o:(.rodata.gate_open_sound)
+    8ce6     8ce6       90     1                 gate_open_sound
+    8d76     8d76       90     1         /opt/cmdrx-cadet-fidelity/cadet/play-build/TEST.image.lto.o:(.rodata.gate_close_sound)
+    8d76     8d76       90     1                 gate_close_sound
+    8e06     8e06       55     1         /opt/cmdrx-cadet-fidelity/cadet/play-build/TEST.image.lto.o:(.rodata.effects)
+    8e06     8e06       55     1                 effects
+    8e5b     8e5b       79     1         /opt/cmdrx-cadet-fidelity/cadet/play-build/TEST.image.lto.o:(.rodata.phase_pose)
+    8e5b     8e5b       79     1                 phase_pose
+    8ed4     8ed4       65     1         /opt/cmdrx-cadet-fidelity/cadet/play-build/TEST.image.lto.o:(.rodata.charge_pose)
+    8ed4     8ed4       65     1                 charge_pose
+    8f39     8f39        c     1         /opt/cmdrx-cadet-fidelity/cadet/play-build/TEST.image.lto.o:(.rodata.display.labels)
+    8f39     8f39        c     1                 display.labels
+    8f45     8f45       e4     1         /opt/cmdrx-cadet-fidelity/cadet/play-build/TEST.image.lto.o:(.rodata.milestone_placements)
+    8f45     8f45       e4     1                 milestone_placements
+    9029     9029        0     1 .data
+    9029     9029        0     1         __data_start = .
+    9029     9029        0     1         __data_end = .
+    9029     9029        0     1 __data_load_start = LOADADDR(.data)
+    9029     9029        0     1 __data_size = SIZEOF(.data)
+    9029     9029      754     1 .bss
+    9029     9029        0     1         __bss_start = .
+    9029     9029       74     1         /tmp/audio-0d906e.o:(.bss.lab)
+    9029     9029        0     1                 old_irq
+    902b     902b        0     1                 lab_ticks
+    902d     902d        0     1                 saved_ctrl
+    902e     902e        0     1                 saved_addr
+    9031     9031        0     1                 saved_psg
+    9071     9071        0     1                 pcm_remaining
+    9073     9073        0     1                 pcm_bank
+    9074     9074        0     1                 music_enabled
+    9075     9075        0     1                 music_bank
+    9076     9076        0     1                 music_delay
+    9077     9077        0     1                 music_phase
+    9078     9078        0     1                 music_count
+    9079     9079        0     1                 music_reg
+    907a     907a        0     1                 music_loops
+    907b     907b        0     1                 music_error
+    907c     907c        0     1                 irq_start
+    9080     9080        0     1                 irq_elapsed
+    9084     9084        0     1                 irq_max
+    9088     9088        0     1                 fm_writes
+    908c     908c        0     1                 psg_writes
+    9090     9090        0     1                 pcm_select_bank
+    9091     9091        0     1                 pcm_select_ptr
+    9093     9093        0     1                 lz_flags
+    9094     9094        0     1                 lz_left
+    9095     9095        0     1                 lz_run
+    9096     9096        0     1                 lz_low
+    9097     9097        0     1                 lz_high
+    9098     9098        0     1                 music_buffered
+    909a     909a        0     1                 lz_remaining
+    909d     909d        9     1         /tmp/depth_rect-0427a2.o:(.bss.depthrect)
+    909d     909d        0     1                 rect_x
+    909f     909f        0     1                 rect_y
+    90a1     90a1        0     1                 rect_dest
+    90a3     90a3        0     1                 rect_depth
+    90a4     90a4        0     1                 rect_width
+    90a5     90a5        0     1                 rect_height
+    90a6     90a6       a0     1         /opt/cmdrx-cadet-fidelity/cadet/play-build/TEST.image.lto.o:(.bss.active_flags)
+    90a6     90a6       a0     1                 active_flags
+    9146     9146        8     1         /opt/cmdrx-cadet-fidelity/cadet/play-build/TEST.image.lto.o:(.bss.bound_query)
+    9146     9146        8     1                 bound_query
+    914e     914e       46     1         /opt/cmdrx-cadet-fidelity/cadet/play-build/TEST.image.lto.o:(.bss.rules)
+    914e     914e       46     1                 rules
+    9194     9194       a0     1         /opt/cmdrx-cadet-fidelity/cadet/play-build/TEST.image.lto.o:(.bss.active)
+    9194     9194       a0     1                 active
+    9234     9234       10     1         /opt/cmdrx-cadet-fidelity/cadet/play-build/TEST.image.lto.o:(.bss.ramp_ignored)
+    9234     9234       10     1                 ramp_ignored
+    9244     9244      100     1         /opt/cmdrx-cadet-fidelity/cadet/play-build/TEST.image.lto.o:(.bss.cell)
+    9244     9244      100     1                 cell
+    9344     9344        4     1         /opt/cmdrx-cadet-fidelity/cadet/play-build/TEST.image.lto.o:(.bss.ray_a)
+    9344     9344        4     1                 ray_a
+    9348     9348        4     1         /opt/cmdrx-cadet-fidelity/cadet/play-build/TEST.image.lto.o:(.bss.ray_r2)
+    9348     9348        4     1                 ray_r2
+    934c     934c       30     1         /opt/cmdrx-cadet-fidelity/cadet/play-build/TEST.image.lto.o:(.bss.circle_distance)
+    934c     934c       30     1                 circle_distance
+    937c     937c       30     1         /opt/cmdrx-cadet-fidelity/cadet/play-build/TEST.image.lto.o:(.bss.circle_ids)
+    937c     937c       30     1                 circle_ids
+    93ac     93ac        4     1         /opt/cmdrx-cadet-fidelity/cadet/play-build/TEST.image.lto.o:(.bss.ray_ar)
+    93ac     93ac        4     1                 ray_ar
+    93b0     93b0       23     1         /opt/cmdrx-cadet-fidelity/cadet/play-build/TEST.image.lto.o:(.bss.shown)
+    93b0     93b0       23     1                 shown
+    93d3     93d3      301     1         /opt/cmdrx-cadet-fidelity/cadet/play-build/TEST.image.lto.o:(.bss.game)
+    93d3     93d3      301     1                 game
+    96d4     96d4       80     1         /opt/cmdrx-cadet-fidelity/cadet/play-build/TEST.image.lto.o:(.bss.keys)
+    96d4     96d4       80     1                 keys
+    9754     9754       28     1         /opt/cmdrx-cadet-fidelity/cadet/play-build/TEST.image.lto.o:(.bss.status_cache)
+    9754     9754       28     1                 status_cache
+    977c     977c        1     1         /opt/cmdrx-cadet-fidelity/cadet/play-build/TEST.image.lto.o:(.bss.milestone_placement_index)
+    977c     977c        1     1                 milestone_placement_index
+    977d     977d        0     1         __bss_end = .
+    977d     977d        0     1 __bss_size = SIZEOF(.bss)
+    977d     977d        1     1 .noinit
+    977d     977d        1     1         /opt/llvm-mos-sdk-23.4.0/llvm-mos/bin/../mos-platform/cx16/lib/libcrt0.a(_Exit.S.obj):(.noinit)
+    977d     977d        0     1                 __save_s
+    977e     977e        0     1         __heap_start = ALIGN(., 2)
+    a000     a000     1d33     1 .rules
+    a000     a000     1d0f     1         /opt/cmdrx-cadet-fidelity/cadet/play-build/TEST.image.lto.o:(.rules)
+    a000     a000      32f     1                 rule_lamp
+    a32f     a32f      13b     1                 rule_pose
+    a46a     a46a       1a     1                 rule_reset
+    a484     a484      388     1                 rule_tick
+    a80c     a80c       34     1                 rule_shift_lanes
+    a840     a840      173     1                 rule_release
+    a9b3     a9b3      ccb     1                 paddle_core
+    b67e     b67e       9c     1                 rule_lane
+    b71a     b71a       38     1                 rule_destination
+    b752     b752      2b8     1                 rule_capture
+    ba0a     ba0a       b9     1                 rule_hazard
+    bac3     bac3        e     1                 rule_sound
+    bad1     bad1       5b     1                 rule_gate
+    bb2c     bb2c      10b     1                 rule_award_large
+    bc37     bc37       b9     1                 rule_upgrade
+    bcf0     bcf0       1f     1                 countdown
+    bd0f     bd0f       24     1         /opt/cmdrx-cadet-fidelity/cadet/play-build/TEST.image.lto.o:(.rules.rodata)
+    bd0f     bd0f        3     1                 rule_capture.group
+    bd12     bd12        3     1                 rule_capture.param
+    bd15     bd15        a     1                 rule_capture.hold
+    bd1f     bd1f       14     1                 rule_capture.award
+    a000     a000      a15     1 .physics
+    a000     a000      a15     1         /opt/cmdrx-cadet-fidelity/cadet/play-build/TEST.image.lto.o:(.physics)
+    a000     a000      a15     1                 paddle_static_tip_core
+    aa15     aa15        0     1 __stack = 0x9f00
+    aa15     aa15        0     1
+       0        0       cc     1 .comment
+       0        0       cc     1         <internal>:(.comment)
+       0        0        f     1 .llvm_sympart
+       0        0        f     1         /opt/cmdrx-cadet-fidelity/cadet/play-build/TEST.image.lto.o:(.llvm_sympart)
+       0        0     2310     4 .symtab
+       0        0     2310     4         <internal>:(.symtab)
+       0        0       86     1 .shstrtab
+       0        0       86     1         <internal>:(.shstrtab)
+       0        0     1856     1 .strtab
+       0        0     1856     1         <internal>:(.strtab)

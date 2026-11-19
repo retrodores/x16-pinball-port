@@ -2,8 +2,13 @@
 #include "engine.h"
 #include "sprites.h"
 #include "audio.h"
+#include "audio_events.h"
 #include "ui.h"
 #include "projection.h"
+#ifdef MILESTONE_INPUT
+#include "verify_milestone_input.h"
+#endif
+#include "dynamic.h"
 extern int32_t signedmul(int16_t,int16_t);
 extern uint16_t fastsqrt(uint32_t),depth_mask(int16_t,int16_t,uint8_t);
 extern uint8_t depth_quant(uint32_t);
@@ -48,14 +53,10 @@ static void effect(uint8_t id,uint8_t rank){
 }
 void audio_stop(void){pcm_stop();priority=0;}
 void audio_effect(uint8_t id){
- switch(id){
- case 0:effect(SOUND104,1);break;
- case 1:effect(SOUND105,1);break;
- case 2:case 6:effect(contact_sound[game.last_group],2);break;
- case 3:if(game.returns==0||game.last_kind==Plunger)effect(SOUND22,3);break;
- default:break;
- }
+ uint16_t e=audio_event_sample(id,game.last_group,game.last_kind,game.sound_value);
+ effect((uint8_t)e,(uint8_t)(e>>8));
 }
+
 static void status(const char*s){
  for(uint8_t i=0;i<40;++i){uint8_t c=*s?*s++:32;if(status_cache[i]==c)continue;status_cache[i]=c;
   tile(33+i,FONT_BASE/32+c-32,405+(i%20)*8,248+(i/20)*8,FONT_BANK);
@@ -102,7 +103,7 @@ static void display(bool update_panel){
  uint32_t distance_squared=signedmul(game.x,game.x)+signedmul(camera_y,camera_y)+signedmul(depth,depth);
  uint8_t f=0;while(f<6&&ball_depth_squared[f]>distance_squared)++f;
  const SpriteFrame*b=sprites+24+f;
- if(game.state==Serving||game.state==InPlay)ball(f,x-b->width/2,y-b->height/2,distance_squared);else hide(0);
+ if(game.state==Serving||game.state==InPlay||(game.state==Captured&&game.captured==Kickout))ball(f,x-b->width/2,y-b->height/2,distance_squared);else hide(0);
  for(uint8_t i=0;i<2;++i){uint8_t pose=phase_pose[game.phase[i]];
   if(pose!=phase_cache[i]){f=i*8+pose;frame(1+i*9,f,sprites[f].x,sprites[f].y,9);phase_cache[i]=pose;}
  }
@@ -122,6 +123,7 @@ static void display(bool update_panel){
   status(labels[game.state]);previous_state=game.state;
   if(game.state==Serving)effect(SOUND4,3);
  }
+ if(update_panel)dynamic_update(128);
  /* 128-bit score remains exact. Flag a panel overflow instead of silently truncating. */
  if(update_panel&&wide_score)status("SCORE EXCEEDS PANEL  SEE EXACT SCORE LOG");
 }
@@ -131,15 +133,16 @@ int main(void){
  if(!game_load()||!load("MAP.BIN",2,0)||!load("TILES.BIN",2,0x1000)||!load("PAL.BIN",3,0xfa00)||
  !load("SPRITES.BIN",3,SPRITE_BASE&65535)||!load("FONT.BIN",3,FONT_BASE&65535))goto fail;
  for(uint8_t i=0;i<2;++i){char n[]="MUSIC0.BIN";n[5]+=i;*(volatile uint8_t*)0=32+i*8;if(!load(n,0,0xa000))goto fail;}
- for(uint8_t i=0;i<PCM_PARTS;++i){char n[]="PCM0.BIN";n[3]+=i;*(volatile uint8_t*)0=19+i*8;if(!load(n,0,0xa000))goto fail;}
- for(uint8_t i=0;i<22;++i){char n[]="DEPTH00.BIN";n[5]+=i/10;n[6]+=i%10;*(volatile uint8_t*)0=i==0?10:i<3?16+i:i+42;if(!load(n,0,0xa000))goto fail;}
+ for(uint8_t i=0;i<PCM_PARTS;++i){char n[]="PCM0.BIN";n[3]+=i;*(volatile uint8_t*)0=pcm_load_banks[i];if(!load(n,0,0xa000))goto fail;}
+ for(uint8_t i=0;i<9;++i){char n[]="DEPTH00.BIN";n[6]+=i;*(volatile uint8_t*)0=i==0?10:i<3?16+i:i+42;if(!load(n,0,0xa000))goto fail;}
+ for(uint8_t i=0;i<3;++i){char n[]="DYN0.BIN";n[3]+=i;*(volatile uint8_t*)0=58+i;if(!load(n,0,0xa000))goto fail;}
  *(volatile uint8_t*)0=11;if(!load("UI.BIN",0,0xa000))goto fail;
  for(uint8_t i=0;i<128;++i)hide(i);
  for(uint8_t i=0;i<9;++i)score_cache[i]=254;
  v[5]=0;v[9]=0x51;v[10]=v[11]=128;v[12]=0;
  v[13]=0x12;v[14]=0;v[15]=0x0b;v[16]=v[17]=v[18]=v[19]=0;
  __asm__ volatile("sei");*(volatile uint16_t*)0x032e=(uint16_t)(uintptr_t)keyboard;__asm__ volatile("cli");
- lab_install();game_start();frame(31,32,403,197,1);display(true);
+ lab_install();game_start();dynamic_init();frame(31,32,403,197,1);display(true);
 #ifndef NO_MUSIC
  music_start();
 #endif
@@ -153,6 +156,12 @@ int main(void){
   uint16_t now=lab_clock();if(now==last)continue;if((uint16_t)(now-last)>1)++gaps;last=now;
   uint32_t before=irq_start;
 #ifdef GAME_TEST
+#ifdef MILESTONE_INPUT
+  milestone_setup(count);
+  /* Measured restart and cancellation while the music buffer is priming. */
+  if(count==6100||count==6500||count==6502)music_stop();
+  if(count==6101||count==6501||count==6503)music_start();
+#endif
   game_frame(count%43<12,count%67<14,game.state==Serving&&game.charge<80,false);
   if(game.state==GameOver)game_start();
 #else

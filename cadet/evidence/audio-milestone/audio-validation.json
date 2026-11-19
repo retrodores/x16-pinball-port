@@ -1,0 +1,60 @@
+{
+  "pcm_bytes": 148242,
+  "exact_stored_samples": 17,
+  "ram": {
+    "512": {
+      "music_start_cycles": 1724,
+      "prefetch_max_cycles": 11587,
+      "waveforms": {
+        "SOUND43": {
+          "seconds": 0.0002457606291472106,
+          "correlation": 0.9891034932746394
+        },
+        "SOUND17": {
+          "seconds": 2.4698533628246087,
+          "correlation": 0.9708924531487235
+        },
+        "SOUND49D": {
+          "seconds": 3.1081756369296305,
+          "correlation": 0.9794990359091628
+        },
+        "SOUND14": {
+          "seconds": 3.830609486360285,
+          "correlation": 0.9325013373132688
+        },
+        "SOUND35": {
+          "seconds": 4.536106332432211,
+          "correlation": 0.9603083456161576
+        }
+      },
+      "music_lz_compared_bytes": 856956
+    },
+    "2048": {
+      "music_start_cycles": 1734,
+      "prefetch_max_cycles": 11587,
+      "waveforms": {
+        "SOUND43": {
+          "seconds": 0.0002457606291472106,
+          "correlation": 0.9891034932746394
+        },
+        "SOUND17": {
+          "seconds": 2.4698533628246087,
+          "correlation": 0.9708924531487235
+        },
+        "SOUND49D": {
+          "seconds": 3.1081756369296305,
+          "correlation": 0.9794990359091628
+        },
+        "SOUND14": {
+          "seconds": 3.830609486360285,
+          "correlation": 0.9325013373132688
+        },
+        "SOUND35": {
+          "seconds": 4.536106332432211,
+          "correlation": 0.9603083456161576
+        }
+      },
+      "music_lz_compared_bytes": 856956
+    }
+  }
+}

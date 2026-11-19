@@ -17,11 +17,12 @@ edge_bank=12;bounds_bank=edge_bank+(len(src)+255)//256;occupancy_bank=bounds_ban
 assert occupancy_bank<=19
 for i,e in enumerate(src):
  kind=classes[e['class']];flags=2 if e['active'] else 0;param=0
+ if e['class'] in ('9TRollover','14TLightRollover'):flags|=4|(0 if e['active'] else 8)
  if e.get('pass'):kind=14
  if 'ramp'in e:
   m=e['ramp'];param=meta([0,0,0,0,*map(q,m['force']),q(m['plane'][0]),q(m['plane'][1]),q(m['plane'][2] if m['action']==1 else m['z']),0,m['action'],m['mask'],m['zflag']])
  if 'capture'in e:
-  m=e['capture'];d=m['direction'];speed=min(60,m['speed']);param=meta([*map(q,m['position']),q(d[0]*speed),q(d[1]*speed),0,0,0,0,77,max(30,min(360,round(m['delay']*120))),0,1,1])
+  m=e['capture'];d=m['direction'];speed=min(60,m['speed']);param=meta([*map(q,m['position']),q(d[0]*speed),q(d[1]*speed),0,0,0,0,(77 if e['component']==510 else 0),max(1,round(m['delay']*120)),0,1,1])
  if 'hole'in e:
   m=e['hole'];param=meta([0,0,0,0,0,0,0,0,q(m['z']),60,0,m['mask'],1])
  if 'line'in e:
@@ -29,7 +30,6 @@ for i,e in enumerate(src):
   x,y,ex,ey,nx,ny=map(q,[x,y,ex,ey,nx,ny]);lo,hi=sorted((x,ex));yl,yh=sorted((y,ey));shape=[x,y,ex,ey,nx,ny,0]
  else:
   flags|=1;x,y,r2=e['circle'];rad=math.sqrt(r2)
-  if kind in (12,13):rad=max(rad,.13)
   x,y,rad=map(q,[x,y,rad]);assert rad<=181;rs=rad*rad
   shape=[x,y,rs&65535,rs>>16,0,0,rad];shape[2]=shape[2] if shape[2]<32768 else shape[2]-65536
   lo,hi,yl,yh=x-rad,x+rad,y-rad,y+rad
@@ -80,12 +80,14 @@ for mask in (1,2,4):
   if row in shared:index.append(shared[row]);continue
   if len(lists)%8192+len(row)>8192:lists.extend(bytes(8192-len(lists)%8192))
   shared[row]=len(lists);index.append(len(lists));lists.extend(row)
-assert len(lists)<=8*8192
+assert len(lists)<=6*8192
 blob=bytearray(struct.pack('<%dH'%len(index),*index));blob.extend(bytes(3*8192-len(blob)));blob[-2:]=b'WF';blob.extend(lists)
 blob.extend(bytes((12-1)*8192-len(blob)));blob.extend(b''.join(records));blob.extend(bytes((bounds_bank-1)*8192-len(blob)));blob.extend(b''.join(bounds));blob.extend(bytes((occupancy_bank-1)*8192-len(blob)));
 for n,off in enumerate(range(0,len(blob),65536)):(o/f'GEOM{n}.BIN').write_bytes(blob[off:off+65536])
 (o/'MODEL.BIN').write_bytes(blob)
 lines=['#pragma once',f'#define component_count {len(ids)}',f'#define bounds_bank {bounds_bank}',f'#define edge_count {len(src)}',f'#define serve_x {q(j["plunger"][0])}',f'#define plunger_y {q(11.6749783)}']
+lines += [f'#define GROUP_{gid} {group}' for gid,group in groups.items() if gid>=0]
+lines += [f'#define META_{e["component"]} {records[i][28]}' for i,e in enumerate(src) if 'capture' in e or 'hole' in e]
 lines+=['static const Meta metadata[]={'+','.join('{'+','.join(map(str,m))+'}' for m in metas)+'};']
 pivots=[];tips=[];omega=[];length2=[]
 for f in j['flippers']:
@@ -97,8 +99,9 @@ wells=[]
 for i,e in enumerate(src):
  if e['class'] not in ('5THole','8TKickout'):continue
  x,y,_=e['circle'];radius=math.sqrt(e.get('hole',e.get('capture',{})).get('radius_sq',e.get('capture',{}).get('field_radius_sq',.1)))
- wells.append([q(x),q(y),q(radius),e['mask'],records[i][28],groups[e['component']],classes[e['class']]])
-lines+=['typedef struct {int16_t x,y,r;uint8_t mask,param,group,kind;} Well;','static const Well wells[]={'+','.join('{'+','.join(map(str,w))+'}'for w in wells)+'};',f'#define center_group {groups[510]}','static const uint8_t drop_groups[]={'+','.join(str(groups[i])for i in range(432,441))+'};','static const uint8_t gate_groups[]={'+','.join(str(groups[e['component']])for e in src if e['class']=='5TGate')+'};']
+ force=e.get('hole',{}).get('pull',30 if e['component']==510 else 32)
+ wells.append([q(x),q(y),q(radius),q(math.sqrt(e['circle'][2])),q(force),e['mask'],records[i][28],groups[e['component']],classes[e['class']]])
+lines+=['typedef struct {int16_t x,y,r,capture,force;uint8_t mask,param,group,kind;} Well;','static const Well wells[]={'+','.join('{'+','.join(map(str,w))+'}'for w in wells)+'};',f'#define center_group {groups[510]}','static const uint8_t drop_groups[]={'+','.join(str(groups[i])for i in range(432,441))+'};','static const uint8_t gate_groups[]={'+','.join(str(groups[e['component']])for e in src if e['class']=='5TGate')+'};']
 lines+=['static const Vec pivots[2]={'+','.join('{%d,%d}'%tuple(v) for v in pivots)+'};','static const Vec tips[2][121]={'+','.join('{'+','.join('{%d,%d}'%tuple(v) for v in a)+'}' for a in tips)+'};','static const int16_t flipper_omega[2]={%d,%d};'%tuple(omega),f'#define flipper_length2 {sum(length2)//2}L',f'#define flipper_length {math.isqrt(sum(length2)//2)}']
 lines+=['static const uint16_t original_groups[]={'+','.join(map(str,ids))+'};']
 (o/'model.h').write_text('\n'.join(lines)+'\n')

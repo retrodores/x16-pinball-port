@@ -1,91 +1,70 @@
-## Latest OBS review and flipper correction
+# CmdrX Cadet 0.3-dev — playable development milestone
 
-See cadet/OBS-REVIEW.md (OBS-REVIEW.md relative to this directory) and
-cadet/evidence/obs-review for the latest results. Powered flippers now impart
-an impulse to stationary and slowly separating balls on the front face.
-New focused native fixtures pass at 512/2048 KB; host/native paths agree.
-Host optimized/exhaustive soak hash is now 768b50ac (intentional physics change),
-with 120 drains and no escapes/stalls across 40 games. This supersedes the prior
-91cbf84c expectation below. Nine five-contact guard uses remain to investigate.
-The integrated 6000-frame budget still FAILS: 158182/158318 worst cycles at
-512/2048 KB, three overruns each. The music restart hitch is unchanged.
-Original Table 0.2 remains the accepted runnable build. No new release.
-Priority now includes original wormhole audio/rules, kickback/gate timers,
-lane/target lamps and bumper animation; these remain unimplemented.
-The supplied human log reached frame 6405, beyond the scripted test horizon.
+Author: Codex, working with Brett Estrade. Session date: November 18, 2026 (America/Chicago).
 
-# CmdrX Cadet — 0.3 work in progress, 2026-11-18
+This is a runnable development playtest, not a stable or complete Space Cadet port.
+Original Table 0.2 and Wireframe 0.2 remain accepted and preserved. Source-derived
+fixtures establish the listed contracts; recordings and soaks are supporting
+evidence, not proof of complete fidelity.
 
-**This is a source/recovery checkpoint, not a new recommended game release.**
-Original Table 0.2 remains the latest accepted runnable release. Its Git tag
-is table-test-v0.2 (c8312ad), and its binaries remain preserved separately.
+## Implemented
 
-Implemented in this checkpoint:
-- Original table depth-map ball masking, using the high eight bits of each
-  original 16-bit depth sample; all 171550 quantized pixels verified.
-- Correct Euclidean camera distance for ball sizing and depth comparison.
-- Banked sprite/projection metadata; full-size original numeric glyphs retained.
-- Lossless theme compression: 214239 command bytes -> 102730 stored bytes.
-  A bounded main-thread producer fills a 4096-byte dictionary/read-ahead buffer;
-  the IRQ consumes buffered music. Prefetch work is included in frame timings.
-- Exact native arithmetic and collision-filter helpers. Collision topology and
-  tested trajectories are unchanged. Score remains exact unsigned 128-bit.
-- Expensive backbox changes can wait for a quieter frame; ball, flippers and
-  physics update immediately. Existing original art and twelve PCM effects remain.
+- Wormhole capture, selected exit, hold, release, replay and scoring; kickout capture/return and basic hyperspace levels.
+- Both side kickbacks with firing/reset timers, real access gates and hazard-target completion.
+- Both yellow 1/2/3 lane banks, flipper rotation, completion and four bumper levels.
+- 35 original bumper/lamp/gate/kicker components respond to actual events and timers; original artwork, plunger and score UI retained.
+- Five additional original PCM effects; music starts/restarts with bounded priming instead of blocking the game.
+- Original quantized depth masking compressed without loss; stationary grazing flipper-tip collisions fixed while retaining powered-flipper behavior.
+- Exact 128-bit score and decimal carries retained; large awards now fail atomically at overflow.
 
-## Release blocker
+## Final integrated measurements
 
-The required limit is 133333 cycles per frame at 8 MHz. It has NOT been relaxed.
+| RAM | Frames | Worst cycles | Mean cycles | Over133333 | Music errors |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| 512 KB | 12000 | 192560 | 58485 | 36 | 0 |
+| 2048 KB | 12000 | 192631 | 58484 | 36 | 0 |
 
-| RAM | Frames | Worst cycles | Mean cycles | Over limit | Music errors |
-|---|---:|---:|---:|---:|---:|
-| 512 KB | 6000 | 144411 | 39414 | 5 | 0 |
-| 2048 KB | 6000 | 144308 | 39414 | 5 | 0 |
+Both strict budget tests FAIL as expected and retain their nonzero exit status.
+Worst complete frame is about 24.1 ms at8 MHz. The workload includes music restarts
+at 6101/6501/6503 (including priming cancellation) and 19 deliberate source-geometry
+placements at 7000..10900. These placements verify costs/events, not player-route
+reachability. No sustained60 FPS or new2 MHz claim is made.
 
-Worst measured frame is 18.05 ms, versus the
-16.67 ms contract. Both integrated budget tests intentionally FAIL. These
-scripted workloads do not establish a universal worst case. No new 2 MHz
-performance claim is made.
+## Verification
 
-## Functional checks
+- Original source/DAT contracts:216 mechanism assertions pass under host ASan/UBSan and native65C02 at512 KB and2 MB.
+- 254 route/layer checks,10 stationary-tip checks and powered/passive flipper regression pass on host/native at both RAM sizes.
+- Exact score oracle:65536 uint16 awards,128 carry boundaries,255 overflows; additional1920 large-award carry,240 limit and15 latch cases. Real hyperspace boundary test:29host/32native assertions perRAM.
+- 40-seed optimized/exhaustive sanitized host soaks agree at0cfd4551 with zero escapes/stalls.115drains; some games reach18000-frame cap;11 guard uses remain.
+- Native arithmetic, four exact music-stream comparisons, depth quantizer, pixel compositor, bounds and50 host/native checkpoints pass on both RAM sizes.
+- All171550 quantized depth pixels preserved;384 native depth rectangles and14104 dynamic VERA byte checks pass on both RAM sizes.
+- 17resident PCM samples match converted source bytes; five new played waveforms correlate above0.94 on both RAM sizes. Staged music restart/cancellation tests pass.
+- Final12000-frame runs include measured music restarts/cancellation and 19 deliberate mechanism placements beyond frame7000; zero music-buffer errors in both.
+- Interactive emulator checks pass at512 KB/2 MB: table pixels, lamp flashes, main plunger, flippers, launch, F2, M, Escape and audible output.
+- Final PRG sections and both distinct overlays independently match ELF extraction. Main BSS9592/977d preserves the1KB stack guard.
+- 15 packaging checks pass; bank allocation fits512 KB, with bank63 free. AcceptedOriginalTable0.2/Wireframe 0.2 and vendor source unchanged.
 
-- Forty three-ball host games with sanitizers: 120 drains, zero escapes, zero
-  stalls, 378 bumper hits, 532 flipper hits, 137 ramp entries, 68 returns.
-  One five-contact guard use, as in 0.2.
-- Optimized and exhaustive 1217-edge searches both hash to 91cbf84c, identical
-  to the accepted 0.2 host baseline. Host/native trajectories match at 50 points.
-- Native bounds helper: 14604 signed comparisons. Native pixel compositor:
-  32768 VERA bytes checked. Native depth: 384 rectangles, 6144 rows plus varying
-  sprite sizes, including table boundaries; both RAM sizes passed.
-- Native depth quantizer: 5500 distances. Arithmetic: 8292 signed products,
-  3856 narrow fractions, 4096 wide fractions, 2049 rebound ratios.
-- Host score oracle: all 65536 uint16 awards, all 128 carry boundaries, and
-  255 full-width overflow checks.
-- Native music: 856956 bytes compared with the original compact command stream,
-  covering decoder resets and buffered automatic looping. No byte differences.
-  The compact stream still matches all 31676 musical ticks and 21801 key/control
-  side-effect events from the original conversion.
-- Current interactive emulator check passed background pixels, plunger/flipper
-  animation, launch, new game, music toggle, exit and audible output. This is not
-  an acoustic identity claim against the original Windows instruments/mixer.
+Evidence is retained in evidence/milestone-0.3 and evidence/audio-milestone.
+The final UI reports include PRG/RUL/PHY SHA256 values. Tests exposed and corrected
+an overlapping-VMA linker output bug: named ELF sections must supply the two
+separate banked sidecars. The new independent output test guards this.
 
-## Still unfinished
+## Unfinished
 
-Original target-bank resets, real rollover states, gates, bonus/skill shots,
-missions, dynamic bumper/target/lamp graphics, original message text/font and
-high-score controls. Research notes are in ORIGINAL-RULES-NOTES.md; these rules
-have NOT been integrated. Depth currently comes from the static table map;
-separate dynamic sprite depth maps are not included. The display footer still
-uses the accepted 0.2 artwork because this is not a new release package.
+- Frame budget still fails: 36 of 12000 frames exceeded133333 cycles on each RAM configuration; worst about 24.1 ms. Not stable or sustained60 FPS. No new2 MHz performance claim.
+- Moving-flipper continuous tip collision and original tapered-face normals remain incomplete;11 contact-guard uses appeared in the40-seed soak.
+- Advanced hyperspace jackpot/blocker/extra-ball/reflex rules, missions, rank/bonus messages and broader scoring interactions remain incomplete.
+- Advanced hyperspace tiers1/3/4 and gravity-well audio cues are absent. PCM uses one priority channel; music instrument timbre is not note-perfect.
+- Spinner full-rotation callbacks and randomized original throws remain unfinished. Lamps share a blink phase rather than individual DAT phases.
+- Large visual changes may take2–3 frames; dynamic bumper depth maps are absent. Selected layer-route tests are not exhaustive topology proof.
+- Windows BAT quoting/flags were statically tested on Linux; actual Windows execution was not available.
 
-Next priority: remove the remaining collision-frame spikes, repeat the same
-strict tests, then integrate the original rules with source-derived fixtures.
-Start recovery with cadet/RESUME.md. Build with sh cadet/game/build.sh.
-The Windows launcher preference remains parent x16emu.exe/rom.bin, flat files,
-65C02, 8 MHz, 512 KB, -scale 2, and the game directory as current directory.
+## Run and resume
 
-Original reconstruction: Andrey Muzychenko / k4zmu2a, MIT source.
-Original art/audio: Cinematronics and their respective rights holders.
-X16 adaptation and validation: Codex, working with Brett Estrade.
-
-Additional profiling item: music_start currently pre-fills 2048 decoded bytes with interrupts disabled. Startup and an M-key restart can therefore pause for more than one frame; that restart cost is outside the scripted 6000-frame workload. Move that prefill to an interruptible staged path before release. The five reported budget overruns are not the only possible user-triggered timing spikes.
+Extract the whole flat development ZIP; keep x16emu.exe/rom.bin in its parent.
+RUN-WINDOWS.bat uses the game directory and -c02 -mhz 8 -ram 512 -scale 2.
+Keep CADET.PRG, CADET.RUL, CADET.PHY and every BIN together.
+Controls: Space hold/release plunger; Z/leftShift left flipper; slash/rightShift
+right flipper; F2 new game; M music; Escape exit.
+See RESUME.md for build, bank allocation, test commands, source inputs and next work.
+SOURCE.zip contains committed code, recovered references and matching runtime data.

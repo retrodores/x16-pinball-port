@@ -1,93 +1,137 @@
-## Latest OBS review and flipper correction
+# Resume CmdrX Cadet — 0.3 development milestone
 
-See cadet/OBS-REVIEW.md (OBS-REVIEW.md relative to this directory) and
-cadet/evidence/obs-review for the latest results. Powered flippers now impart
-an impulse to stationary and slowly separating balls on the front face.
-New focused native fixtures pass at 512/2048 KB; host/native paths agree.
-Host optimized/exhaustive soak hash is now 768b50ac (intentional physics change),
-with 120 drains and no escapes/stalls across 40 games. This supersedes the prior
-91cbf84c expectation below. Nine five-contact guard uses remain to investigate.
-The integrated 6000-frame budget still FAILS: 158182/158318 worst cycles at
-512/2048 KB, three overruns each. The music restart hitch is unchanged.
-Original Table 0.2 remains the accepted runnable build. No new release.
-Priority now includes original wormhole audio/rules, kickback/gate timers,
-lane/target lamps and bumper animation; these remain unimplemented.
-The supplied human log reached frame 6405, beyond the scripted test horizon.
+Author: Codex, working with Brett Estrade. Session date: November 18, 2026 (America/Chicago).
 
-# Resume CmdrX Cadet — 0.3 development checkpoint
+## Checkout and preservation
 
-Author: Codex, working with Brett Estrade. Date: 2026-11-18.
-Use the VM through Desktop Commander. Device 62fb2876-6dc0-4e77-abff-35f1c9d17cb4.
-Worktree /opt/cmdrx-cadet-fidelity, branch spacecadet-fidelity; no remote.
-Read AGENTS.md, cadet/AGENTS.md and cadet/STATUS-0.3-WIP.md before editing.
+Use Desktop Commander on the authorized VM. Repository:
+`/opt/cmdrx-cadet-fidelity`, branch `spacecadet-fidelity`.
+This milestone started from verified clean commit
+`ecd54e999853b82b5c55a716394d99943b60da83`.
+Read root/cadet AGENTS.md, this file, OBS-REVIEW.md and STATUS-0.3-WIP.md.
 
-The latest accepted runnable release is Original Table 0.2, tag table-test-v0.2
-at c8312ad. Its assets are preserved at /opt/cmdrx-cadet-table02-assets.
-The accepted Wireframe 0.2 remains untouched at /opt/cmdrx-cadet-direct.
-CURRENT cadet/play-build/CADET.PRG IS DEVELOPMENT CODE, NOT THE ACCEPTED 0.2.
-Do not publish it as passing the 133333-cycle gate.
+Original Table 0.2 remains preserved at tag `table-test-v0.2`
+(`c8312addc4c05994ae8a3de400a2d1d7dac8aeab`) and
+`/opt/cmdrx-cadet-table02-assets`. The 15 accepted runtime files were compared
+byte-for-byte with the delivered ZIP. Wireframe 0.2 remains unchanged in
+`/opt/cmdrx-cadet-direct`, clean at `51149308b350ca485d36ec73713c6bbf2cba5e41`.
+Vendor source is unchanged. This is a separately labeled DEVELOPMENT build.
 
-This checkpoint adds original depth-map ball masking, Euclidean ball sizing,
-banked UI metadata, lossless music compression/read-ahead, and exact arithmetic
-and collision filtering optimizations. Native functional checks pass, but the
-integrated frame-budget test still fails on a small number of frames.
-Final results are in cadet/evidence/table-0.3 and STATUS-0.3-WIP.md.
-The original target-bank, rollover, gate, skill-shot and mission rules have been
-investigated but are NOT integrated into this checkpoint.
+## What is implemented
 
-Build: sh cadet/game/build.sh
-Regenerate assets: sh cadet/game/build.sh assets
-Runtime is integer-only 65C02. Keep exact 128-bit scoring. No 65816 requirement.
-Native tests: python3 cadet/game/native_check.py 512 (or 2048);
-python3 cadet/game/test_depth.py 512 (or 2048);
-python3 cadet/game/test_native.py 512 (or 2048);
-xvfb-run -a python3 cadet/game/test_ui.py.
-Host soak: compile engine.c + soak.c with -Icadet/play-build and run 40.
-Repeat with -DCADET_BRUTE; both must match state hash 91cbf84c.
-test_score_host.c exhaustively checks every uint16 award and full-width carries.
+Source-derived wormhole destinations/awards/replay and capture/release timing;
+kickout hold, return and component-specific reset; both kickbacks and hazard gates;
+yellow three-lane banks, flipper lane rotation, bumper upgrades/decay; 35 original
+lamp/bumper/gate/kicker visual components driven by events and timers.
+Wormhole/kickback/hazard/hyperspace base PCM effects are resident. Music startup
+primes in bounded interruptible batches instead of blocking for a full refill.
+Original quantized depth masking is now losslessly compressed to free banked RAM.
+The powered-flipper fix is preserved, with a new stationary grazing-tip sweep.
 
-RAM layout within 512 KB:
-- Geometry uses banks 1..9 and 12..16. GEOM files still load unused padding and
-  old bounds into 10/11/17/18; these are overwritten after game_load.
-- UI bank 11: sprite descriptors A000, projection A800, squared depth thresholds
-  B000, 470 three-byte depth-row descriptors B400.
-- Original depth bytes (16-bit original >>8): banks 10,17,18,45..63, 22 rows/bank.
-- Twelve resident PCM effects: banks 19..30.
-- LZSS dictionary and read-ahead: bank 31 A000..AFFF. B000..BFFF is available.
-- Compressed music: banks 32..44 (102730 bytes).
-Do not overlap these. pack_model currently permits larger spatial lists; before
-adding geometry, tighten its size assertion to the actual six-bank allocation.
+See game/MECHANISMS-MILESTONE.md, game/AUDIO-MILESTONE.md and
+game/verify_milestone_physics.md for original-source contracts, tests and limits.
+OBS-REVIEW.md is historical evidence; its original missing-feature list describes
+the pre-milestone build. Recordings supplement source-derived fixtures and do not
+make soak results proof of fidelity.
 
-Music keeps every byte of the compact ZSM stream. LZSS uses 12-bit backward
-distances and lengths 3..18. The producer is music_prefetch (64 bytes maximum,
-2048-byte target), called only on frames with time available; its cost is INCLUDED
-in the frame measurement. The IRQ consumes buffered bytes. Producer rewind at the
-known 214239-byte uncompressed length preserves ring position across song loops.
-Changing the theme requires updating that native length and test fixture.
-Do not move prefetch outside the measured interval to make the benchmark pass.
+## Build and recovery
 
-The frame interval starts at irq_start and ends after display AND prefetch.
-The extra IRQ seen in some long frames is real. Testbench mode disables video
-IRQs and is invalid for this integrated benchmark. Keep the existing 133333 bound.
-Panel updates can wait for a quieter frame; physics, ball and flippers remain
-immediate. There is no deliberate skipping of simulation frames.
+Runtime: integer-only stock 65C02, 8 MHz, 512 KB. No 65816 requirement.
+Compiler: LLVM-MOS SDK 23.4.0 at
+`/opt/llvm-mos-sdk-23.4.0/llvm-mos/bin/mos-cx16-clang`.
+Emulator: `/opt/x16emu-r49/x16emu`, matching adjacent rom.bin.
 
-Next:
-1. Finish performance profiling. Remaining spikes include bumper collision
-   clusters and lower-table/flipper contact. Inspect PROFILE_DISPLAY diagnostics
-   and CADET_PROFILE before making further arithmetic changes.
-2. Run both RAM sizes, native/host trajectory equivalence, direct depth masks,
-   exact arithmetic, buffered full-theme loops, and UI/audio after the final fix.
-3. Only then integrate original target-bank resets, real rollovers, gates/lamp
-   state and bonus/skill-shot logic. Add source-derived event fixtures first.
-4. Add dynamic target/bumper/lamp graphics and original message font/UI.
+```sh
+sh cadet/game/build.sh
+# Full regeneration, when the original inputs below are available:
+sh cadet/game/build.sh assets
+```
 
-Original source oracle: direct/vendor/SpaceCadetPinball (unchanged).
-Original files: /opt/spacecadet-x16-analysis/input/game/PINBALL.DAT;
-inventory /opt/spacecadet-x16-analysis/evidence/inventory.json.
-Toolchain /opt/llvm-mos-sdk-23.4.0/llvm-mos/bin/mos-cx16-clang.
-Emulator /opt/x16emu-r49/x16emu and matching rom.bin.
-Windows delivery remains flat, parent-folder x16emu.exe/rom.bin, -scale 2,
--c02 -mhz 8 -ram 512, with the game directory current.
+Source archive includes generated headers and matching runtime assets, so rebuilding
+the PRGs does not require regenerating artwork or obtaining the DAT again.
+Full asset regeneration uses:
+`/opt/spacecadet-x16-analysis/input/game/PINBALL.DAT`,
+`/opt/spacecadet-x16-analysis/evidence/inventory.json`, recovered source under
+`direct/vendor/SpaceCadetPinball`, Python/Pillow/NumPy and the existing conversion
+tools. Development dependencies may be installed as already authorized.
 
-Additional profiling item: music_start currently pre-fills 2048 decoded bytes with interrupts disabled. Startup and an M-key restart can therefore pause for more than one frame; that restart cost is outside the scripted 6000-frame workload. Move that prefill to an interruptible staged path before release. The five reported budget overruns are not the only possible user-triggered timing spikes.
+build_native.py uses the custom linker layout and creates each PRG with its own
+.RUL and .PHY companion. Never mix overlays from different builds/programs.
+Both overlays execute at A000 in different physical RAM banks. Extract their
+**named ELF sections**; LLVM's raw FULL(region) writer cannot distinguish the
+overlapping virtual addresses and previously emitted incorrect sidecars.
+test_build_native.py independently verifies the emitted bytes with LLVM objcopy.
+Main RAM must leave at least 1 KB below the 9f00 software-stack start.
+
+## Live RAM bank allocation
+
+| Banks | Contents |
+| --- | --- |
+| 1..9, 12..16 | Original indexed collision geometry |
+| 10 | Compressed depth index |
+| 11 | Sprite/projection/quantization UI metadata |
+| 17,18,45..50 | Compressed original quantized depth blocks |
+| 19..30,51..57 | 17 PCM samples |
+| 31 A000..AFFF | Music dictionary/read-ahead |
+| 32..44 | Losslessly compressed theme commands |
+| 58..60 | Original dynamic visual patches |
+| 61 | Rules and powered-paddle code (.RUL) |
+| 62 | Stationary tip-sweep core (.PHY) |
+| 63 | Unallocated |
+
+Geometry loading temporarily writes obsolete padding into 10/11/17/18; later
+loaders replace it before gameplay. All live banks fit 512 KB.
+Compressed depth reproduces all 171550 quantized pixels exactly. Dynamic patches
+preserve neighboring nibbles and write at most 128 bytes per permitted update.
+
+## Required verification
+
+```sh
+python3 cadet/game/test_build_native.py CADET TEST
+python3 cadet/game/test_mechanisms.py
+python3 cadet/game/test_large_award.py
+python3 cadet/game/test_routes.py
+python3 cadet/game/test_flipper_contact.py
+python3 cadet/game/native_check.py 512
+python3 cadet/game/native_check.py 2048
+python3 cadet/game/test_depth.py 512
+python3 cadet/game/test_depth.py 2048
+python3 cadet/game/test_dynamic.py
+python3 cadet/game/test_audio.py
+xvfb-run -a python3 cadet/game/test_ui.py
+CADET_RAM=2048 xvfb-run -a python3 cadet/game/test_ui.py
+python3 cadet/game/test_native.py 512 8 12000
+python3 cadet/game/test_native.py 2048 8 12000
+python3 cadet/game/test_package_development.py
+```
+
+Check each runner's CLI before changing fixtures. Large awards preflight the full 32-bit award before chunking, preserving both score
+and decimal digits atomically on overflow. test_award_large.c adds sanitized
+carry/limit regression; test_large_award.py exercises real banked hyperspace awards.
+Host score tests cover every
+uint16 award and all 128-bit carries. Host optimized and exhaustive 40-seed soaks
+now agree at hash `0cfd4551`, with zero escapes/stalls; some games reach the
+18000-frame cap. Eleven contact-guard uses still need investigation.
+The integrated TEST includes measured music restarts/cancellation after frame6100
+and 19 deliberate source-geometry placements at frames7000..10900. These placements
+exercise cost and mechanisms, not proof of legal player routes.
+
+The strict budget remains 133333 cycles. Measurement includes physics, rendering
+and music prefetch, including IRQ costs. Do not move work outside the measured
+interval or relax the threshold. The current development build does not pass
+the sustained-60-FPS gate. See STATUS-0.3-WIP.md and evidence/milestone-0.3.
+
+## Packaging and next work
+
+Commit source, notes and selected evidence before running package_development.py.
+Supply the tested commit and actual native results in the validation JSON.
+The ZIP is flat; CADET.PRG, CADET.RUL, CADET.PHY and all BIN files are required.
+RUN-WINDOWS.bat keeps game-directory cwd, uses parent x16emu.exe/rom.bin and
+`-c02 -mhz 8 -ram 512 -scale 2`. No emulator, ROM or Windows executable is bundled.
+
+Continue profiling collision clusters and depth/graphics work. Complete moving-tip
+continuous collision and tapered flipper face normals, advanced hyperspace
+jackpot/blocker/extra-ball/reflex rules and missing cues, spinner callbacks,
+mission/rank/bonus/message UI, randomized throws and per-lamp phase fidelity.
+Dynamic object depth maps and some multi-frame visual updates remain imperfect.
+Do not describe the development build as a complete or note/pixel-perfect port.

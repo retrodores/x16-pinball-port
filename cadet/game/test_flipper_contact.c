@@ -8,6 +8,7 @@
 static unsigned failures;
 static void check(bool ok){if(!ok)++failures;}
 int main(void){
+ if(!game_load())return 1;
  for(uint8_t side=0;side<2;++side){
   for(uint8_t mode=0;mode<3;++mode){
    game_start();game.state=InPlay;game.mask=1;game.phase[side]=25;

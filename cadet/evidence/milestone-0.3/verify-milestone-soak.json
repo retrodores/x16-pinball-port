@@ -1,0 +1,21 @@
+{
+  "seeds": 40,
+  "max_frames_per_seed": 18000,
+  "state_hash": "0cfd4551",
+  "optimized_exhaustive_equal": true,
+  "asan_ubsan": true,
+  "drains": 115,
+  "escapes": 0,
+  "stalls": 0,
+  "bumpers": 1152,
+  "flippers": 805,
+  "ramp_entries": 455,
+  "guard_hits": 11,
+  "returns": 383,
+  "sha256": {
+    "cadet/game/engine.c": "c7113314a97577ff6f09a5ac55d58d658e775cf19a383b6e9a38c5a9ad2a7699",
+    "cadet/game/rules.inc": "eee9964e161bc3d16ab9b4d7df43a6deabf55af2e42f83775289daec5108ecde",
+    "cadet/game/flipper_sweep.h": "13d15226246ee38b8f336cf97892ccfc73db9416cc3fa4020119332ff2d401fe",
+    "cadet/play-build/MODEL.BIN": "4e0fadf95d1d82585f63d5c0c1fce6c256bc958855dfc294ec6cf91c9e08da99"
+  }
+}

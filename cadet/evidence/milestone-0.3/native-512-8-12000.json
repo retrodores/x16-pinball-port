@@ -1,0 +1,14 @@
+{
+  "frames": 12000,
+  "max_cycles": 192560,
+  "mean_cycles": 58485,
+  "over_budget": 36,
+  "missed_frame_starts": 0,
+  "irq_max": 32370,
+  "music_errors": 0,
+  "ram": 512,
+  "mhz": 8,
+  "expected_frames": 12000,
+  "program": "TEST.PRG",
+  "budget_pass": false
+}

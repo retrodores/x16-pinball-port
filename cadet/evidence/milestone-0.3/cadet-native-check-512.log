@@ -1,0 +1,6 @@
+Native exact arithmetic PASS 512
+Native lossless music PASS 512 four exact stream comparisons, including buffered looping
+Native depth quantizer PASS 512
+Native pixel compositor PASS 512
+Native bounds PASS 512
+Native/host state PASS 512 50 checkpoints

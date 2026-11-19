@@ -1,23 +1,37 @@
 from pathlib import Path
-import subprocess as sp,time,os,wave,json
+import subprocess as sp,time,os,wave,json,hashlib,re
 import numpy as np
-from PIL import Image,ImageChops
+from PIL import Image,ImageChops,ImageDraw
 r=Path(__file__).resolve().parents[2];o=r/'cadet/play-build'
-with (o/'ui.log').open('w')as f:
- p=sp.Popen(['/opt/x16emu-r49/x16emu','-c02','-rom','/opt/x16emu-r49/rom.bin','-ram','512','-mhz','8','-scale','1','-echo','raw','-fsroot',str(o),'-prg',str(o/'CADET.PRG'),'-run','-wav',str(o/'ui.wav')+',auto'],stdout=f,stderr=f,env=dict(os.environ,SDL_AUDIODRIVER='dummy'))
+ram=os.environ.get('CADET_RAM','512');tag=''if ram=='512'else'-'+ram
+inputs={n:hashlib.sha256((o/n).read_bytes()).hexdigest()for n in('CADET.PRG','CADET.RUL','CADET.PHY')}
+def output(name):
+ p=Path(name);return o/(p.stem+tag+p.suffix)
+with (output('ui.log')).open('w')as f:
+ p=sp.Popen(['/opt/x16emu-r49/x16emu','-c02','-rom','/opt/x16emu-r49/rom.bin','-ram',ram,'-mhz','8','-scale','1','-echo','raw','-fsroot',str(o),'-prg',str(o/'CADET.PRG'),'-run','-wav',str(output('ui.wav'))+',auto'],stdout=f,stderr=f,env=dict(os.environ,SDL_AUDIODRIVER='dummy'))
  try:
   w=sp.check_output(['xdotool','search','--sync','--onlyvisible','--name','Commander X16'],timeout=10).decode().splitlines()[0]
   sp.run(['xdotool','windowfocus',w],check=True)
   deadline=time.monotonic()+30
-  while '# PLAY READY'not in (o/'ui.log').read_text(errors='replace'):
+  while '# PLAY READY'not in (output('ui.log')).read_text(errors='replace'):
    assert time.monotonic()<deadline;time.sleep(.2)
   time.sleep(.5)
   def action(cmd,key):sp.run(['xdotool',cmd,'--window',w,key],check=True)
   def shot(n):
-   dest=o/(n+'.png');sp.run(['import','-window',w,str(dest)],check=True);return Image.open(dest).convert('RGB')
+   dest=output(n+'.png');sp.run(['import','-window',w,str(dest)],check=True);return Image.open(dest).convert('RGB')
   ready=shot('ready')
-  packed=Image.open(o/'x16-layout.png').convert('RGB')
-  assert ImageChops.difference(ready.crop((0,0,320,340)),packed.crop((0,0,320,340))).getbbox()is None,'background differs from packed pixels'
+  packed=Image.open(o/'dynamic-rest.png').convert('RGB')
+  # Original new-ball gate lamps flash; compare the static region independently.
+  actual=ready.crop((0,0,320,340));expected=packed.crop((0,0,320,340))
+  blink_boxes=[(298,348,310,362),(51,328,63,342),(290,210,299,220),(50,257,60,268)]
+  for box in blink_boxes:
+   ImageDraw.Draw(actual).rectangle(box,fill=0);ImageDraw.Draw(expected).rectangle(box,fill=0)
+  assert ImageChops.difference(actual,expected).getbbox()is None,'static background differs from packed pixels'
+  flashed=False
+  for i in range(6):
+   time.sleep(.06);lamp=shot('lamp-'+str(i))
+   flashed|=any(ImageChops.difference(ready.crop(box),lamp.crop(box)).getbbox()is not None for box in blink_boxes)
+  assert flashed,'original new-ball gate lamps do not animate'
   action('keydown','space');time.sleep(2);pulled=shot('pulled')
   assert ImageChops.difference(ready.crop((320,375,370,470)),pulled.crop((320,375,370,470))).getbbox(),'plunger not animated'
   action('keyup','space');time.sleep(.8);shot('launched')
@@ -26,14 +40,19 @@ with (o/'ui.log').open('w')as f:
   action('keyup','z');action('keyup','slash');time.sleep(8);shot('playing')
   action('key','F2');time.sleep(.5);shot('new-game')
   action('key','m');time.sleep(.3);action('key','Escape');time.sleep(.4)
-  assert '# DONE'in(o/'ui.log').read_text(errors='replace'),'exit failed'
+  assert '# DONE'in(output('ui.log')).read_text(errors='replace'),'exit failed'
  finally:
   p.terminate()
   try:p.wait(timeout=5)
   except sp.TimeoutExpired:p.kill();p.wait()
-with wave.open(str(o/'ui.wav'))as f:
+with wave.open(str(output('ui.wav')))as f:
  a=np.frombuffer(f.readframes(f.getnframes()),'<i2').astype(float)
- report={'audio_rms':float(np.sqrt(np.mean(a*a))),'peak':float(np.max(np.abs(a))),'samples':len(a)}
+ report={'ram_kb':int(ram),'audio_rms':float(np.sqrt(np.mean(a*a))),'peak':float(np.max(np.abs(a))),'samples':len(a)}
 assert report['audio_rms']>20,report
-(o/'ui-test.json').write_text(json.dumps(report,indent=2)+'\n')
+report['inputs_sha256']=inputs
+result=re.findall(r'# RESULT ([0-9a-f ]+)',output('ui.log').read_text(errors='replace'))
+if result:
+ values=[int(v,16)for v in result[-1].split()]
+ report.update(reported_frame=values[0],worst_cycles=values[1],mean_cycles=values[2])
+(output('ui-test.json')).write_text(json.dumps(report,indent=2)+'\n')
 print('UI test PASS',report)

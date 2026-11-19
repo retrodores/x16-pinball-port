@@ -1,0 +1,23 @@
+{
+  "source_group": 107,
+  "width": 365,
+  "height": 470,
+  "depth_bits": 8,
+  "codec": "packbits64-deduplicated",
+  "index_bytes": 5640,
+  "data_bytes": 64169,
+  "unique_blocks": 2466,
+  "banks": [
+    10,
+    17,
+    18,
+    45,
+    46,
+    47,
+    48,
+    49,
+    50
+  ],
+  "codec_exact_pixels": 171550,
+  "depth_quantum_world": 0.0594799722730537
+}
