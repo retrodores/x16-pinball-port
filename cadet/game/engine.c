@@ -229,6 +229,9 @@ __attribute__((noinline)) static bool circle_hit(uint16_t id,int16_t dx,int16_t 
    else{
     // Discriminant identity: a*r*r - cross(s,v)^2. All circles are <=181 Q8
     // units and each movement component <=256: the products fit unsigned 32 bits.
+    // A nonzero projection guarantees nonzero motion. Defer the squared
+    // length until an actual circle candidate needs the discriminant.
+    if(!ray_a)ray_a=mul(dx,dx)+mul(dy,dy);
     uint32_t a=ray_a;
     int32_t cross=mul(sx,dy)-mul(sy,dx);
     if(cross>65535||cross< -65535)return false;
@@ -260,7 +263,7 @@ __attribute__((noinline)) static bool nearest_core(int16_t dx,int16_t dy,Hit*hit
 #endif
  const int16_t xl=game.x+(dx<0?dx:0)-5,xh=game.x+(dx>0?dx:0)+5,yl=game.y+(dy<0?dy:0)-5,yh=game.y+(dy>0?dy:0)+5;const uint8_t layer=game.mask;
  bound_query[0]=xl;bound_query[1]=xh;bound_query[2]=yl;bound_query[3]=yh;
- bool found=false;hit->t=257;uint8_t circle_count=0;ray_a=mul(dx,dx)+mul(dy,dy);ray_r2=0;
+ bool found=false;hit->t=257;uint8_t circle_count=0;ray_a=0;ray_r2=0;
 #ifdef __CX16__
  uint8_t saved=*(volatile uint8_t*)0;
 #endif

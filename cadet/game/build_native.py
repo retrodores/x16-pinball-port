@@ -1,6 +1,6 @@
 """Build one 65C02 engine program and its separately loaded rules/physics overlays."""
 from pathlib import Path
-import os, struct, subprocess as sp
+import os, shlex, struct, subprocess as sp
 ROOT=Path(__file__).resolve().parents[2]
 OUT=ROOT/'cadet/play-build'
 CC=os.environ.get('MOS_CC','/opt/llvm-mos-sdk-23.4.0/llvm-mos/bin/mos-cx16-clang')
@@ -22,7 +22,9 @@ def build_native(name,sources,defines=()):
     OUT.mkdir(exist_ok=True)
     raw=OUT/(name+'.image')
     config=OUT/'banked-native.cfg'
-    config.write_text('-L'+str(ROOT/'cadet/game/linker')+'\n@'+str(Path(CC).parent/'mos-cx16.cfg')+'\n')
+    linker = '-L' + str(ROOT/'cadet/game/linker')
+    sdk = '@' + str(Path(CC).parent/'mos-cx16.cfg')
+    config.write_text(shlex.join((linker, sdk)) + '\n', encoding='utf-8')
     args=[CC,'--no-default-config','--config='+str(config),'-Os','-Icadet/play-build',
           '-DRULES_FILE="'+name+'.RUL"','-DPHYSICS_FILE="'+name+'.PHY"',*defines,*sources,
           # Both banked code sections intentionally share A000 VMA. Region sizes
