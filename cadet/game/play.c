@@ -194,7 +194,7 @@ static __attribute__((section(".physics"),noinline)) void compact_footer(void){
 int main(void){
  uint8_t oldbank=*(volatile uint8_t*)0;uint16_t oldkey=*(volatile uint16_t*)0x032e;
 #ifdef COVER_AUDIO
- if(!cover_high_ram()){print("GTR3QQ MUSIC PREVIEW REQUIRES 2 MB BANKED RAM\r");echo("# COVER NEEDS 2 MB\n");return 1;}
+ if(!cover_high_ram()){print("COVER REQUIRES 2 MB RAM\r");echo("# COVER NEEDS 2 MB\n");return 1;}
 #endif
  print("\x93" "CMDRX CADET - ORIGINAL TABLE\rLOADING...\r");v[5]=0;v[9]=1;
  if(!game_load()||!load("MAP.BIN",2,0)||!load("TILES.BIN",2,0x1000)||!load("PAL.BIN",3,0xfa00)||

@@ -213,9 +213,16 @@ cover_mix_block:
  sbc #73
  pha
  lda pcm_buffer,x
- ; Give effects half-scale headroom, equal to each stereo drum channel.
+ ; Mix effects at 5/8 scale (1/2 + 1/8), leaving headroom for 1/4 drums.
  cmp #$80
  ror
+ sta cover_held_effect
+ cmp #$80
+ ror
+ cmp #$80
+ ror
+ clc
+ adc cover_held_effect
  sta cover_held_effect
  inx
  pla
