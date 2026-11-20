@@ -57,7 +57,13 @@ with log.open('w') as output:
         assert not lit(start,player) and not lit(start,message)
         until(lambda f: changed(f,start,table) and not lit(f,player))
         until(lambda f: lit(f,player) and not lit(f,message))
-        ready = until(lambda f: lit(f,player) and lit(f,message))
+        until(lambda f: lit(f,player) and lit(f,message))
+        time.sleep(.5)
+        ready = snap()
+        for action in ('keydown','keyup'):
+            sp.run(['xdotool',action,'--window',win,'space'],check=True)
+            time.sleep(.5)
+        until(lambda f: lit(f,message) and changed(f,ready,message),5)
         key('F2')
         until(lambda f: not lit(f,player) and not lit(f,message),5)
         # F2 during the show advances directly to the ready prompt.
@@ -78,5 +84,5 @@ with log.open('w') as output:
             try: p.wait(5)
             except sp.TimeoutExpired: p.kill();p.wait()
 print(json.dumps({'ram_kb':int(ram),'cold_start':True,'changing_lamps':True,
-                  'player_before_prompt':True,'f2_restart_and_skip':True,
+                  'player_before_prompt':True,'plunger_after_serve':True,'f2_restart_and_skip':True,
                   'f3_enters_demo_during_show':True,'exit':True}))

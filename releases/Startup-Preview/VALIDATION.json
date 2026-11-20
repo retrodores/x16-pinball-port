@@ -1,0 +1,126 @@
+{
+  "engine_source_commit": "c6b92454ac7d870e66ae2cc699e7f02050e7c7c3",
+  "emulator": "Linux r49, stock 65C02, 8 MHz",
+  "windows_launcher_tested": false,
+  "reference": "Enhanced Windows startup capture, music on. Video sampled at 0.5-second intervals.",
+  "stage_frames": {
+    "lamp_show": 300,
+    "player_before_serve": 60
+  },
+  "reference_stage_seconds_approx": [
+    [
+      3,
+      8,
+      9
+    ],
+    [
+      43.5,
+      48.5,
+      49.5
+    ],
+    [
+      70,
+      75.5,
+      76.5
+    ],
+    [
+      88.5,
+      93.5,
+      94.5
+    ]
+  ],
+  "fresh_zip_tests": {
+    "SpaceCadet-X16-Startup-512KB-Preview.zip": {
+      "ram_kb": 512,
+      "cold_start": true,
+      "changing_lamps": true,
+      "player_before_prompt": true,
+      "plunger_after_serve": true,
+      "f2_restart_and_skip": true,
+      "f3_enters_demo_during_show": true,
+      "exit": true,
+      "timing_smoke": {
+        "frames": 1362,
+        "peak_cycles": 160682,
+        "mean_cycles": 44326,
+        "over_133333": 2,
+        "missed_intervals": 0,
+        "irq_peak_cycles": 26534,
+        "music_error": 0
+      }
+    },
+    "SpaceCmdr2D-Startup-512KB-Preview.zip": {
+      "ram_kb": 512,
+      "cold_start": true,
+      "changing_lamps": true,
+      "player_before_prompt": true,
+      "plunger_after_serve": true,
+      "f2_restart_and_skip": true,
+      "f3_enters_demo_during_show": true,
+      "exit": true,
+      "timing_smoke": {
+        "frames": 1605,
+        "peak_cycles": 161637,
+        "mean_cycles": 43941,
+        "over_133333": 2,
+        "missed_intervals": 0,
+        "irq_peak_cycles": 26534,
+        "music_error": 0
+      }
+    },
+    "SpaceCadet-X16-Startup-2048KB-Preview.zip": {
+      "ram_kb": 2048,
+      "cold_start": true,
+      "changing_lamps": true,
+      "player_before_prompt": true,
+      "plunger_after_serve": true,
+      "f2_restart_and_skip": true,
+      "f3_enters_demo_during_show": true,
+      "exit": true,
+      "timing_smoke": {
+        "frames": 1255,
+        "peak_cycles": 239984,
+        "mean_cycles": 102757,
+        "over_133333": 99,
+        "missed_intervals": 0,
+        "irq_peak_cycles": 97921,
+        "music_error": 0
+      }
+    },
+    "SpaceCmdr2D-Startup-2048KB-Preview.zip": {
+      "ram_kb": 2048,
+      "cold_start": true,
+      "changing_lamps": true,
+      "player_before_prompt": true,
+      "plunger_after_serve": true,
+      "f2_restart_and_skip": true,
+      "f3_enters_demo_during_show": true,
+      "exit": true,
+      "timing_smoke": {
+        "frames": 1415,
+        "peak_cycles": 253156,
+        "mean_cycles": 102849,
+        "over_133333": 112,
+        "missed_intervals": 0,
+        "irq_peak_cycles": 98086,
+        "music_error": 0
+      }
+    }
+  },
+  "native_mechanism_checks_each_ram_size": [
+    52,
+    67,
+    186
+  ],
+  "host_mechanism_checks": 255,
+  "host_attract": {
+    "frames": 180000,
+    "demos": 3,
+    "missions": 16
+  },
+  "startup_audio_capture_seconds": {
+    "512": 6.85,
+    "2048": 7.88
+  },
+  "notes": "No extended timing run on this preview. The 133333-cycle target remains open."
+}
