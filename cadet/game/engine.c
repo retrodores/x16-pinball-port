@@ -154,7 +154,7 @@ static BANK_TRAMPOLINE void rules_destination(bool n){RULE_ENTER;rule_destinatio
 /* Spread four interleaved phases across the available lamp inserts. */
 static RULE_FN uint8_t startup_lamp(uint8_t group){
  if(game.wait<=StartupReadyFrames)return 0;
- return ((group^(group>>3)^game.ring_phase)&3u)==0;
+ return ((group^(group>>3)^game.ring_phase)&3u)<2;
 }
 BANK_TRAMPOLINE uint8_t game_lamp(uint16_t n){RULE_ENTER;uint8_t r=game.state==Ready?startup_lamp((uint8_t)n):rule_lamp(n);RULE_LEAVE;return r;}
 BANK_TRAMPOLINE uint8_t game_pose(uint16_t n){RULE_ENTER;uint8_t r=rule_pose(n);RULE_LEAVE;return r;}
@@ -176,7 +176,7 @@ static BANK_TRAMPOLINE void mission_advance(void){
  ++game.visual_epoch;
 }
 __attribute__((noinline)) uint8_t game_ring_lamp(uint8_t index){
- if(game.state==Ready)return ((index^(index>>3)^game.ring_phase)&3u)==0&&game.wait>StartupReadyFrames;
+ if(game.state==Ready)return ((index+game.ring_phase)&7u)<4&&game.wait>StartupReadyFrames;
  if(index>=18)return index-18<game.rank;
  if(game.ring_flash)return 1u^((game.ring_flash>>4)&1u);
  if(game.mission>=Practice){
@@ -198,12 +198,10 @@ static void mission_ramp(void){
 }
 static RULE_FN void ring_tick(void){
  if(game.state==Ready){
-  if(game.wait==StartupFrames)sound(SoundStartupHigh);
+  if(game.wait==StartupFrames)sound(SoundStartup);
   --game.wait;
-  if(game.wait==StartupReadyFrames||(game.wait>StartupReadyFrames&&++game.ring_clock==12)){
+  if(game.wait==StartupReadyFrames||(game.wait>StartupReadyFrames&&++game.ring_clock==15)){
    game.ring_clock=0;++game.ring_phase;++game.visual_epoch;
-   if(game.wait>StartupReadyFrames&&!(game.ring_phase&1))
-    sound(game.ring_phase&2?SoundStartupLow:SoundStartupHigh);
   }
   return;
  }
@@ -217,8 +215,17 @@ static RULE_FN void ring_tick(void){
  }
 }
 static void serve(){sound(255);rules.gate[0]=rules.gate[1]=1;rules.gate_flash[0]=rules.gate_flash[1]=600;++game.visual_epoch;game.ball_number=4-game.balls;game.state=Serving;game.x=serve_x;game.y=plunger_y-2;game.z=77;game.vx=game.vy=game.remx=game.remy=game.accx=game.accy=0;game.mask=1;game.ramp=false;game.charge=0;game.charge_clock=0;game.flags=0;game.nudges=0;game.last_group=GROUP_473;game.last_kind=Plunger;sound(SoundFeed);}
-void game_begin(bool show){uint8_t epoch=game.visual_epoch;active_count=0;memset(active_flags,0,sizeof active_flags);memset(&game,0,sizeof game);game.visual_epoch=epoch;game.balls=3;game.multiplier=1;game.rank=1;game.ball_number=1;game.score_dirty=true;rules_reset();
- if(show){game.wait=StartupFrames;sound(255);++game.visual_epoch;}else serve();}
+static RULE_FN void reset_game(void){
+ uint8_t epoch=game.visual_epoch;
+ active_count=0;memset(active_flags,0,sizeof active_flags);
+ memset(&game,0,sizeof game);game.visual_epoch=epoch;
+ game.balls=3;game.multiplier=1;game.rank=1;game.ball_number=1;game.score_dirty=true;
+ rule_reset();
+}
+BANK_TRAMPOLINE void game_begin(bool show){
+ RULE_ENTER;reset_game();RULE_LEAVE;
+ if(show){game.wait=StartupFrames;sound(255);++game.visual_epoch;}else serve();
+}
 static void drain(){if(game.state!=InPlay)return;game.state=Between;game.mission=NoMission;game.mission_left=0;game.wait=120;game.vx=game.vy=0;game.mask=0;game.ramp=false;++game.drains;if(rules.replay)rules.replay=0;else if(game.balls)--game.balls;rules_reset();memset(game.lamps,0,sizeof game.lamps);memset(game.disabled,0,sizeof game.disabled);sound(5);}
 #ifdef __CX16__
 __attribute__((section(".physics"),noinline))

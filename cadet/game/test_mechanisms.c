@@ -95,7 +95,7 @@ static void captures(void){
 static void mission_rings(void){
  game_begin(true);
  CHECK(game.state==Ready&&game.wait==StartupFrames);
- CHECK(game_ring_lamp(0)&&!game_ring_lamp(2));
+ CHECK(game_ring_lamp(0)&&!game_ring_lamp(4));
  for(uint16_t i=0;i<StartupFrames-1;++i)game_frame(0,0,1,0);
  CHECK(game.state==Ready&&game.wait==1&&!game.charge);
  game_frame(0,0,1,0);

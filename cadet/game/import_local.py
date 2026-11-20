@@ -67,7 +67,7 @@ def convert(args):
     destination.parent.mkdir(parents=True, exist_ok=True)
     required_audio = re.findall(r"'(SOUND[^']+\.WAV)'",
                                 (ROOT / 'cadet/game/prepare_runtime.py').read_text().split('banks=')[0])
-    required = set(EXPECTED) | set(required_audio)
+    required = set(EXPECTED) | set(required_audio) | {'SOUND1.WAV'}
     available = {}
     for path in args.install.iterdir():
         name = path.name.upper()

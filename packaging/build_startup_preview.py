@@ -8,7 +8,7 @@ from build_cover_balance import read_verified
 from build_backbox_preview import sha
 
 
-def build(releases, runtime, out, source, startup_audio):
+def build(releases, runtime, out, source, startup_audio, opening_show=False):
     archives = {}
     manifests = {}
     for base, ram, program in (('Backbox', '512', 'CADET'),
@@ -29,14 +29,19 @@ def build(releases, runtime, out, source, startup_audio):
                 '\n\nThe opening animates the playfield lamps before the first ball is served.\n'
                 'F2 starts a new game or skips an active opening.\n').encode('ascii')
             title = 'Startup'
-            if startup_audio:
-                title = 'Startup-Audio'
+            if startup_audio or opening_show:
+                title = 'Opening-Show' if opening_show else 'Startup-Audio'
                 sample = (runtime/'STARTFX.BIN').read_bytes()
-                assert len(sample) == 768
+                assert len(sample) == (55539 if opening_show else 768)
                 files['STARTFX.BIN'] = sample
                 files['RUN-WINDOWS.bat'] = files['RUN-WINDOWS.bat'].replace(
                     b'for %%F in (', b'for %%F in (STARTFX.BIN ', 1)
-                files['README.txt'] += b'Original electronic pulses play on cold start and F2.\n'
+                if opening_show:
+                    files['README.txt'] = files['README.txt'].replace(
+                        b'Startup Preview', b'Opening Show Preview')
+                    files['README.txt'] += b'The installed opening sound plays on cold start and F2.\n'
+                else:
+                    files['README.txt'] += b'Original electronic pulses play on cold start and F2.\n'
             path = out/f'{edition}-{title}-{ram}KB-Preview.zip'
             with zipfile.ZipFile(path,'w') as z:
                 for name,data in sorted(files.items()):
@@ -59,6 +64,7 @@ if __name__ == '__main__':
         p.add_argument(name,type=Path)
     p.add_argument('source')
     p.add_argument('--startup-audio', action='store_true')
+    p.add_argument('--opening-show', action='store_true')
     a = p.parse_args()
     a.output.mkdir(parents=True,exist_ok=True)
-    build(a.releases,a.runtime,a.output,a.source,a.startup_audio)
+    build(a.releases,a.runtime,a.output,a.source,a.startup_audio,a.opening_show)

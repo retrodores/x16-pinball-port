@@ -63,6 +63,25 @@ static void print(const char*s){while(*s)cbm_k_bsout(*s++);}
 static void echo(const char*s){while(*s)*(volatile uint8_t*)0x9fbb=*s++;}
 static void hex(uint32_t a){for(uint8_t i=0;i<8;++i){*(volatile uint8_t*)0x9fbb="0123456789abcdef"[a>>28];a<<=4;}}
 static uint32_t cycles(void){uint8_t a=*(volatile uint8_t*)0x9fb8,b=*(volatile uint8_t*)0x9fb9,c=*(volatile uint8_t*)0x9fba,d=*(volatile uint8_t*)0x9fbb;return(uint32_t)a|((uint32_t)b<<8)|((uint32_t)c<<16)|((uint32_t)d<<24);}
+#ifndef GAME_TEST
+/* The opening sample borrows the first gameplay PCM banks. Restore
+ * their assets before any ball feed or gameplay effect can run. */
+static __attribute__((noinline)) bool startup_pcm(bool opening){
+ uint8_t saved=*(volatile uint8_t*)0;
+ pcm_stop();
+#ifdef COVER_AUDIO
+ /* Keep the mixer FIFO from draining during the bank load. */
+ uint8_t rate=v[28];v[28]=0;
+#endif
+ *(volatile uint8_t*)0=19;
+ bool ok=load(opening?"STARTFX.BIN":"PCM0.BIN",0,0xa000);
+ *(volatile uint8_t*)0=saved;
+#ifdef COVER_AUDIO
+ v[28]=rate;
+#endif
+ return ok;
+}
+#endif
 static void effect(uint8_t id,uint8_t rank,uint8_t voice){
  if(id==255)return;
  if(!voice){
@@ -76,9 +95,9 @@ static void effect(uint8_t id,uint8_t rank,uint8_t voice){
 }
 void audio_stop(void){pcm_stop();priority=0;}
 void audio_effect(uint8_t id){
- if(id==SoundStartupHigh||id==SoundStartupLow){
-  pcm_select_bank=57;pcm_select_ptr=id==SoundStartupHigh?0xbd00:0xbe80;
-  pcm_start(384);return;
+ if(id==SoundStartup){
+  pcm_select_bank=19;pcm_select_ptr=0xa000;
+  pcm_start(55539);return;
  }
  uint16_t e=audio_event_sample(id,game.last_group,game.last_kind,game.sound_value);
  uint8_t voice=id<=1?1:(id==3||id==4||id==16)?2:0;
@@ -117,31 +136,7 @@ static void ball(uint8_t f,int16_t x,int16_t y,uint32_t distance_squared){
  copy_cycles=cycles()-copy_start;
 #endif
 }
-static void display(bool update_panel){
- /* Camera matrix from PINBALL.DAT, Q8. Products retain 16 fractional bits. */
- int16_t depth=6317-(signedmul(game.y,104)+signedmul(game.z,234))/256;
- int16_t camera_y=(signedmul(game.y,-234)+signedmul(game.z,104))/256+971;
- if(depth<2048)depth=2048;if(depth>10232)depth=10232;
- uint16_t scale=projection_scale[(depth-2048+4)>>3];
- int16_t x=191-projected(game.x,scale),y=243-projected(camera_y,scale);
- uint32_t distance_squared=signedmul(game.x,game.x)+signedmul(camera_y,camera_y)+signedmul(depth,depth);
- uint8_t f=0;while(f<6&&ball_depth_squared[f]>distance_squared)++f;
- const SpriteFrame*b=sprites+24+f;
- if(game.state==Serving||game.state==InPlay||(game.state==Captured&&game.captured==Kickout))ball(f,x-b->width/2,y-b->height/2,distance_squared);else hide(0);
- for(uint8_t i=0;i<2;++i){uint8_t pose=phase_pose[game.phase[i]];
-  if(pose!=phase_cache[i]){f=i*8+pose;frame(1+i*9,f,sprites[f].x,sprites[f].y,9);phase_cache[i]=pose;}
- }
- uint8_t pose=(game.flags&1)?charge_pose[game.charge]:0;
- if(pose!=plunger_cache){f=16+pose;frame(19,f,sprites[f].x,sprites[f].y,3);plunger_cache=pose;}
- if(game.score_dirty&&update_panel){uint8_t hi=39;while(hi&&!game.digits[hi])--hi;
-  for(uint8_t i=0;i<9;++i){uint8_t digit=i<=hi?game.digits[i]:255;if(digit==score_cache[i])continue;score_cache[i]=digit;
-   if(digit==255){hide(22+i);}else frame(22+i,31+digit,553-i*15,197,1);
-  }
-  wide_score=hi>=9;
-  if(hi>=9){echo("# EXACT SCORE ");for(int8_t i=hi;i>=0;--i)*(volatile uint8_t*)0x9fbb=48+game.digits[i];echo("\n");}
-  game.score_dirty=false;
- }
- uint8_t number=game.ball_number;if(update_panel&&number!=ball_cache){frame(32,31+number,553,152,1);ball_cache=number;}
+static __attribute__((section(".rules"),noinline)) void update_status_banked(void){
  uint8_t panel_state=game.state;
 #if !defined(GAME_TEST)||defined(ATTRACT_TEST)
  if(attract_caption)panel_state=5+attract_caption;
@@ -149,7 +144,7 @@ static void display(bool update_panel){
  if(game.state==Ready&&game.wait>StartupReadyFrames)panel_state=126;
  if(game.state==InPlay&&game.mission)panel_state=128+9*game.mission+game.mission_left;
  if(wide_score)panel_state=254;
- if(update_panel&&previous_state!=panel_state){
+ if(previous_state!=panel_state){
   static const char*const labels[]={
    "",
    "Ready to\nlaunch",
@@ -176,7 +171,40 @@ static void display(bool update_panel){
   else status(labels[game.state],0);
   previous_state=panel_state;
  }
- dynamic_update(update_panel?128:0);
+}
+static void update_status(void){
+ uint8_t saved=*(volatile uint8_t*)0;
+ font_bank(61);
+ update_status_banked();
+ font_bank(saved);
+}
+static void display(bool update_panel){
+ /* Camera matrix from PINBALL.DAT, Q8. Products retain 16 fractional bits. */
+ int16_t depth=6317-(signedmul(game.y,104)+signedmul(game.z,234))/256;
+ int16_t camera_y=(signedmul(game.y,-234)+signedmul(game.z,104))/256+971;
+ if(depth<2048)depth=2048;if(depth>10232)depth=10232;
+ uint16_t scale=projection_scale[(depth-2048+4)>>3];
+ int16_t x=191-projected(game.x,scale),y=243-projected(camera_y,scale);
+ uint32_t distance_squared=signedmul(game.x,game.x)+signedmul(camera_y,camera_y)+signedmul(depth,depth);
+ uint8_t f=0;while(f<6&&ball_depth_squared[f]>distance_squared)++f;
+ const SpriteFrame*b=sprites+24+f;
+ if(game.state==Serving||game.state==InPlay||(game.state==Captured&&game.captured==Kickout))ball(f,x-b->width/2,y-b->height/2,distance_squared);else hide(0);
+ for(uint8_t i=0;i<2;++i){uint8_t pose=phase_pose[game.phase[i]];
+  if(pose!=phase_cache[i]){f=i*8+pose;frame(1+i*9,f,sprites[f].x,sprites[f].y,9);phase_cache[i]=pose;}
+ }
+ uint8_t pose=(game.flags&1)?charge_pose[game.charge]:0;
+ if(pose!=plunger_cache){f=16+pose;frame(19,f,sprites[f].x,sprites[f].y,3);plunger_cache=pose;}
+ if(game.score_dirty&&update_panel){uint8_t hi=39;while(hi&&!game.digits[hi])--hi;
+  for(uint8_t i=0;i<9;++i){uint8_t digit=i<=hi?game.digits[i]:255;if(digit==score_cache[i])continue;score_cache[i]=digit;
+   if(digit==255){hide(22+i);}else frame(22+i,31+digit,553-i*15,197,1);
+  }
+  wide_score=hi>=9;
+  if(hi>=9){echo("# EXACT SCORE ");for(int8_t i=hi;i>=0;--i)*(volatile uint8_t*)0x9fbb=48+game.digits[i];echo("\n");}
+  game.score_dirty=false;
+ }
+ uint8_t number=game.ball_number;if(update_panel&&number!=ball_cache){frame(32,31+number,553,152,1);ball_cache=number;}
+ if(update_panel)update_status();
+ dynamic_update(update_panel?(game.state==Ready?240:128):0);
  if(update_panel)message_step();
 }
 static __attribute__((section(".physics"),noinline)) void compact_footer(void){
@@ -219,7 +247,7 @@ int main(void){
 #endif
  for(uint8_t i=0;i<PCM_PARTS;++i){char n[]="PCM0.BIN";n[3]+=i;*(volatile uint8_t*)0=pcm_load_banks[i];if(!load(n,0,0xa000))goto fail;}
  for(uint8_t i=0;i<9;++i){char n[]="DEPTH00.BIN";n[6]+=i;*(volatile uint8_t*)0=i==0?10:i<3?16+i:i+42;if(!load(n,0,0xa000))goto fail;}
- *(volatile uint8_t*)0=57;if(!load("MSGFONT.BIN",0,0xa400)||!load("STARTFX.BIN",0,0xbd00))goto fail;
+ *(volatile uint8_t*)0=57;if(!load("MSGFONT.BIN",0,0xa400))goto fail;
  *(volatile uint8_t*)0=31;if(!load("RINGS.BIN",0,0xb000))goto fail;
  for(uint8_t i=0;i<DYNAMIC_BANK_COUNT;++i){char n[]="DYN0.BIN";n[3]+=i;*(volatile uint8_t*)0=dynamic_load_banks[i];if(!load(n,0,0xa000))goto fail;}
  *(volatile uint8_t*)0=11;if(!load("UI.BIN",0,0xa000))goto fail;
@@ -235,6 +263,9 @@ int main(void){
   * entirely visible while reducing the empty strip below the cabinet. */
  v[5]=0;v[10]=119;v[11]=117;v[12]=0;
  v[13]=0x12;v[14]=0;v[15]=0x0b;v[16]=v[17]=v[18]=v[19]=0;
+#ifndef GAME_TEST
+ if(!startup_pcm(true))goto fail;
+#endif
  __asm__ volatile("sei");*(volatile uint16_t*)0x032e=(uint16_t)(uintptr_t)keyboard;__asm__ volatile("cli");
  lab_install();
 #ifdef GAME_TEST
@@ -285,7 +316,12 @@ int main(void){
     (keys[61]?DemoLaunch:0)|(keys[83]?DemoNudge:0)|(keys[114]?DemoToggle:0)|
     (keys[113]?DemoNew:0);
   buttons=attract_input(buttons,now);
-  if(buttons&DemoReset){game_begin(game.state!=Ready&&!attract_caption&&!(buttons&15));previous_state=255;}
+  if(buttons&DemoReset){
+   bool show=game.state!=Ready&&!attract_caption&&!(buttons&15);
+   if((show||game.state==Ready)&&!startup_pcm(show))goto audio_load_failed;
+   game_begin(show);previous_state=255;
+  }
+  if(game.state==Ready&&game.wait==1&&!startup_pcm(false))goto audio_load_failed;
   game_frame(buttons&DemoLeft,buttons&DemoRight,buttons&DemoLaunch,buttons&DemoNudge);
 #endif
 
@@ -334,5 +370,9 @@ int main(void){
  *(volatile uint8_t*)0x9fb4=0;__asm__ volatile("jmp $ffff");
 #endif
  __asm__ volatile("jsr $ff81");return 0;
+#ifndef GAME_TEST
+audio_load_failed:
+ lab_uninstall();__asm__ volatile("sei");*(volatile uint16_t*)0x032e=oldkey;__asm__ volatile("cli");
+#endif
 fail:*(volatile uint8_t*)0=oldbank;__asm__ volatile("jsr $ff81");print("ASSET LOAD FAILED\r");echo("# LOAD FAILED\n");return 1;
 }

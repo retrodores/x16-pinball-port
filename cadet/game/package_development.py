@@ -114,7 +114,7 @@ def audit(build=BUILD):
     assert dynamic['bytes']<=4*8192
     for i in range(4): assert len(data[f'DYN{i}.BIN'])==8192
     assert 0<len(data['MSGFONT.BIN'])<=0x1900
-    assert len(data['STARTFX.BIN'])==0x300
+    assert len(data['STARTFX.BIN'])==55539
     assert len(data['PCM2.BIN'])<=6*8192+0x400
     assert 0<len(data['RINGS.BIN'])<=4096
     assert dynamic['ring_tail_bytes']==len(data['RINGS.BIN'])

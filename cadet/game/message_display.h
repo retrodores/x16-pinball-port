@@ -133,7 +133,7 @@ static FONT_CODE void status_banked(const char *s,uint8_t digit){
  font_x=MESSAGE_LEFT;font_y=MESSAGE_TOP;font_digit=digit;font_pending=s;
 }
 
-static void status(const char *s,uint8_t digit){
+static __attribute__((noinline)) void status(const char *s,uint8_t digit){
  uint8_t saved=*(volatile uint8_t*)0;
  font_bank(62);
  status_banked(s,digit);

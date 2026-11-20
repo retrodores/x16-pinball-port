@@ -1,24 +1,9 @@
-"""Generate two original electronic pulses at the resident PCM rate."""
-from math import exp, pi, sin
+"""Stage the installed game's opening sample at the existing PCM rate."""
 from pathlib import Path
 import sys
 
-SAMPLE_RATE = 11062.6220703125
-NOTE_BYTES = 384
-
-
-def pulse(frequency, amplitude):
-    data = bytearray()
-    phase = 0.0
-    for i in range(NOTE_BYTES):
-        t = i/SAMPLE_RATE
-        phase += 2*pi*(frequency + 220*exp(-t*125))/SAMPLE_RATE
-        attack = min(1, i/24)
-        release = min(1, (NOTE_BYTES-1-i)/65)
-        envelope = amplitude*attack*release*exp(-t*72)
-        data.append(round(envelope*(sin(phase)+0.24*sin(phase*2))) & 255)
-    return data
-
-
-if __name__ == '__main__':
-    Path(sys.argv[1]).write_bytes(pulse(1140, 90) + pulse(810, 68))
+source = Path(__file__).resolve().parents[1]/'build'/'PCM'/'SOUND1.PCM'
+sample = source.read_bytes()
+if len(sample) != 55539:
+    raise ValueError("Expected 55,539 bytes of converted SOUND1.WAV")
+Path(sys.argv[1]).write_bytes(sample)
