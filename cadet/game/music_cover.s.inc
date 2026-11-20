@@ -213,8 +213,7 @@ cover_mix_block:
  sbc #73
  pha
  lda pcm_buffer,x
- cmp #$80
- ror
+ ; Give effects half-scale headroom, equal to each stereo drum channel.
  cmp #$80
  ror
  sta cover_held_effect

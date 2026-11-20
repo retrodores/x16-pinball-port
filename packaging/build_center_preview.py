@@ -37,6 +37,8 @@ def create(edition, base_dir, runtime, output, commit, cover):
     files.update((name, (runtime / name).read_bytes()) for name in names)
     files['RUN-WINDOWS.bat'] = launcher.encode('ascii')
     ram = '2048' if cover else '512'
+    mix = ('This cover build brings the game effects forward by approximately 6 dB.\n'
+           if cover else '')
     files['README.txt'] = f'''{edition} - Center and Demo Preview ({ram} KB)
 
 Extract into its own folder. Put x16emu.exe and matching rom.bin in the
@@ -47,7 +49,7 @@ The center lamps show rank and the first-rank Target Practice and Launch
 Training missions. Demo flippers respond to the ball's approach.
 The upper pane shows Player 1. Short messages appear in the lower pane.
 
-This is a development preview. The broader mission system is incomplete
+{mix}This is a development preview. The broader mission system is incomplete
 and some frames exceed the 133,333-cycle target. The embedded engine
 specifications describe the verified baseline. Runtime source commit {commit}.
 '''.encode('ascii')

@@ -14,7 +14,7 @@ class PackageTests(unittest.TestCase):
           'MUSIC0.BIN':65536,'MUSIC1.BIN':37194,'PCM0.BIN':65536,
           'PCM1.BIN':32768,'PCM2.BIN':49938,
           **{f'DEPTH{i:02}.BIN':(5640 if i==0 else 6825 if i==8 else 8192)for i in range(9)},
-          **{f'DYN{i}.BIN':8192 for i in range(4)}}
+          'RINGS.BIN':2542,**{f'DYN{i}.BIN':8192 for i in range(4)}}
         for name,size in sizes.items():
             data=bytes(size)
             if name=='CADET.PRG':data=b'\x01\x08'+data[2:]
@@ -24,7 +24,7 @@ class PackageTests(unittest.TestCase):
          'sprites.json':{'base':102912,'bytes':18560,'end':121472},
          'resident-audio.json':{'bytes':148242,'banks':list(range(19,31))+list(range(51,58)),'load_banks':[19,27,51]},
          'depth.json':{'codec':'packbits64-deduplicated','codec_exact_pixels':171550,'data_bytes':64169},
-         'dynamic.json':{'bytes':20434}}
+         'dynamic.json':{'ring_tail_bytes':2542,'bytes':20434}}
         for name,data in metadata.items():(self.root/name).write_text(json.dumps(data))
     def tearDown(self):self.temp.cleanup()
     def test_valid_asset_layout(self):

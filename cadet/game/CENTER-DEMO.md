@@ -21,3 +21,8 @@ rank-selection and original jackpot behavior remain incomplete.
 The added ring poses occupy the end of the existing DYN2 bank and 2,542
 bytes starting at bank 31's B000. The legacy LZSS player uses the lower 4 KB
 of that bank. The packer keeps each edition's existing mechanism patches.
+
+
+The 2 MB cover mix raises the isolated effects signal by approximately 6 dB
+over the first cover preview. It keeps the music voice gains. At full scale,
+each channel sums two signed half-scale signals within the 8-bit PCM range.

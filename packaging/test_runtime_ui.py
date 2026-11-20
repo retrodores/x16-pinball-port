@@ -35,7 +35,7 @@ with (output('ui.log')).open('w')as f:
   ready=shot('ready')
   if split_panes:
    assert purple_glyphs(ready,player)>60,'Player 1 is missing from upper pane'
-   assert purple_glyphs(ready,(405,261,570,288))==0,'upper pane has extra message rows'
+   assert purple_glyphs(ready,(405,268 if score_digits else 261,570,288))==0,'upper pane has extra message rows'
    for top in ((309,332,355) if score_digits else (306,324,342)):
     assert purple_glyphs(ready,(405,top,570,top+15))>25,('launch message row missing',top)
    blank_top=374 if score_digits else 361

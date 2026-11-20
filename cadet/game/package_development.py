@@ -14,7 +14,7 @@ VERSION='0.3.1-dev'
 RUNTIME=('CADET.PRG','CADET.RUL','CADET.PHY','MAP.BIN','TILES.BIN','PAL.BIN','SPRITES.BIN',
          'FONT.BIN','UI.BIN',*[f'GEOM{i}.BIN' for i in range(3)],
          *[f'MUSIC{i}.BIN' for i in range(2)],*[f'PCM{i}.BIN' for i in range(3)],
-         *[f'DEPTH{i:02}.BIN' for i in range(9)],*[f'DYN{i}.BIN' for i in range(4)])
+         *[f'DEPTH{i:02}.BIN' for i in range(9)],*[f'DYN{i}.BIN' for i in range(4)],'RINGS.BIN')
 # Geometry loader temporarily writes padding/obsolete bounds in10,11,17,18.
 # The later UI/depth loads intentionally overwrite those locations.
 LIVE_BANKS={
@@ -113,6 +113,8 @@ def audit(build=BUILD):
     dynamic=json.loads((build/'dynamic.json').read_text())
     assert dynamic['bytes']<=4*8192
     for i in range(4): assert len(data[f'DYN{i}.BIN'])==8192
+    assert 0<len(data['RINGS.BIN'])<=4096
+    assert dynamic['ring_tail_bytes']==len(data['RINGS.BIN'])
     return {'runtime_files':len(data),'runtime_bytes':sum(map(len,data.values())),
             'live_banks':LIVE_BANKS,'free_banks':[b for b in range(1,64)if b not in seen],
             'sha256':{n:sha(b)for n,b in sorted(data.items())}}
