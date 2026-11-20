@@ -93,9 +93,13 @@ static void captures(void){
  game_start();rules_destination(true);hit(338);rules_release();drain();CHECK(game.balls==3);game.state=InPlay;drain();CHECK(game.balls==2);
 }
 static void mission_rings(void){
- game_start();
+ game_begin(true);
+ CHECK(game.state==Ready&&game.wait==StartupFrames);
  CHECK(game_ring_lamp(0)&&!game_ring_lamp(2));
- for(uint8_t i=0;i<72;++i)rules_tick();
+ for(uint16_t i=0;i<StartupFrames-1;++i)game_frame(0,0,1,0);
+ CHECK(game.state==Ready&&game.wait==1&&!game.charge);
+ game_frame(0,0,1,0);
+ CHECK(game.state==Serving&&!game.charge);
  CHECK(game_ring_lamp(18)==1&&game_ring_lamp(19)==0);
  Edge ramp={0};
  for(uint16_t i=0;i<edge_count;++i){ramp=*edge(i);if(ramp.kind==Ramp&&original_groups[ramp.group]==101&&metadata[ramp.param].action==1)break;}

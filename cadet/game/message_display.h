@@ -120,6 +120,10 @@ static FONT_CODE void init_messages(void){
 }
 
 static FONT_CODE void status_banked(const char *s,uint8_t digit){
+ uint8_t visible=game.state==Ready&&game.wait>StartupReadyFrames?0:12;
+ for(uint8_t i=PLAYER_FIRST_SPRITE;i<PLAYER_FIRST_SPRITE+7;++i){
+  addr(0x1fc06UL+(uint16_t)i*8);v[3]=visible;
+ }
  while(font_slot>MESSAGE_FIRST_SPRITE)hide(--font_slot);
  for(uint8_t i=0;i<96;++i){
   uint8_t slot=font_cache[i];

@@ -142,12 +142,13 @@ static void display(bool update_panel){
 #if !defined(GAME_TEST)||defined(ATTRACT_TEST)
  if(attract_caption)panel_state=5+attract_caption;
 #endif
+ if(game.state==Ready&&game.wait>StartupReadyFrames)panel_state=126;
  if(game.state==InPlay&&game.mission)panel_state=128+9*game.mission+game.mission_left;
  if(wide_score)panel_state=254;
  if(update_panel&&previous_state!=panel_state){
   static const char*const labels[]={
-   "Ready\nF2 for\nnew game",
-   "Hold Space\nRelease to\nlaunch",
+   "",
+   "Ready to\nlaunch",
    "In play",
    "Ball held\nReturn soon",
    "Next ball",
@@ -228,10 +229,16 @@ int main(void){
  *(volatile uint8_t*)0=11;
  /* Fill the 640x480 signal with the playable viewport. Keep the backbox
   * entirely visible while reducing the empty strip below the cabinet. */
- v[5]=0;v[9]=0x51;v[10]=119;v[11]=117;v[12]=0;
+ v[5]=0;v[10]=119;v[11]=117;v[12]=0;
  v[13]=0x12;v[14]=0;v[15]=0x0b;v[16]=v[17]=v[18]=v[19]=0;
  __asm__ volatile("sei");*(volatile uint16_t*)0x032e=(uint16_t)(uintptr_t)keyboard;__asm__ volatile("cli");
- lab_install();game_start();dynamic_init();frame(31,32,403,197,1);display(true);
+ lab_install();
+#ifdef GAME_TEST
+ game_start();
+#else
+ game_begin(true);
+#endif
+ dynamic_init();frame(31,32,403,197,1);display(true);v[9]=0x51;
 #ifndef NO_MUSIC
  music_start();
 #endif
@@ -274,7 +281,7 @@ int main(void){
     (keys[61]?DemoLaunch:0)|(keys[83]?DemoNudge:0)|(keys[114]?DemoToggle:0)|
     (keys[113]?DemoNew:0);
   buttons=attract_input(buttons,now);
-  if(buttons&DemoReset){game_start();previous_state=255;}
+  if(buttons&DemoReset){game_begin(game.state!=Ready&&!attract_caption&&!(buttons&15));previous_state=255;}
   game_frame(buttons&DemoLeft,buttons&DemoRight,buttons&DemoLaunch,buttons&DemoNudge);
 #endif
 

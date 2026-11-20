@@ -90,7 +90,7 @@ static PHYSICS uint8_t controls(uint8_t buttons, uint16_t now){
    idle_started=true;
    idle_since=now;
   }
-  bool at_start=game.state==Serving&&game.ball_number==1&&!game.events;
+  bool at_start=game.state==Ready||(game.state==Serving&&game.ball_number==1&&!game.events);
   if(((terminal||at_start)&&(pressed&DemoToggle)) ||
      ((terminal||idle_allowed)&&(uint16_t)(now-idle_since)>=IDLE_TICKS)){
    attract_caption=DemoActive;
