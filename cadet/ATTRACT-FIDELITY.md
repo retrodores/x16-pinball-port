@@ -26,7 +26,7 @@ python3 cadet/game/test_mechanisms.py
 python3 cadet/game/test_package_development.py
 cc -O2 -Icadet/play-build cadet/game/test_attract.c cadet/game/engine.c -o /tmp/cadet-test-attract
 /tmp/cadet-test-attract
-python3 packaging/build_center_preview.py --attract-fidelity releases/Attract-Preview-3 cadet/play-build /opt/cadet-attract-zips d8160f2
+python3 packaging/build_center_preview.py --attract-fidelity releases/Attract-Preview-3 cadet/play-build /opt/cadet-attract-zips a65c79437e02d5f8095949b7b30eed6a7b0e58c3
 ```
 
 The font importer uses the executable at

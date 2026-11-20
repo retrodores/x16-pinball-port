@@ -22,9 +22,12 @@ def create(edition, base_dir, runtime, output, commit, cover, fidelity=False):
     files['DYN2.BIN'] = old[:boundary] + (runtime / 'DYN2.BIN').read_bytes()[boundary:]
     files['RINGS.BIN'] = (runtime / 'RINGS.BIN').read_bytes()
     launcher = files['RUN-WINDOWS.bat'].decode('ascii').replace('for %%F in (', 'for %%F in (RINGS.BIN ')
+    message_font = runtime / 'MSGFONT.BIN'
     if fidelity:
-        files['MSGFONT.BIN'] = (runtime / 'MSGFONT.BIN').read_bytes()
+        files[message_font.name] = message_font.read_bytes()
         launcher = launcher.replace('for %%F in (', 'for %%F in (MSGFONT.BIN ')
+    elif message_font.exists():
+        raise ValueError('Use --attract-fidelity for a runtime with MSGFONT.BIN')
     names = ('CADET.PRG', 'CADET.PHY', 'CADET.RUL')
     if cover:
         names = COVER_FILES
@@ -57,12 +60,23 @@ def create(edition, base_dir, runtime, output, commit, cover, fidelity=False):
     font_notes = ('Both panes use the original proportional message glyphs. '
                   'The score and BALL counters use their original numeral sprites.\n'
                   'The center rings sparkle during the opening.\n' if fidelity else '')
+    play_notes = (
+        'Flippers: Z and /. Plunger: hold and release Space. Exit: Escape.\n'
+        if fidelity else ''
+    )
+    attribution = (
+        '\nLICENSE covers the new code. Original game artwork, audio, and the\n'
+        'PBMSG_FT letterforms are separate resources. See ENGINE-THIRD-PARTY-LICENSE\n'
+        'and https://github.com/k4zmu2a/SpaceCadetPinball for engine attribution.\n'
+        'Specification commit 898276b21c124afddbb242fb4dba0ff933feb049.\n'
+        if fidelity else ''
+    )
     files['README.txt'] = f'''{edition} - {preview} ({ram} KB)
 
 Extract into its own folder. Put x16emu.exe and matching rom.bin in the
 parent folder, then double-click RUN-WINDOWS.bat. All game assets are included.
 
-F3 or idle starts the demo. F2 or a play control takes over. M toggles music.
+{play_notes}F3 or idle starts the demo. F2 or a play control takes over. M toggles music.
 The center lamps show rank and the first-rank Target Practice and Launch
 Training missions. Demo flippers respond to the ball's approach.
 The upper pane shows Player 1. Short messages appear in the lower pane.
@@ -70,7 +84,7 @@ The upper pane shows Player 1. Short messages appear in the lower pane.
 {font_notes}{mix}This is a development preview. The broader mission system is incomplete
 and some frames exceed the 133,333-cycle target. The embedded engine
 specifications describe the verified baseline. Runtime source commit {commit}.
-'''.encode('ascii')
+{attribution}'''.encode('ascii')
     assert set(REPLACED_FILES).isdisjoint(files) if cover else set(REPLACED_FILES)<=files.keys()
     required = launcher.split('for %%F in (', 1)[1].split(')', 1)[0].split()
     assert all(name in files for name in required)
