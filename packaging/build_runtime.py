@@ -1,11 +1,16 @@
 #!/usr/bin/env python3
 """Package complete runtimes. No first-run import or patching.
-Usage: python3 packaging/build_runtime.py ORIGINAL_DIR CMDR_2D_DIR SPEC_DIR OUT_DIR
+Usage: python3 packaging/build_runtime.py ORIGINAL_DIR CMDR_2D_DIR SPEC_DIR OUT_DIR [--attract-preview]
 Inputs must be prepared, tested runtime directories; only allowlisted files ship.
 """
 from pathlib import Path
-import sys,json,hashlib,zipfile
-original,cmdr,spec,out=map(Path,sys.argv[1:])
+import argparse,json,hashlib,zipfile
+parser=argparse.ArgumentParser(description=__doc__)
+for name in ('original','cmdr','spec','out'):
+ parser.add_argument(name,type=Path)
+parser.add_argument('--attract-preview',action='store_true')
+args=parser.parse_args()
+original,cmdr,spec,out=args.original,args.cmdr,args.spec,args.out
 out.mkdir(parents=True,exist_ok=True)
 runtime=['CADET.PRG','CADET.PHY','CADET.RUL','FONT.BIN','MAP.BIN','TILES.BIN','PAL.BIN','SPRITES.BIN','UI.BIN']
 runtime += [f'{prefix}{i}.BIN' for prefix,n in [('GEOM',3),('MUSIC',2),('PCM',3),('DYN',4)] for i in range(n)]
@@ -21,6 +26,26 @@ runtime_pinned={
  'MUSIC0.BIN':'235d0956bff4a8fbb6bc979e2663eb55f5b50b27fa8b9593faa1338f70b831ec',
  'MUSIC1.BIN':'dcb3b3501b76b87f2790ae79945a6641d2fc2496b81cd4e806ce38924ee3b5b4',
 }
+label='1.0 Beta'
+archive_label='1.0-Beta'
+notes=('Music: M. Exit: Escape. This refresh puts the music ahead of sound effects\n'
+       'and uses purple for live status text.')
+if args.attract_preview:
+ label='Attract Preview 1'
+ archive_label='Attract-Preview-1'
+ source='bc67ff64f550ad08503d528d5b263884a7855fb7'
+ notes=('Music: M. Exit: Escape. Press F3 or idle for about 15 seconds for the demo.\n'
+        'F2 starts a fresh game. A play control also takes over from the demo.\n'
+        'This preview uses an effects-forward mix.\n\n'
+        'Known timing limit: 70 of 12000 benchmark frames exceeded the cycle budget\n'
+        'at each tested RAM size. See the release validation report.')
+ runtime_pinned={
+  'CADET.PRG':'f39633133da4a03608d9a9471747dc25464375fc1aa8127f5000876356204346',
+  'CADET.PHY':'5c0e7f1da75e8050edfc709990ce96e4b9789e4d34d58bcd85bc0a34aebba492',
+  'CADET.RUL':'2a3143a442b4711a6b9e039bb053e3fb4ea9342196660fac203a111af2e0bf4b',
+  'MUSIC0.BIN':'d73e67d4a41a3946c697171b6c77ef77e842c01ab55a9afa8fcece772b9e00b5',
+  'MUSIC1.BIN':'771273719e81d71c90271664b10f5effb5938b94ec0f719fa0c98d9be2cf224d',
+ }
 spec_commit='898276b21c124afddbb242fb4dba0ff933feb049'
 contract=json.loads((spec/'engine-contract.json').read_text())
 pinned={Path(x['path']).name:x['sha256'] for x in contract['runtime_files']}
@@ -43,7 +68,7 @@ echo Place x16emu.exe and its matching rom.bin in the parent folder.
 pause
 exit /b 1
 '''
-manifest={'label':'1.0 Beta','packaging':'complete runtime with all 30 game files; no asset import',
+manifest={'label':label,'packaging':'complete runtime with all 30 game files; no asset import',
 'engine_source_commit':source,'music_source_commit':source,'specification_commit':spec_commit,
 'reference_sha256':'7f2984ab9939b5ec8ffa828cdd2423c16c4faa3e3bf2afb3881fb47acf87b72b',
 'windows_interactive_tested':False,'archives':[]}
@@ -54,7 +79,7 @@ for title,folder,stem in [('Space Cadet - original presentation on X16',original
  for n,digest in runtime_pinned.items():assert sha(files[n])==digest,n
  for n in ['LICENSE','ENGINE-THIRD-PARTY-LICENSE']:files[n]=(folder/n).read_bytes()
  files['RUN-WINDOWS.bat']=launcher.replace('FILES',' '.join(runtime)).replace('\n','\r\n').encode()
- files['README.txt']=f'''{title} -- 1.0 Beta
+ files['README.txt']=f'''{title} -- {label}
 
 ALL GAME ASSETS ARE INCLUDED AND READY.
 Extract this ZIP into its own folder and double-click RUN-WINDOWS.bat.
@@ -64,8 +89,7 @@ The emulator and ROM are the only external prerequisites.
 
 Use separate folders for the two editions.
 Flippers: Z and /. Plunger: hold/release Space. New game: F2.
-Music: M. Exit: Escape. This refresh puts the music ahead of sound effects
-and uses purple for live status text.
+{notes}
 
 Engine source commit: {source}
 Specification commit: {spec_commit}
@@ -85,7 +109,7 @@ and are not relicensed under the engine's MIT notice.
 Source reference: https://github.com/k4zmu2a/SpaceCadetPinball
 '''.encode()
  for n in specnames:files['specs/'+n]=(spec/n).read_bytes()
- name=stem+'-1.0-Beta-Runtime.zip'
+ name=f'{stem}-{archive_label}-Runtime.zip'
  with zipfile.ZipFile(out/name,'w',zipfile.ZIP_DEFLATED,compresslevel=9) as z:
   for n,data in sorted(files.items()):
    info=zipfile.ZipInfo(n,(2026,11,19,0,0,0));info.compress_type=zipfile.ZIP_DEFLATED;info.external_attr=0o100644<<16
