@@ -93,12 +93,17 @@ static __attribute__((section(".physics"),noinline)) void upload_glyphs(uint32_t
     for(uint8_t glyph=0;glyph<count;++glyph){
         uint8_t previous=0;
         for(uint8_t y=0;y<16;++y){
-            uint8_t stroke=y<14 ? glyphs[glyph][y/2]<<2 : 0;
+            uint8_t dots=y<14 ? glyphs[glyph][y/2] : 0;
+            uint8_t stroke=((dots&16)<<3)|((dots&8)<<3)|((dots&8)<<2)|
+                ((dots&4)<<2)|((dots&2)<<2)|((dots&2)<<1)|((dots&1)<<1);
             uint8_t shadow=(stroke>>1)|previous;
             previous=stroke;
             uint8_t pair=0;
+            uint8_t highlights=y&1 ? 0x55 : 0xaa;
             for(uint8_t bit=0x80;bit;bit>>=1){
-                uint8_t color=stroke&bit ? FONT_STATUS_PEN : shadow&bit ? FONT_STATUS_SHADOW : 0;
+                uint8_t color=0;
+                if(stroke&bit)color=highlights&bit ? FONT_STATUS_HIGHLIGHT : FONT_STATUS_PEN;
+                else if(shadow&bit)color=FONT_STATUS_SHADOW;
                 if(bit&0x55)v[3]=pair|color;
                 else pair=color<<4;
             }
