@@ -7,7 +7,7 @@ tracks four bumper hits followed by two ramp entries. It holds the final
 score for about three seconds and starts a new demo.
 
 Press F2 to start a fresh manual game. A flipper, the plunger, or nudge also
-takes over from a fresh manual game and applies that control. F3 can leave
+takes over, starts a fresh manual game, and applies that control. F3 can leave
 an active demo and cannot replace a manual game in progress. M still toggles
 music and Escape exits.
 
@@ -28,7 +28,9 @@ quartile during 0:22–5:00 was about 4352. The resulting 15.2 dB contrast is a
 guide to the mix, since the two windows do not expose independent stems.
 The preview uses an effects-forward default based on that comparison. Its
 matched music-only and effects-only emulator scenes measured a 14.16 dB
-effects lead at 512 KB and 14.27 dB at 2 MB.
+effects lead at 512 KB and 14.27 dB at 2 MB. The mixed fixture peaked at 18432
+of 32767 in both configurations. Each soundtrack loop completed with
+concurrent sounds and zero PCM underruns.
 
 ## Building and checking
 
@@ -43,8 +45,14 @@ Linux UI smoke tests ran on Space Cadet X16 first, then Space CmdrX16, at
 512 KB and 2 MB. They checked idle entry, actual score and objective
 progression, F3 entry, F2 and flipper takeover, and the four new-ball
 gate lamp regions. The host controller fixture checks the game-over
-pause and restart, idle clock wrap, score-independent objective state,
-and the manual-game takeover guard. The native build audit verified
+pause and restart, idle clock wrap, same-ball relaunch, objective ordering,
+and the manual-game takeover guard. The host engine completed seven full
+automatic games in 90000 frames. Each completed both objectives with zero
+ball escapes. The native build audit verified
 the overlay files against their ELF sections.
 
-The 133333-cycle timing gate remains a release blocker.
+The standard 12000-frame native benchmark still has 70 over-budget frames
+at each RAM size, with a maximum of 212845 cycles against the 133333-cycle
+target. It reported zero audio errors and underruns. Benchmark binaries
+were byte-identical before and after the final demo-only fixes. The Beta
+ZIPs point to the existing release build while the timing gate is open.

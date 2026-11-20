@@ -1,10 +1,12 @@
-/* Run with cc -std=c99 -Wall -Wextra cadet/game/test_attract.c -o /tmp/test-attract. */
+/* From the repo root:
+ * cc -O2 -Wall -Wextra -Icadet/play-build cadet/game/test_attract.c \
+ *    cadet/game/engine.c -o /tmp/test-attract && /tmp/test-attract
+ */
 #include <assert.h>
+#include <stdio.h>
 #include "attract.c"
 
-Game game;
-
-int main(void){
+static void transitions(void){
  game.state=Serving;
  game.ball_number=1;
 
@@ -22,21 +24,28 @@ int main(void){
  controls(0,467);
  assert(attract_caption==DemoBumpers);
  game.bumper_hits=4;
+ game.ramp_entries=5;
  controls(0,468);
  assert(attract_caption==DemoRamps+1);
- game.ramp_entries=2;
+ game.ramp_entries=7;
  controls(0,469);
  assert(attract_caption==DemoTourComplete);
 
+ /* A ball can return to the shooter lane without changing the ball number. */
+ game.state=Serving;
+ assert(controls(0,480)==0);
+ assert(controls(0,528)==DemoLaunch);
+ assert(controls(0,590)==0);
+
  game.state=GameOver;
- assert(controls(0,500)==0);
+ assert(controls(0,600)==0);
  assert(attract_caption==DemoFinalScore);
- assert(controls(0,679)==0);
- assert(controls(0,680)==DemoReset);
+ assert(controls(0,779)==0);
+ assert(controls(0,780)==DemoReset);
 
  game.state=Serving;
  game.bumper_hits=game.ramp_entries=0;
- assert(controls(DemoLeft,681)==(DemoReset|DemoLeft));
+ assert(controls(DemoLeft,781)==(DemoReset|DemoLeft));
  assert(!attract_caption);
  assert(controls(0,2500)==0);
 
@@ -48,5 +57,30 @@ int main(void){
  assert(controls(DemoToggle,2503)==DemoReset);
  assert(controls(DemoNew,2504)==DemoReset);
  assert(!attract_caption);
+}
+
+int main(void){
+ transitions();
+ idle_allowed=true;
+ idle_started=false;
+ previous_buttons=0;
+ assert(game_load());
+ game_start();
+ unsigned completed=0,tours=0;
+ for(unsigned frame=0;frame<90000;++frame){
+  bool finished_tour=goal==2;
+  uint8_t input=controls(0,(uint16_t)frame);
+  if(input&DemoReset){
+   if(game.state==GameOver){
+    ++completed;
+    if(finished_tour)++tours;
+    assert(!game.escapes);
+   }
+   game_start();
+  }
+  game_frame(input&DemoLeft,input&DemoRight,input&DemoLaunch,input&DemoNudge);
+ }
+ assert(completed>=2&&tours>=2);
+ printf("%u complete demos, %u complete objective tours\n",completed,tours);
  return 0;
 }

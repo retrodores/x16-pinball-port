@@ -3,9 +3,9 @@
 /* Bank 62 contains the controller; only its trampoline is always resident. */
 #define PHYSICS __attribute__((section(".physics"),noinline))
 #define IDLE_TICKS 900u
-static uint16_t idle_since, ball_since;
-static uint8_t previous_buttons, previous_ball, goal;
-static bool idle_allowed=true, idle_started;
+static uint16_t idle_since, ball_since, ramp_start;
+static uint8_t previous_buttons, goal;
+static bool idle_allowed=true, idle_started, was_serving;
 uint8_t attract_caption;
 
 static PHYSICS uint8_t controls(uint8_t buttons, uint16_t now){
@@ -32,7 +32,7 @@ static PHYSICS uint8_t controls(uint8_t buttons, uint16_t now){
   if(((terminal||at_start)&&(pressed&DemoToggle)) ||
      ((terminal||idle_allowed)&&(uint16_t)(now-idle_since)>=IDLE_TICKS)){
    attract_caption=DemoBumpers+3;
-   previous_ball=0;
+   was_serving=false;
    goal=0;
    return DemoReset;
   }
@@ -45,20 +45,25 @@ static PHYSICS uint8_t controls(uint8_t buttons, uint16_t now){
   }
   if((uint16_t)(now-ball_since)<180u)return 0;
   attract_caption=DemoBumpers+3;
-  previous_ball=0;
+  was_serving=false;
   goal=0;
   return DemoReset;
  }
- if(previous_ball!=game.ball_number){
-  previous_ball=game.ball_number;
-  ball_since=now;
+ if(!goal&&game.bumper_hits>=4){
+  goal=1;
+  ramp_start=game.ramp_entries;
  }
- if(!goal&&game.bumper_hits>=4)goal=1;
- if(goal==1&&game.ramp_entries>=2)goal=2;
  if(!goal)attract_caption=DemoBumpers+3-game.bumper_hits;
- else if(goal==1)attract_caption=DemoRamps+1-game.ramp_entries;
- else attract_caption=DemoTourComplete;
- if(game.state==Serving){
+ else if(goal==1){
+  uint16_t ramps=game.ramp_entries-ramp_start;
+  if(ramps>=2)goal=2;
+  else attract_caption=DemoRamps+1-ramps;
+ }
+ if(goal==2)attract_caption=DemoTourComplete;
+ bool serving=game.state==Serving;
+ if(serving&&!was_serving)ball_since=now;
+ was_serving=serving;
+ if(serving){
   uint16_t age=now-ball_since;
   return age>=48&&age<90+(uint8_t)(game.ball_number*11)?DemoLaunch:0;
  }
