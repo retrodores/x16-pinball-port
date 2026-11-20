@@ -19,7 +19,7 @@ STEPS = (
     'cadet/game/pack_model.py', 'cadet/game/pack_music.py',
     'cadet/game/pack_sprites.py', 'cadet/game/pack_depth.py',
     'cadet/game/prepare_runtime.py', 'cadet/game/pack_dynamic.py',
-    'cadet/game/build_native.py',
+    'cadet/game/make_startup_fx.py', 'cadet/game/build_native.py',
 )
 SOURCES = STEPS + tuple('cadet/game/' + name for name in (
     'import_local.py', 'message_font.py', 'package_development.py', 'analyze_dat.pl', 'engine.c',
@@ -112,6 +112,8 @@ def convert(args):
             command = [sys.executable, step]
             if step == 'cadet/build_graphics.py':
                 command.append(str(build))
+            if step == 'cadet/game/make_startup_fx.py':
+                command.append(str(build / 'STARTFX.BIN'))
             subprocess.run(command, cwd=work, env=env, check=True, timeout=180)
         manifest = audit(build)
         manifest.update(schema=1, inputs=hashes, font=sha(args.font),

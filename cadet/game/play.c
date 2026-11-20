@@ -76,6 +76,10 @@ static void effect(uint8_t id,uint8_t rank,uint8_t voice){
 }
 void audio_stop(void){pcm_stop();priority=0;}
 void audio_effect(uint8_t id){
+ if(id==SoundStartupHigh||id==SoundStartupLow){
+  pcm_select_bank=57;pcm_select_ptr=id==SoundStartupHigh?0xbd00:0xbe80;
+  pcm_start(384);return;
+ }
  uint16_t e=audio_event_sample(id,game.last_group,game.last_kind,game.sound_value);
  uint8_t voice=id<=1?1:(id==3||id==4||id==16)?2:0;
  effect((uint8_t)e,(uint8_t)(e>>8),voice);
@@ -215,7 +219,7 @@ int main(void){
 #endif
  for(uint8_t i=0;i<PCM_PARTS;++i){char n[]="PCM0.BIN";n[3]+=i;*(volatile uint8_t*)0=pcm_load_banks[i];if(!load(n,0,0xa000))goto fail;}
  for(uint8_t i=0;i<9;++i){char n[]="DEPTH00.BIN";n[6]+=i;*(volatile uint8_t*)0=i==0?10:i<3?16+i:i+42;if(!load(n,0,0xa000))goto fail;}
- *(volatile uint8_t*)0=57;if(!load("MSGFONT.BIN",0,0xa400))goto fail;
+ *(volatile uint8_t*)0=57;if(!load("MSGFONT.BIN",0,0xa400)||!load("STARTFX.BIN",0,0xbd00))goto fail;
  *(volatile uint8_t*)0=31;if(!load("RINGS.BIN",0,0xb000))goto fail;
  for(uint8_t i=0;i<DYNAMIC_BANK_COUNT;++i){char n[]="DYN0.BIN";n[3]+=i;*(volatile uint8_t*)0=dynamic_load_banks[i];if(!load(n,0,0xa000))goto fail;}
  *(volatile uint8_t*)0=11;if(!load("UI.BIN",0,0xa000))goto fail;

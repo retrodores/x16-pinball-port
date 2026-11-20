@@ -3,7 +3,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 enum Kind {Wall,Bumper,Plunger,Drain,Ramp,Target,Drop,Sensor,Spinner,Gate,Kickback,Sink,Kickout,Hole,Pass};
-enum SoundEvent {SoundCapture=7,SoundRelease,SoundKickback,SoundGateOpen,SoundGateClose,SoundLane,SoundUpgrade,SoundHazard,SoundWormholeAdvance,SoundFeed};
+enum SoundEvent {SoundCapture=7,SoundRelease,SoundKickback,SoundGateOpen,SoundGateClose,SoundLane,SoundUpgrade,SoundHazard,SoundWormholeAdvance,SoundFeed,SoundStartupHigh,SoundStartupLow};
 enum Mission {NoMission, SelectPractice, SelectLaunch, Practice, LaunchTraining};
 enum { StartupFrames=360, StartupReadyFrames=60 };
 enum State {Ready,Serving,InPlay,Captured,Between,GameOver};

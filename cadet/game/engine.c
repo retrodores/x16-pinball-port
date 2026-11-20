@@ -198,9 +198,12 @@ static void mission_ramp(void){
 }
 static RULE_FN void ring_tick(void){
  if(game.state==Ready){
+  if(game.wait==StartupFrames)sound(SoundStartupHigh);
   --game.wait;
   if(game.wait==StartupReadyFrames||(game.wait>StartupReadyFrames&&++game.ring_clock==12)){
    game.ring_clock=0;++game.ring_phase;++game.visual_epoch;
+   if(game.wait>StartupReadyFrames&&!(game.ring_phase&1))
+    sound(game.ring_phase&2?SoundStartupLow:SoundStartupHigh);
   }
   return;
  }

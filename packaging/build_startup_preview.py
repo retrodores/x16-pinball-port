@@ -8,7 +8,7 @@ from build_cover_balance import read_verified
 from build_backbox_preview import sha
 
 
-def build(releases, runtime, out, source):
+def build(releases, runtime, out, source, startup_audio):
     archives = {}
     manifests = {}
     for base, ram, program in (('Backbox', '512', 'CADET'),
@@ -28,7 +28,16 @@ def build(releases, runtime, out, source):
             files['README.txt'] = (readme.rstrip()+
                 '\n\nThe opening animates the playfield lamps before the first ball is served.\n'
                 'F2 starts a new game or skips an active opening.\n').encode('ascii')
-            path = out/f'{edition}-Startup-{ram}KB-Preview.zip'
+            title = 'Startup'
+            if startup_audio:
+                title = 'Startup-Audio'
+                sample = (runtime/'STARTFX.BIN').read_bytes()
+                assert len(sample) == 768
+                files['STARTFX.BIN'] = sample
+                files['RUN-WINDOWS.bat'] = files['RUN-WINDOWS.bat'].replace(
+                    b'for %%F in (', b'for %%F in (STARTFX.BIN ', 1)
+                files['README.txt'] += b'Original electronic pulses play on cold start and F2.\n'
+            path = out/f'{edition}-{title}-{ram}KB-Preview.zip'
             with zipfile.ZipFile(path,'w') as z:
                 for name,data in sorted(files.items()):
                     z.writestr(zipfile.ZipInfo(name,(2026,11,20,0,0,0)), data,
@@ -49,6 +58,7 @@ if __name__ == '__main__':
     for name in ('releases','runtime','output'):
         p.add_argument(name,type=Path)
     p.add_argument('source')
+    p.add_argument('--startup-audio', action='store_true')
     a = p.parse_args()
     a.output.mkdir(parents=True,exist_ok=True)
-    build(a.releases,a.runtime,a.output,a.source)
+    build(a.releases,a.runtime,a.output,a.source,a.startup_audio)

@@ -11,4 +11,5 @@ if [ "${1:-}" = assets ]; then
  python3 cadet/game/prepare_runtime.py
  python3 cadet/game/pack_dynamic.py
 fi
+python3 cadet/game/make_startup_fx.py cadet/play-build/STARTFX.BIN
 python3 cadet/game/build_native.py

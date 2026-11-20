@@ -14,7 +14,7 @@ VERSION='0.3.1-dev'
 RUNTIME=('CADET.PRG','CADET.RUL','CADET.PHY','MAP.BIN','TILES.BIN','PAL.BIN','SPRITES.BIN',
          'FONT.BIN','UI.BIN',*[f'GEOM{i}.BIN' for i in range(3)],
          *[f'MUSIC{i}.BIN' for i in range(2)],*[f'PCM{i}.BIN' for i in range(3)],
-         *[f'DEPTH{i:02}.BIN' for i in range(9)],*[f'DYN{i}.BIN' for i in range(4)],'RINGS.BIN','MSGFONT.BIN')
+         *[f'DEPTH{i:02}.BIN' for i in range(9)],*[f'DYN{i}.BIN' for i in range(4)],'RINGS.BIN','MSGFONT.BIN','STARTFX.BIN')
 # Geometry loader temporarily writes padding/obsolete bounds in10,11,17,18.
 # The later UI/depth loads intentionally overwrite those locations.
 LIVE_BANKS={
@@ -114,6 +114,7 @@ def audit(build=BUILD):
     assert dynamic['bytes']<=4*8192
     for i in range(4): assert len(data[f'DYN{i}.BIN'])==8192
     assert 0<len(data['MSGFONT.BIN'])<=0x1900
+    assert len(data['STARTFX.BIN'])==0x300
     assert len(data['PCM2.BIN'])<=6*8192+0x400
     assert 0<len(data['RINGS.BIN'])<=4096
     assert dynamic['ring_tail_bytes']==len(data['RINGS.BIN'])

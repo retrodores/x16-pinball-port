@@ -14,7 +14,7 @@ class PackageTests(unittest.TestCase):
           'MUSIC0.BIN':65536,'MUSIC1.BIN':37194,'PCM0.BIN':65536,
           'PCM1.BIN':32768,'PCM2.BIN':49938,
           **{f'DEPTH{i:02}.BIN':(5640 if i==0 else 6825 if i==8 else 8192)for i in range(9)},
-          'MSGFONT.BIN':6360,'RINGS.BIN':2542,**{f'DYN{i}.BIN':8192 for i in range(4)}}
+          'MSGFONT.BIN':6360,'STARTFX.BIN':768,'RINGS.BIN':2542,**{f'DYN{i}.BIN':8192 for i in range(4)}}
         for name,size in sizes.items():
             data=bytes(size)
             if name=='CADET.PRG':data=b'\x01\x08'+data[2:]
