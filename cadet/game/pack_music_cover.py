@@ -2,6 +2,7 @@
 import argparse
 import hashlib
 from pathlib import Path
+from cover_gain import attenuate
 
 BANK = 8192
 LOW_COMMAND_BYTES = 13 * BANK
@@ -47,6 +48,7 @@ def pack(source, out):
 
     out.mkdir(parents=True, exist_ok=True)
     (out / 'COVER.PCM').write_bytes(samples)
+    commands = attenuate(commands)
     (out / 'COVER.CMD').write_bytes(commands[:LOW_COMMAND_BYTES])
     (out / 'COVER.HI').write_bytes(commands[LOW_COMMAND_BYTES:])
     (out / 'music_cover_data.inc').write_text(

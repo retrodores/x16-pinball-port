@@ -13,7 +13,7 @@ typedef struct {
  int16_t x,y,z,vx,vy,remx,remy,accx,accy,fx,fy;uint16_t tick,wait,ignore,contacts;
  uint8_t mask,phase[2],charge,balls,state,last_sound,flash[160],score[16],digits[40];
  uint16_t disabled[160];uint8_t lamps[160];uint8_t captured,param,flags,multiplier,nudges;bool ramp,overflow,score_dirty;
- uint8_t mission,mission_left,rank,rank_progress,ring_phase,ring_clock;
+ uint8_t mission,mission_left,rank,rank_progress,ring_phase,ring_clock,ring_intro;
  uint16_t ring_flash;
  uint16_t bumper_hits,flipper_hits,target_hits,returns,drains,guard_hits,escapes;
  uint8_t last_group,last_kind,charge_clock,ball_number,sound_value,visual_epoch,flipper_keys;uint16_t last_edge,events,ramp_entries,layer_changes;

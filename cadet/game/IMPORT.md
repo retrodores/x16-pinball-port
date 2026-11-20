@@ -21,8 +21,8 @@ python3 cadet/game/import_local.py \
 
 Choose a new output directory. The importer stages all outputs, checks the RAM/VRAM
 layout and publishes the completed folder in one rename. The manifest records
-input and output hashes. The importer validates the supported DAT and MIDI
-revisions. Input filenames are case insensitive. The file list includes the
+input and output hashes. The importer validates the supported DAT, MIDI and
+Windows executable. It reads PBMSG_FT directly from the local executable. Input filenames are case insensitive. The file list includes the
 17 required WAVs. Other WAVs are optional for this build.
 
 Put the matching x16emu and rom.bin in the parent folder, then use

@@ -1,154 +1,139 @@
 #ifndef CADET_MESSAGE_DISPLAY_H
 #define CADET_MESSAGE_DISPLAY_H
 
-#include <stdint.h>
+#include "msgfont.h"
 
-/* Original 5x7 dot designs, stored as seven rows of five bits. */
-static const uint8_t message_glyphs[][7] __attribute__((section(".physics.rodata"))) = {
-    {14,17,17,31,17,17,17}, /* A */
-    {30,17,17,30,17,17,30},
-    {14,17,16,16,16,17,14},
-    {28,18,17,17,17,18,28},
-    {31,16,16,30,16,16,31},
-    {31,16,16,30,16,16,16},
-    {14,17,16,23,17,17,14},
-    {17,17,17,31,17,17,17},
-    {14,4,4,4,4,4,14},
-    {7,2,2,2,2,18,12},
-    {17,18,20,24,20,18,17},
-    {16,16,16,16,16,16,31},
-    {17,27,21,21,17,17,17},
-    {17,25,21,19,17,17,17},
-    {14,17,17,17,17,17,14},
-    {30,17,17,30,16,16,16},
-    {14,17,17,17,21,18,13},
-    {30,17,17,30,20,18,17},
-    {15,16,16,14,1,1,30},
-    {31,4,4,4,4,4,4},
-    {17,17,17,17,17,17,14},
-    {17,17,17,17,17,10,4},
-    {17,17,17,21,21,27,17},
-    {17,17,10,4,10,17,17},
-    {17,17,10,4,4,4,4},
-    {31,1,2,4,8,16,31}, /* Z */
-
-};
-
-/* Lowercase glyphs reuse the former legend font's VRAM. */
-static const uint8_t message_lowercase[][7] __attribute__((section(".physics.rodata"))) = {
-    {0,0,14,1,15,17,15}, /* a */
-    {16,16,22,25,17,17,30},
-    {0,0,14,17,16,17,14},
-    {1,1,13,19,17,17,15},
-    {0,0,14,17,31,16,14},
-    {6,9,8,28,8,8,8},
-    {0,0,15,17,15,1,14},
-    {16,16,22,25,17,17,17},
-    {4,0,12,4,4,4,14},
-    {2,0,6,2,2,18,12},
-    {16,16,18,20,24,20,18},
-    {12,4,4,4,4,4,14},
-    {0,0,26,21,21,21,21},
-    {0,0,22,25,17,17,17},
-    {0,0,14,17,17,17,14},
-    {0,0,30,17,30,16,16},
-    {0,0,15,17,15,1,1},
-    {0,0,22,25,16,16,16},
-    {0,0,15,16,14,1,30},
-    {8,8,28,8,8,9,6},
-    {0,0,17,17,17,19,13},
-    {0,0,17,17,17,10,4},
-    {0,0,17,17,21,21,10},
-    {0,0,17,10,4,10,17},
-    {0,0,17,17,15,1,14},
-    {0,0,31,2,4,8,31}, /* z */
-};
-
-#define MESSAGE_COLUMNS 15u
-#define MESSAGE_ROWS 3u
-#define PLAYER_COLUMNS 8u
+/* Bank 57: PCM ends before A400, font data ends before BD00.
+ * The glyph renderer runs in bank 62. */
+#define FONT_RECORDS ((const uint8_t *)0xa400)
+#define FONT_CODE __attribute__((section(".physics"),noinline))
+static uint8_t font_cache[96] __attribute__((section(".physics.fontcache")));
+#define FONT_BANK_RAM 57
+#define FONT_HEAD_CELLS 16u
+#define FONT_TAIL_CELLS ((0x1f9c0UL-FAST_TILE_END)/128u)
 #define PLAYER_FIRST_SPRITE 33u
-#define MESSAGE_FIRST_SPRITE (PLAYER_FIRST_SPRITE + PLAYER_COLUMNS)
-#define MESSAGE_GLYPH_BYTES 64u
-#define MESSAGE_FONT_BASE FAST_TILE_END
+#define MESSAGE_FIRST_SPRITE 41u
+#define MESSAGE_LAST_SPRITE 96u
+#define MESSAGE_LEFT 405u
+#define MESSAGE_RIGHT 570u
+#define MESSAGE_TOP 306u
 
-_Static_assert(sizeof(message_glyphs)/7*MESSAGE_GLYPH_BYTES+MESSAGE_FONT_BASE<=0x1f9c0UL,
-               "Message font overlaps reserved VERA memory");
-_Static_assert(sizeof(message_lowercase)/7*MESSAGE_GLYPH_BYTES<=2048,
-               "Lowercase font overlaps the ball scratch sprite");
-_Static_assert(MESSAGE_FIRST_SPRITE+MESSAGE_COLUMNS*MESSAGE_ROWS<=128,
-               "Messages exceed the VERA sprite table");
+static const uint8_t font_colors[16] = MSG_COLOR_TABLE;
+static uint8_t font_head,font_tail,player_head,player_tail,font_slot,font_digit;
+static uint16_t font_x,font_y;
+static const char *font_pending;
 
-static __attribute__((section(".physics"),noinline)) void upload_glyphs(uint32_t base,const uint8_t glyphs[][7],uint8_t count){
-    addr(base);
-    for(uint8_t glyph=0;glyph<count;++glyph){
-        uint8_t previous=0;
-        for(uint8_t y=0;y<16;++y){
-            uint8_t dots=y<14 ? glyphs[glyph][y/2] : 0;
-            uint8_t stroke=((dots&16)<<3)|((dots&8)<<3)|((dots&8)<<2)|
-                ((dots&4)<<2)|((dots&2)<<2)|((dots&2)<<1)|((dots&1)<<1);
-            uint8_t shadow=(stroke>>1)|previous;
-            previous=stroke;
-            uint8_t pair=0;
-            uint8_t highlights=(y&3)==1 ? 0x22 : (y&3)==3 ? 0x88 : 0;
-            for(uint8_t bit=0x80;bit;bit>>=1){
-                uint8_t color=0;
-                if(stroke&bit)color=highlights&bit ? FONT_STATUS_HIGHLIGHT : FONT_STATUS_PEN;
-                else if(shadow&bit)color=FONT_STATUS_SHADOW;
-                if(bit&0x55)v[3]=pair|color;
-                else pair=color<<4;
-            }
-        }
-    }
+static void font_bank(uint8_t b){
+ __asm__ volatile("":::"memory");
+ *(volatile uint8_t*)0=b;
+ __asm__ volatile("":::"memory");
 }
 
-static __attribute__((section(".physics"),noinline)) uint16_t message_pattern(uint8_t c){
-    if(c>='a'&&c<='z')return FONT_BASE/32+2u*(c-'a');
-    if(c>='A'&&c<='Z')return MESSAGE_FONT_BASE/32+2u*(c-'A');
-    return 0;
+/* A banked caller cannot keep executing while bank 57 is selected. Copy
+ * the glyph into its unbanked stack before switching back to the renderer. */
+static __attribute__((noinline)) uint8_t font_read(uint8_t code,uint8_t *pixels){
+ uint8_t saved=*(volatile uint8_t*)0;
+ font_bank(FONT_BANK_RAM);
+ const uint8_t *record=FONT_RECORDS+3u*code;
+ uint8_t width=record[0];
+ if(pixels){
+  const uint8_t *source=(const uint8_t*)(uintptr_t)(record[1]|((uint16_t)record[2]<<8));
+  uint8_t count=(uint8_t)((width+3u)/4u*MSG_HEIGHT);
+  for(uint8_t i=0;i<count;++i)pixels[i]=source[i];
+ }
+ font_bank(saved);
+ return width;
 }
 
-/* Digits in both panes share the score/BALL sprite bytes, size and palette. */
-static __attribute__((section(".physics"),noinline)) void message_tile(uint8_t slot,uint8_t c,uint16_t x,uint16_t y){
-    if(c>='0'&&c<='9'){
-        tile(slot,SCORE_DIGIT_BASE+8u*(c-'0'),x,y,SCORE_DIGIT_ATTR);
-        return;
-    }
-    uint16_t pattern=message_pattern(c);
-    if(pattern)tile(slot,pattern,x,y+3,0x40|FONT_STATUS_BANK);
-    else hide(slot);
+static uint16_t glyph_pattern(uint8_t slot){
+ if(slot<FONT_HEAD_CELLS)return FONT_BASE/32u+4u*slot;
+ return FAST_TILE_END/32u+4u*(slot-FONT_HEAD_CELLS);
 }
 
-static __attribute__((section(".physics"),noinline)) void init_messages(void){
-    upload_glyphs(FONT_BASE,message_lowercase,sizeof(message_lowercase)/7);
-    upload_glyphs(MESSAGE_FONT_BASE,message_glyphs,sizeof(message_glyphs)/7);
-    const char player[]="Player 1";
-    for(uint8_t i=0;i<PLAYER_COLUMNS;++i){
-        message_tile(PLAYER_FIRST_SPRITE+i,player[i],405u+11u*i,244);
-    }
+static FONT_CODE uint8_t font_upload(uint8_t code,uint8_t width,const uint8_t *pixels){
+ uint8_t cells=width>16?4:width>8?2:1;
+ uint8_t slot;
+ if(font_head+cells<=FONT_HEAD_CELLS){
+  slot=font_head;font_head+=cells;
+ }else if(font_tail+cells<=FONT_HEAD_CELLS+FONT_TAIL_CELLS){
+  slot=font_tail;font_tail+=cells;
+ }else return 255;
+ font_cache[code]=slot;
+ uint8_t stride=cells*4,bytes=(width+3)/4;
+ addr((uint32_t)glyph_pattern(slot)*32u);
+ for(uint8_t y=0;y<32;++y){
+  uint8_t n=0;
+  if(y<MSG_HEIGHT){
+   for(uint8_t j=0;j<bytes;++j){
+    uint8_t data=*pixels++;
+    v[3]=font_colors[data>>4];v[3]=font_colors[data&15];n+=2;
+   }
+  }
+  while(n++<stride)v[3]=0;
+ }
+ return slot;
 }
 
-/* The lower pane owns the changing text. An empty line hides its old sprites. */
-static void draw_message(const char *message,uint8_t digit,uint8_t *cache){
-    uint8_t slot=0;
-    uint16_t y=306;
-    for(uint8_t row=0;row<MESSAGE_ROWS;++row,y+=23){
-        uint16_t x=405;bool reflow=false;
-        for(uint8_t column=0;column<MESSAGE_COLUMNS;++column,++slot){
-            uint8_t c=*message&&*message!='\n' ? *message++ : ' ';
-            if(c=='#')c=digit;
-            uint8_t width=c>='0'&&c<='9'?15:11;
-            if(reflow||cache[slot]!=c){
-                reflow|=width!=(cache[slot]>='0'&&cache[slot]<='9'?15:11);
-                cache[slot]=c;
-                if(x+(width==15?15:8)<=570)message_tile(MESSAGE_FIRST_SPRITE+slot,c,x,y);
-                else hide(MESSAGE_FIRST_SPRITE+slot);
-            }
-            x+=width;
-        }
-        while(*message&&*message!='\n')++message;
-        if(*message)++message;
-    }
+/* Each frame uploads at most one new glyph. Already cached advances are cheap. */
+static FONT_CODE void message_banked(void){
+ uint8_t pixels[110];
+ for(uint8_t i=0;i<4;++i){
+  uint8_t c=*font_pending++;
+  if(!c||font_slot>=MESSAGE_LAST_SPRITE||font_y>MESSAGE_TOP+2u*MSG_HEIGHT){
+   font_pending=0;break;
+  }
+  if(c=='\n'){font_x=MESSAGE_LEFT;font_y+=MSG_HEIGHT;continue;}
+  if(c=='#')c=font_digit;
+  if(c<32||c>=128)c=' ';
+  uint8_t code=c-32;
+  uint8_t slot=font_cache[code];
+  bool fresh=slot==255;
+  uint8_t width=font_read(code,fresh?pixels:0);
+  if(c!=' '&&font_x+width<=MESSAGE_RIGHT){
+   if(fresh)slot=font_upload(code,width,pixels);
+   uint8_t attr=0x82;
+   if(width>8)attr+=width>16?32:16;
+   if(slot!=255)tile(font_slot++,glyph_pattern(slot),font_x,font_y,attr);
+   font_x+=width+MSG_GAP;
+   if(fresh)break;
+  }else font_x+=width+MSG_GAP;
+ }
+}
+
+static void message_step(void){
+ if(!font_pending)return;
+ uint8_t saved=*(volatile uint8_t*)0;
+ font_bank(62);
+ message_banked();
+ font_bank(saved);
+}
+
+static FONT_CODE void init_messages(void){
+ for(uint8_t i=0;i<96;++i)font_cache[i]=255;
+ font_slot=PLAYER_FIRST_SPRITE;
+ font_head=0;font_tail=FONT_HEAD_CELLS;
+ font_x=MESSAGE_LEFT;font_y=244;
+ font_pending="Player 1";
+ while(font_pending)message_banked();
+ player_head=font_head;player_tail=font_tail;
+ font_slot=MESSAGE_FIRST_SPRITE;
+}
+
+static FONT_CODE void status_banked(const char *s,uint8_t digit){
+ while(font_slot>MESSAGE_FIRST_SPRITE)hide(--font_slot);
+ for(uint8_t i=0;i<96;++i){
+  uint8_t slot=font_cache[i];
+  if((slot>=player_head&&slot<FONT_HEAD_CELLS)||slot>=player_tail)font_cache[i]=255;
+ }
+ font_head=player_head;font_tail=player_tail;
+ font_x=MESSAGE_LEFT;font_y=MESSAGE_TOP;font_digit=digit;font_pending=s;
+}
+
+static void status(const char *s,uint8_t digit){
+ uint8_t saved=*(volatile uint8_t*)0;
+ font_bank(62);
+ status_banked(s,digit);
+ font_bank(saved);
 }
 
 #endif

@@ -34,8 +34,10 @@ bool dynamic_update(uint8_t budget){
  uint8_t saved=*(volatile uint8_t*)0;
  if(fast_epoch!=game.visual_epoch){bool changed=fast_update();bank(saved);if(changed)return true;}
  if(!budget)return false;
+ bool changed=false;
+again:
  if(active==255){
-  if(shown_epoch==game.visual_epoch)return false;
+  if(shown_epoch==game.visual_epoch)goto done;
   uint8_t checked=0;
   do{
    uint8_t i=next_component;if(++next_component==DYNAMIC_COUNT)next_component=DYNAMIC_FAST_COUNT;
@@ -43,7 +45,7 @@ bool dynamic_update(uint8_t budget){
    uint8_t pose=d->lamp==3?game_ring_lamp(d->group):d->lamp?game_lamp(d->group):game_pose(d->group);
    if(shown[i]!=pose){active=i;target=pose;break;}
   }while(++checked<DYNAMIC_COUNT-DYNAMIC_FAST_COUNT);
-  if(active==255){shown_epoch=game.visual_epoch;return false;}
+  if(active==255){shown_epoch=game.visual_epoch;goto done;}
   const DynamicDesc*d=&dynamic_desc[active];bank(d->bank);
   const uint8_t*p=(const uint8_t*)(uintptr_t)d->ptr;
   runs_left=p[0];if(target>=p[1])target=0;
@@ -51,6 +53,7 @@ bool dynamic_update(uint8_t budget){
   mask_ptr=run_ptr+(uint16_t)runs_left*4;value_ptr=mask_ptr+count+(uint16_t)target*count;
   run_left=0;
  }else bank(dynamic_desc[active].bank);
+ changed=true;
  while(budget){
   if(!run_left){
    if(!runs_left){shown[active]=target;active=255;break;}
@@ -61,7 +64,9 @@ bool dynamic_update(uint8_t budget){
   while(n--){uint8_t mask=*mask_ptr++,value=*value_ptr++;uint8_t old=dv[3];dv[4]=(old&~mask)|(value&mask);}
  }
  if(!run_left&&!runs_left&&active!=255){shown[active]=target;active=255;}
- bank(saved);dv[5]=0;return true;
+ if(budget&&active==255)goto again;
+done:
+ bank(saved);dv[5]=0;return changed;
 }
 void dynamic_init(void){
  uint8_t saved=*(volatile uint8_t*)0;

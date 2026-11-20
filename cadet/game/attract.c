@@ -94,7 +94,7 @@ static PHYSICS uint8_t controls(uint8_t buttons, uint16_t now){
   if(((terminal||at_start)&&(pressed&DemoToggle)) ||
      ((terminal||idle_allowed)&&(uint16_t)(now-idle_since)>=IDLE_TICKS)){
    attract_caption=DemoActive;
-   was_serving=false;held=armed=0;
+   was_serving=tracking=false;held=armed=0;
    random_state=0x5d;
    return DemoReset;
   }

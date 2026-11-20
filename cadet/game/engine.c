@@ -142,7 +142,8 @@ void add_score(uint16_t n){if(game.overflow)return;game.score_dirty=true;uint16_
 #define RULE_LEAVE
 #endif
 static BANK_TRAMPOLINE void rules_reset(void){RULE_ENTER;rule_reset();RULE_LEAVE;}
-static BANK_TRAMPOLINE void rules_tick(void){RULE_ENTER;rule_tick();RULE_LEAVE;}
+static RULE_FN void ring_tick(void);
+static BANK_TRAMPOLINE void rules_tick(void){RULE_ENTER;rule_tick();ring_tick();RULE_LEAVE;}
 static BANK_TRAMPOLINE void rules_capture(const Edge*e){RULE_ENTER;rule_capture(e);++game.visual_epoch;RULE_LEAVE;}
 static BANK_TRAMPOLINE void rules_release(void){RULE_ENTER;rule_release();++game.visual_epoch;RULE_LEAVE;}
 static BANK_TRAMPOLINE void rules_lane(uint16_t n){RULE_ENTER;rule_lane(n);++game.visual_epoch;RULE_LEAVE;}
@@ -169,7 +170,8 @@ static BANK_TRAMPOLINE void mission_advance(void){
  RULE_LEAVE;
  ++game.visual_epoch;
 }
-uint8_t game_ring_lamp(uint8_t index){
+__attribute__((noinline)) uint8_t game_ring_lamp(uint8_t index){
+ if(game.ring_intro)return ((uint8_t)(index+game.ring_phase)%7u)<2;
  if(index>=18)return index-18<game.rank;
  if(game.ring_flash)return 1u^((game.ring_flash>>4)&1u);
  if(game.mission>=Practice){
@@ -185,11 +187,18 @@ static void mission_ramp(void){
   bool practice=game.mission==SelectPractice;
   game.mission=practice?Practice:LaunchTraining;
   game.mission_left=practice?8:3;
-  game.ring_phase=0;game.ring_clock=0;
+  game.ring_phase=0;game.ring_clock=0;game.ring_intro=0;
   add_score(10000);++game.visual_epoch;
  }
 }
-static void ring_tick(void){
+static RULE_FN void ring_tick(void){
+ if(game.ring_intro){
+  --game.ring_intro;
+  if(++game.ring_clock==12){
+   game.ring_clock=0;++game.ring_phase;++game.visual_epoch;
+  }
+  return;
+ }
  if(game.ring_flash){
   if(!(--game.ring_flash&15))++game.visual_epoch;
  }
@@ -200,7 +209,7 @@ static void ring_tick(void){
  }
 }
 static void serve(){sound(255);rules.gate[0]=rules.gate[1]=1;rules.gate_flash[0]=rules.gate_flash[1]=600;++game.visual_epoch;game.ball_number=4-game.balls;game.state=Serving;game.x=serve_x;game.y=plunger_y-2;game.z=77;game.vx=game.vy=game.remx=game.remy=game.accx=game.accy=0;game.mask=1;game.ramp=false;game.charge=0;game.charge_clock=0;game.flags=0;game.nudges=0;game.last_group=GROUP_473;game.last_kind=Plunger;sound(SoundFeed);}
-void game_start(void){uint8_t epoch=game.visual_epoch;active_count=0;memset(active_flags,0,sizeof active_flags);memset(&game,0,sizeof game);game.visual_epoch=epoch;game.balls=3;game.multiplier=1;game.rank=1;game.score_dirty=true;rules_reset();serve();}
+void game_start(void){uint8_t epoch=game.visual_epoch;active_count=0;memset(active_flags,0,sizeof active_flags);memset(&game,0,sizeof game);game.visual_epoch=epoch;game.balls=3;game.multiplier=1;game.rank=1;game.ring_intro=72;game.score_dirty=true;rules_reset();serve();}
 static void drain(){if(game.state!=InPlay)return;game.state=Between;game.mission=NoMission;game.mission_left=0;game.wait=120;game.vx=game.vy=0;game.mask=0;game.ramp=false;++game.drains;if(rules.replay)rules.replay=0;else if(game.balls)--game.balls;rules_reset();memset(game.lamps,0,sizeof game.lamps);memset(game.disabled,0,sizeof game.disabled);sound(5);}
 #ifdef __CX16__
 __attribute__((section(".physics"),noinline))
@@ -528,7 +537,7 @@ static bool plunger_input(bool pull){
  return serving;
 }
 __attribute__((noinline)) static void tick(bool left,bool right,bool pull,bool nudge){
- rules_tick();ring_tick();game.tick+=2;for(uint8_t k=0;k<active_count;){uint8_t i=active[k];if(game.flash[i])game.flash[i]=game.flash[i]>2?game.flash[i]-2:0;if(game.disabled[i])game.disabled[i]=game.disabled[i]>2?game.disabled[i]-2:0;if(!game.flash[i]&&!game.disabled[i]){active_flags[i]=0;active[k]=active[--active_count];}else ++k;}if(game.ignore)game.ignore=game.ignore>2?game.ignore-2:0;
+ rules_tick();game.tick+=2;for(uint8_t k=0;k<active_count;){uint8_t i=active[k];if(game.flash[i])game.flash[i]=game.flash[i]>2?game.flash[i]-2:0;if(game.disabled[i])game.disabled[i]=game.disabled[i]>2?game.disabled[i]-2:0;if(!game.flash[i]&&!game.disabled[i]){active_flags[i]=0;active[k]=active[--active_count];}else ++k;}if(game.ignore)game.ignore=game.ignore>2?game.ignore-2:0;
  bool keys[2]={left,right};uint8_t old[2],pressed=(left?1:0)|(right?2:0);
  for(uint8_t i=0;i<2;++i){old[i]=game.phase[i];uint8_t key=1u<<i;
   if((pressed^game.flipper_keys)&key){if(pressed&key){rules_shift(i);sound(0);}else sound(1);}

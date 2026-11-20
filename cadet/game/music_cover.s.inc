@@ -1,7 +1,7 @@
 ; Optional 2 MB player for the verified GTR3QQ R6 export.
 ; Read commands and PCM directly from resident banks. The caller owns RAM-bank
 ; and VERA-address preservation. No KERNAL calls or compiler zero page in IRQ.
-.globl music_prefetch, cover_triggers, cover_pcm_frames
+.globl music_prefetch, cover_triggers
 
 music_prefetch:
  rts
@@ -228,12 +228,16 @@ cover_left:
  lda $a000,y
  cmp #$80
  ror
+ cmp #$80
+ ror
  clc
  adc cover_held_effect
  sta $9f3d
  iny
 cover_right:
  lda $a000,y
+ cmp #$80
+ ror
  cmp #$80
  ror
  clc
@@ -264,15 +268,6 @@ cover_right:
  sty cover_position
  pla
  sta $00
- clc
- lda cover_pcm_frames
- adc #128
- sta cover_pcm_frames
- bcc 8f
- inc cover_pcm_frames+1
- bne 8f
- inc cover_pcm_frames+2
-8:
  rts
 
 .include "cadet/play-build/music_cover_data.inc"
@@ -289,5 +284,4 @@ cover_drum_frames: .zero 1
 cover_effect_phase: .zero 1
 cover_held_effect: .zero 1
 cover_triggers: .zero 2
-cover_pcm_frames: .zero 3
 .section .text.lab,"ax",@progbits

@@ -9,7 +9,7 @@
 #include "verify_milestone_input.h"
 #endif
 #include "dynamic.h"
-#ifndef GAME_TEST
+#if !defined(GAME_TEST)||defined(ATTRACT_TEST)
 #include "attract.h"
 #endif
 extern int32_t signedmul(int16_t,int16_t);
@@ -82,18 +82,6 @@ void audio_effect(uint8_t id){
 }
 
 #include "message_display.h"
-static uint8_t status_cache[MESSAGE_COLUMNS * MESSAGE_ROWS];
-static __attribute__((section(".physics"),noinline)) void status_banked(const char *message,uint8_t digit){
- draw_message(message,digit,status_cache);
-}
-static void status(const char *s,uint8_t digit){
- uint8_t saved=*(volatile uint8_t*)0;
- *(volatile uint8_t*)0=62;
- __asm__ volatile("":::"memory");
- status_banked(s,digit);
- __asm__ volatile("":::"memory");
- *(volatile uint8_t*)0=saved;
-}
 #ifdef PROFILE_DISPLAY
 static uint32_t mask_cycles,copy_cycles,prefetch_cycles;
 #endif
@@ -151,7 +139,7 @@ static void display(bool update_panel){
  }
  uint8_t number=game.ball_number;if(update_panel&&number!=ball_cache){frame(32,31+number,553,152,1);ball_cache=number;}
  uint8_t panel_state=game.state;
-#ifndef GAME_TEST
+#if !defined(GAME_TEST)||defined(ATTRACT_TEST)
  if(attract_caption)panel_state=5+attract_caption;
 #endif
  if(game.state==InPlay&&game.mission)panel_state=128+9*game.mission+game.mission_left;
@@ -174,7 +162,7 @@ static void display(bool update_panel){
     case LaunchTraining:status("Launches left:\n#",'0'+game.mission_left);break;
    }
   }
-#ifndef GAME_TEST
+#if !defined(GAME_TEST)||defined(ATTRACT_TEST)
   else if(attract_caption){
    status(attract_caption==DemoFinalScore?
     "Demo\nFinal score\nF2 to play":"Demo\nHit mission\ntargets",0);
@@ -184,6 +172,7 @@ static void display(bool update_panel){
   previous_state=panel_state;
  }
  dynamic_update(update_panel?128:0);
+ if(update_panel)message_step();
 }
 static __attribute__((section(".physics"),noinline)) void compact_footer(void){
  /* The supported maps use private tiles in this part of row 25. The
@@ -225,6 +214,7 @@ int main(void){
 #endif
  for(uint8_t i=0;i<PCM_PARTS;++i){char n[]="PCM0.BIN";n[3]+=i;*(volatile uint8_t*)0=pcm_load_banks[i];if(!load(n,0,0xa000))goto fail;}
  for(uint8_t i=0;i<9;++i){char n[]="DEPTH00.BIN";n[6]+=i;*(volatile uint8_t*)0=i==0?10:i<3?16+i:i+42;if(!load(n,0,0xa000))goto fail;}
+ *(volatile uint8_t*)0=57;if(!load("MSGFONT.BIN",0,0xa400))goto fail;
  *(volatile uint8_t*)0=31;if(!load("RINGS.BIN",0,0xb000))goto fail;
  for(uint8_t i=0;i<DYNAMIC_BANK_COUNT;++i){char n[]="DYN0.BIN";n[3]+=i;*(volatile uint8_t*)0=dynamic_load_banks[i];if(!load(n,0,0xa000))goto fail;}
  *(volatile uint8_t*)0=11;if(!load("UI.BIN",0,0xa000))goto fail;
@@ -247,14 +237,21 @@ int main(void){
 #endif
 
  uint16_t last=lab_clock(),count=0,gaps=0,over=0;uint32_t maximum=0,total=0;
- uint8_t old_m=0;echo("# PLAY READY\n");
+#ifndef GAME_TEST
+ uint8_t old_m=0;
+#endif
+ echo("# PLAY READY\n");
 #ifdef GAME_TEST
  *(volatile uint8_t*)0x9fb8=0;
 #endif
  for(;;){
   uint16_t now=lab_clock();if(now==last)continue;if((uint16_t)(now-last)>1)++gaps;last=now;
   uint32_t before=irq_start;
-#ifdef GAME_TEST
+#if defined(ATTRACT_TEST)
+  uint8_t buttons=attract_input(count?0:DemoToggle,now);
+  if(buttons&DemoReset){game_start();previous_state=255;}
+  game_frame(buttons&DemoLeft,buttons&DemoRight,buttons&DemoLaunch,false);
+#elif defined(GAME_TEST)
 #ifdef MILESTONE_INPUT
   if(count>=MILESTONE_FIRST_TICK){
    volatile uint8_t *const ram_bank=(volatile uint8_t*)0;
@@ -304,8 +301,14 @@ int main(void){
 #define TEST_FRAMES 6000
 #endif
   if(count>=TEST_FRAMES)break;
+#ifdef ATTRACT_TEST
+  if(game.state==GameOver)break;
+#endif
 #endif
  }
+#ifdef ATTRACT_TEST
+ echo("# DEMO ");hex(game.state);echo(" ");hex(game.drains);echo(" ");hex(game.flipper_hits);echo(" ");hex(game.escapes);echo("\n");
+#endif
 #ifdef COVER_AUDIO
  echo("# COVER LOOPS ");hex(music_loops);echo(" TRIGGERS ");hex(cover_triggers);echo("\n");
 #endif

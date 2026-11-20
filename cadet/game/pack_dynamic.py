@@ -14,6 +14,8 @@ rgb[:10]=[(0,0,0),(128,0,0),(0,128,0),(128,128,0),(0,0,128),(128,0,128),(0,128,1
 rgb[246:255]=0;rgb[255]=255
 pal=(o/'PAL.BIN').read_bytes()
 colors=np.array([((pal[i+1]&15)*17,(pal[i]>>4)*17,(pal[i]&15)*17)for i in range(0,512,2)]).reshape(16,16,3)
+brightness=colors @ np.array([3,6,1])
+source_brightness=rgb @ np.array([3,6,1])
 lookup=(((rgb[None,:,None,:]-colors[:,None,:,:])**2).sum(axis=3)).argmin(axis=2)
 mapping=bytearray((o/'MAP.BIN').read_bytes());base=(o/'TILES.BIN').read_bytes()
 def bitmap(gid):
@@ -62,7 +64,18 @@ for gid,kind,poses in defs:
    if attr&4:xx=15-xx
    if attr&8:yy=15-yy
    addr=4096+t*128+yy*8+xx//2;shift=0 if xx&1 else 4;mask=15<<shift
-   value=int(lookup[attr>>4,a[y-5,x-8]])<<shift
+   bank=attr>>4
+   pixel=a[y-5,x-8]
+   pen=int(lookup[bank,pixel])
+   if item and gid in ring_groups:
+    off_pen=(base[addr-4096]>>shift)&15
+    if source_brightness[pixel]>=1500 and brightness[bank,pen]<brightness[bank,off_pen]+450:
+     # Preserve a lit highlight when the local 16-color palette has no
+     # close match. Keep the off-state tile and colored midtones intact.
+     choices=np.flatnonzero(brightness[bank]>=brightness[bank,off_pen]+450)
+     if len(choices):
+      pen=int(choices[np.argmin(((colors[bank,choices]-rgb[pixel])**2).sum(axis=1))])
+   value=pen<<shift
    writes[addr]=(writes[addr]&~mask)|value
   data.append(writes)
  # Every addressed byte must be written on every pose to restore old pixels.

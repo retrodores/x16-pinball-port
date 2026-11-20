@@ -2,6 +2,7 @@ from pathlib import Path
 import os
 import json,re,struct,math,numpy as np
 from PIL import Image,ImageFont,ImageDraw
+from message_font import write_assets
 r=Path(__file__).resolve().parents[2];o=r/'cadet/play-build';src=r/'cadet/build'
 j=json.loads((src/'audio-catalog.json').read_text())
 # Resident full-rate signed PCM. Logical bank order jumps 30 -> 51 to leave
@@ -56,6 +57,9 @@ for code in range(32,96):
 assert base+len(data)<0x1f9c0
 (o/'FONT.BIN').write_bytes(data)
 inv=json.loads(Path(os.environ.get('CADET_INVENTORY', '/opt/spacecadet-x16-analysis/evidence/inventory.json')).read_text())
+exe=Path(os.environ.get('CADET_EXE', '/opt/spacecadet-x16-analysis/input/game/pinball.exe'))
+dat=Path(os.environ.get('CADET_DAT', '/opt/spacecadet-x16-analysis/input/game/PINBALL.DAT'))
+write_assets(exe.read_bytes(),dat.read_bytes(),inv,o)
 depths=[]
 for gid in range(108,115):
  p=next(e['values'][1:]for e in inv['groups'][gid]['entries']if e['type']==11 and e['values'][0]==501)

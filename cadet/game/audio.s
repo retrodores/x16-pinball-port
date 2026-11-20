@@ -282,6 +282,7 @@ irq_end:
  plx
  pla
  jmp (old_irq)
+.ifndef COVER_AUDIO
 pcm_service:
  lda pcm_remaining
  ora pcm_remaining+1
@@ -355,6 +356,7 @@ pcm_fifo_write:
  lda #29
  sta $9f3c
  rts
+.endif
 pcm_count_underrun:
  inc pcm_underruns
  bne 1f

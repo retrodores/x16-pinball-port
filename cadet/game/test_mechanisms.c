@@ -93,7 +93,10 @@ static void captures(void){
  game_start();rules_destination(true);hit(338);rules_release();drain();CHECK(game.balls==3);game.state=InPlay;drain();CHECK(game.balls==2);
 }
 static void mission_rings(void){
- game_start();CHECK(game_ring_lamp(18)==1&&game_ring_lamp(19)==0);
+ game_start();
+ CHECK(game_ring_lamp(0)&&!game_ring_lamp(2));
+ for(uint8_t i=0;i<72;++i)ring_tick();
+ CHECK(game_ring_lamp(18)==1&&game_ring_lamp(19)==0);
  Edge ramp={0};
  for(uint16_t i=0;i<edge_count;++i){ramp=*edge(i);if(ramp.kind==Ramp&&original_groups[ramp.group]==101&&metadata[ramp.param].action==1)break;}
  CHECK(ramp.kind==Ramp&&original_groups[ramp.group]==101);
@@ -116,7 +119,8 @@ static void mission_rings(void){
 }
 
 int main(void){
- if(!game_load()){puts("# LOAD FAIL\n# DONE");mission_rings();return 1;}
+ if(!game_load()){puts("# LOAD FAIL\n# DONE");return 1;}
+ mission_rings();
 #ifndef TEST_PART
 #define TEST_PART 0
 #endif

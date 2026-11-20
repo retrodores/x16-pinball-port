@@ -22,7 +22,7 @@ STEPS = (
     'cadet/game/build_native.py',
 )
 SOURCES = STEPS + tuple('cadet/game/' + name for name in (
-    'import_local.py', 'package_development.py', 'analyze_dat.pl', 'engine.c',
+    'import_local.py', 'message_font.py', 'package_development.py', 'analyze_dat.pl', 'engine.c',
     'engine.h', 'play.c', 'message_display.h', 'attract.c', 'attract.h', 'rules.inc', 'flipper_sweep.h', 'audio_events.h',
     'audio.s', 'music_lz.s.inc', 'depth.c', 'dynamic.c', 'signedmul.s', 'fraction.s',
     'ratio.s', 'bounds.s', 'depth_quant.s', 'mask_pixels.s', 'depth_rect.s',
@@ -33,6 +33,7 @@ SOURCES = STEPS + tuple('cadet/game/' + name for name in (
     'direct/integer/squares-lo.inc', 'direct/integer/squares-hi.inc',
 )
 EXPECTED = {
+    'PINBALL.EXE': '2bbc8234685fe2f6324040af6ea20123cf00c4a56882ce0d9074f0beefac67bc',
     'PINBALL.DAT': '42defd5d2a339a3953fe643716aff4e35b2cea7a3e54505c82d1e78d5325bc04',
     'PINBALL.MID': 'b030f95b0d3b7b582a8c030ce548e11ab9457e2281f615af1e291401ffb0be41',
 }
@@ -105,7 +106,7 @@ def convert(args):
                         'cadet/build'], cwd=work, check=True, timeout=60)
         env = dict(os.environ, MOS_CC=str(compiler), CADET_FONT=str(args.font.resolve()),
                    CADET_DAT=str(install / 'PINBALL.DAT'), CADET_MIDI=str(install / 'PINBALL.MID'),
-                   CADET_INSTALL=str(install), CADET_INVENTORY=str(work / 'cadet/build/inventory.json'),
+                   CADET_EXE=str(install / 'PINBALL.EXE'), CADET_INSTALL=str(install), CADET_INVENTORY=str(work / 'cadet/build/inventory.json'),
                    CADET_SKIP_CAPTURE='1', CADET_BUILD_PLAYER_ONLY='1')
         for step in STEPS:
             command = [sys.executable, step]
