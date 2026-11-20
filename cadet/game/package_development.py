@@ -11,10 +11,10 @@ import argparse, datetime, hashlib, io, json, os, re, subprocess as sp, zipfile
 ROOT=Path(__file__).resolve().parents[2]
 BUILD=ROOT/'cadet/play-build'
 VERSION='0.3.1-dev'
-RUNTIME=('CADET.PRG','CADET.RUL','CADET.PHY','MAP.BIN','TILES.BIN','PAL.BIN','SPRITES.BIN',
+RUNTIME=('CADET.PRG','CADET.RUL','CADET.PHY','CADET.MEC','MAP.BIN','TILES.BIN','PAL.BIN','SPRITES.BIN',
          'FONT.BIN','UI.BIN',*[f'GEOM{i}.BIN' for i in range(3)],
          *[f'MUSIC{i}.BIN' for i in range(2)],*[f'PCM{i}.BIN' for i in range(3)],
-         *[f'DEPTH{i:02}.BIN' for i in range(9)],*[f'DYN{i}.BIN' for i in range(4)],'RINGS.BIN','MSGFONT.BIN','STARTFX.BIN')
+         *[f'DEPTH{i:02}.BIN' for i in range(9)],*[f'DYN{i}.BIN' for i in range(4)],'RINGS.BIN','RINGS2.BIN','MSGFONT.BIN','STARTFX.BIN')
 # Geometry loader temporarily writes padding/obsolete bounds in10,11,17,18.
 # The later UI/depth loads intentionally overwrite those locations.
 LIVE_BANKS={
@@ -76,6 +76,9 @@ def audit(build=BUILD):
     assert data['CADET.PRG'][:2]==b'\x01\x08', 'wrong PRG load address'
     assert len(data['CADET.RUL'])==8192, 'incomplete rules overlay'
     assert len(data['CADET.PHY'])==8192, 'incomplete physics overlay'
+    assert len(data['CADET.MEC'])==0x9f8, 'mechanics overlay must fit after bank 10 depth index'
+    assert len(data['UI.BIN'])<=0x1a00, 'UI overlaps ring data in bank 11'
+    assert 0<len(data['RINGS2.BIN'])<=0x600, 'ring data crosses out of bank 11'
     assert data['CADET.RUL']!=data['CADET.PHY'], 'rules/physics overlays are duplicated'
     seen={}
     for owner,banks in LIVE_BANKS.items():
@@ -118,6 +121,7 @@ def audit(build=BUILD):
     assert len(data['PCM2.BIN'])<=6*8192+0x400
     assert 0<len(data['RINGS.BIN'])<=4096
     assert dynamic['ring_tail_bytes']==len(data['RINGS.BIN'])
+    assert dynamic['overflow_bytes']==len(data['RINGS2.BIN'])
     return {'runtime_files':len(data),'runtime_bytes':sum(map(len,data.values())),
             'live_banks':LIVE_BANKS,'free_banks':[b for b in range(1,64)if b not in seen],
             'sha256':{n:sha(b)for n,b in sorted(data.items())}}
@@ -192,7 +196,7 @@ You can also drag x16emu.exe onto that BAT. On Linux, run sh RUN-LINUX.sh.
 Both launchers keep the game folder current and use stock 65C02, 8 MHz,
 512 KB RAM and scale 2. The archive has no enclosing wrapper directory.
 
-Do not copy CADET.PRG alone: CADET.RUL, CADET.PHY and all BIN assets are required.
+Do not copy CADET.PRG alone: CADET.RUL, CADET.PHY, CADET.MEC and all BIN assets are required.
 No emulator, ROM or original Windows executable is included.
 
 ## Controls

@@ -16,6 +16,8 @@ int main(void){
  assert(sample(8,512,Kickout)==SOUND57);
  assert(sample(7,514,Kickout)==SOUND57);
  assert(sample(8,514,Kickout)==255);
+ assert(sample(6,481,Spinner)==SOUND131);
+ assert(sample(6,489,Spinner)==SOUND131);
  assert(sample(9,505,Kickback)==SOUND17);
  assert(sample(9,507,Kickback)==SOUND17);
  assert(sample(10,501,Gate)==255);

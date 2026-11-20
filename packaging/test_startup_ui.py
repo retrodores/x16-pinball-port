@@ -11,10 +11,17 @@ from PIL import ImageChops, ImageGrab
 ram, stem, *flags = sys.argv[1:]
 audio = "--audio" in flags
 show_frames = "--show-frames" in flags
+red_cross = "--red-cross" in flags
 player = (430, 260, 610, 306)
 message = (430, 333, 610, 430)
 table = (85, 75, 295, 360)
 log = Path('startup.log')
+cross = (142, 338, 160, 353)
+
+
+def cross_visible(img):
+    colors = img.crop(cross).getdata()
+    return sum(r >= 136 and r - max(g, b) >= 80 for r, g, b in colors) >= 12
 
 
 def changed(a, b, roi):
@@ -63,6 +70,9 @@ with log.open('w') as output:
         start = snap()
         assert not lit(start,player) and not lit(start,message)
         until(lambda f: changed(f,start,table) and not lit(f,player))
+        if red_cross:
+            image = until(cross_visible)
+            image.save('red-cross.png')
         if show_frames:
             reference = Path('lamp-frames')
             reference.mkdir(exist_ok=True)
@@ -75,6 +85,8 @@ with log.open('w') as output:
         until(lambda f: lit(f,player) and lit(f,message))
         time.sleep(1.5)
         ready = snap()
+        if red_cross:
+            assert not cross_visible(ready)
         if show_frames:
             ready.save(reference/'ready.png')
         for action in ('keydown','keyup'):
@@ -95,6 +107,9 @@ with log.open('w') as output:
         f2_visible_ms = round((time.monotonic()-f2_start)*1000,1)
         sp.run(['xdotool','keyup','--window',win,'F2'],check=True)
         until(lambda f: not lit(f,player) and not lit(f,message),5)
+        if red_cross:
+            image = until(cross_visible, 5)
+            image.save('red-cross-f2.png')
         # Allow a few reset cues in the audio capture before testing skip.
         if audio:
             time.sleep(1.4)
@@ -116,5 +131,6 @@ with log.open('w') as output:
             except sp.TimeoutExpired: p.kill();p.wait()
 print(json.dumps({'ram_kb':int(ram),'cold_start':True,'changing_lamps':True,'f2_visible_ms':f2_visible_ms,
                   'f2_audio_file_size_at_keydown':f2_audio_bytes,
+                  'red_cross_on_start_and_f2':red_cross,
                   'player_before_prompt':True,'plunger_after_serve':True,'f2_restart_and_skip':True,
                   'f3_enters_demo_during_show':True,'exit':True}))

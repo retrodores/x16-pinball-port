@@ -15,9 +15,13 @@ def meta(m):
 arcs={};facets=0
 edge_bank=12;bounds_bank=edge_bank+(len(src)+255)//256;occupancy_bank=bounds_bank+(len(src)+1023)//1024
 assert occupancy_bank<=19
+spinner_directions={}
 for i,e in enumerate(src):
  kind=classes[e['class']];flags=2 if e['active'] else 0;param=0
  if e['class'] in ('9TRollover','14TLightRollover'):flags|=4|(0 if e['active'] else 8)
+ if kind==8:
+  param=spinner_directions.get(e['component'],0)
+  spinner_directions[e['component']]=param+1
  if e.get('pass'):kind=14
  if 'ramp'in e:
   m=e['ramp'];param=meta([0,0,0,0,*map(q,m['force']),q(m['plane'][0]),q(m['plane'][1]),q(m['plane'][2] if m['action']==1 else m['z']),0,m['action'],m['mask'],m['zflag']])
@@ -62,6 +66,7 @@ for i,e in enumerate(src):
   for gy in range(max(0,(yl-131+4096)//128),min(63,(yh+131+4096)//128)+1):
    a=gx*128-3072;b=gy*128-4096
    if overlaps(a-131,b-131,a+128+131,b+128+131):grid[gx+gy*48].append(i)
+assert spinner_directions and all(n==2 for n in spinner_directions.values())
 assert max(map(len,grid))<127 and len(src)<4096
 # Per-layer cell lists avoid scanning the two invisible collision layers.
 index=[];lists=bytearray();shared={}

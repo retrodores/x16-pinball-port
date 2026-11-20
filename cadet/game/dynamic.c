@@ -6,6 +6,7 @@
 extern uint8_t game_lamp(uint16_t),game_pose(uint16_t);
 static volatile uint8_t *const dv=(volatile uint8_t*)0x9f20;
 static uint8_t shown[DYNAMIC_COUNT],active=255,target,next_component,shown_epoch,fast_epoch;
+static uint8_t cross_shown,spinner_epoch;
 static uint8_t runs_left,run_left,address_bank;
 static uint16_t address;
 static const uint8_t *run_ptr,*mask_ptr,*value_ptr;
@@ -30,7 +31,16 @@ static bool fast_update(void){
  }
  fast_epoch=game.visual_epoch;return changed;
 }
+static void cross_update(void){
+ uint8_t on=game_lamp(254);
+ if(on==cross_shown)return;
+ cross_shown=on;
+ /* Sprite 127 stays behind the ball and doesn't own slingshot tiles. */
+ write_address(0x1fffeUL);
+ dv[3]=on?12:0;
+}
 bool dynamic_update(uint8_t budget){
+ if(game.state==Ready||cross_shown)cross_update();
  uint8_t saved=*(volatile uint8_t*)0;
  if(fast_epoch!=game.visual_epoch){bool changed=fast_update();bank(saved);if(changed)return true;}
  if(!budget)return false;
@@ -38,13 +48,20 @@ bool dynamic_update(uint8_t budget){
 again:
  if(active==255){
   if(shown_epoch==game.visual_epoch)goto done;
+  if(spinner_epoch!=game.spinner_epoch){
+   for(uint8_t i=FLAG_DESCRIPTOR;i<FLAG_DESCRIPTOR+2;++i){
+    uint8_t pose=game_pose(dynamic_desc[i].group);
+    if(shown[i]!=pose){active=i;target=pose;break;}
+   }
+   if(active==255)spinner_epoch=game.spinner_epoch;
+  }
   uint8_t checked=0;
-  do{
+  while(active==255&&checked++<DYNAMIC_COUNT-DYNAMIC_FAST_COUNT){
    uint8_t i=next_component;if(++next_component==DYNAMIC_COUNT)next_component=DYNAMIC_FAST_COUNT;
    const DynamicDesc*d=&dynamic_desc[i];
    uint8_t pose=d->lamp==3?game_ring_lamp(d->group):d->lamp?game_lamp(d->group):game_pose(d->group);
    if(shown[i]!=pose){active=i;target=pose;break;}
-  }while(++checked<DYNAMIC_COUNT-DYNAMIC_FAST_COUNT);
+  }
   if(active==255){shown_epoch=game.visual_epoch;goto done;}
   const DynamicDesc*d=&dynamic_desc[active];bank(d->bank);
   const uint8_t*p=(const uint8_t*)(uintptr_t)d->ptr;
@@ -72,6 +89,15 @@ void dynamic_init(void){
  uint8_t saved=*(volatile uint8_t*)0;
  active=255;next_component=DYNAMIC_FAST_COUNT;shown_epoch=fast_epoch=game.visual_epoch-1;
  for(uint8_t i=0;i<DYNAMIC_COUNT;++i)shown[i]=255;
+ /* Upload the independent insert sprite into reserved pattern memory. */
+ bank(63);
+ const uint8_t*cross=(const uint8_t*)(uintptr_t)CROSS_PATTERN_PTR;
+ write_address(CROSS_PATTERN_VRAM);
+ for(uint8_t i=0;i<128;++i)dv[3]=*cross++;
+ write_address(0x1fff8UL);
+ dv[3]=(uint8_t)(CROSS_PATTERN_VRAM/32);dv[3]=CROSS_PATTERN_VRAM/8192;
+ dv[3]=CROSS_X;dv[3]=0;dv[3]=CROSS_Y&255;dv[3]=CROSS_Y>>8;
+ dv[3]=0;dv[3]=CROSS_ATTR;cross_shown=0;spinner_epoch=game.spinner_epoch;
  /* Load both permanent-rest and alternate-fire private patterns once. */
  for(uint8_t i=0;i<DYNAMIC_FAST_COUNT;++i){
   const DynamicDesc*d=dynamic_desc+i;bank(d->bank);

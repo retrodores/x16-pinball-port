@@ -1,10 +1,11 @@
-"""Build one 65C02 engine program and its separately loaded rules/physics overlays."""
+"""Build one 65C02 engine program and its separately loaded rules, physics and mechanics overlays."""
 from pathlib import Path
 import os, shlex, struct, subprocess as sp
 ROOT=Path(__file__).resolve().parents[2]
 OUT=ROOT/'cadet/play-build'
 CC=os.environ.get('MOS_CC','/opt/llvm-mos-sdk-23.4.0/llvm-mos/bin/mos-cx16-clang')
 MAIN_BYTES=2+0x96ff
+OVERLAYS=(('.rules','.RUL',8192),('.physics','.PHY',8192),('.mechanics','.MEC',0x9f8))
 def elf_section(path,name):
     # The linker raw writer selects by VMA; overlays share A000, so FULL cannot
     # distinguish them. Extract each named ELF section instead (ELF32 little-endian).
@@ -26,20 +27,20 @@ def build_native(name,sources,defines=()):
     sdk = '@' + str(Path(CC).parent/'mos-cx16.cfg')
     config.write_text(shlex.join((linker, sdk)) + '\n', encoding='utf-8')
     args=[CC,'--no-default-config','--config='+str(config),'-Oz','-Icadet/play-build',
-          '-DRULES_FILE="'+name+'.RUL"','-DPHYSICS_FILE="'+name+'.PHY"',*defines,*sources,
+          '-DRULES_FILE="'+name+'.RUL"','-DPHYSICS_FILE="'+name+'.PHY"','-DMECHANICS_FILE="'+name+'.MEC"',*defines,*sources,
           # Both banked code sections intentionally share A000 VMA. Region sizes
           # and main-stack assertions remain enforced by the linker.
           '-Wl,--no-check-sections',
           '-Wl,-Map,'+str(OUT/(name+'.map')),'-o',str(raw)]
     sp.run(args,cwd=ROOT,check=True)
     data=raw.read_bytes()
-    assert len(data)==MAIN_BYTES+16384,(name,len(data))
+    assert len(data)==MAIN_BYTES+sum(size for _,_,size in OVERLAYS),(name,len(data))
     assert data[:2]==b'\x01\x08'
     (OUT/(name+'.PRG')).write_bytes(data[:MAIN_BYTES])
-    for section,ext in (('.rules','.RUL'),('.physics','.PHY')):
+    for section,ext,size in OVERLAYS:
         overlay=elf_section(Path(str(raw)+'.elf'),section)
-        assert len(overlay)<=8192,(name,section,len(overlay))
-        (OUT/(name+ext)).write_bytes(overlay.ljust(8192,b'\x00'))
+        assert len(overlay)<=size,(name,section,len(overlay))
+        (OUT/(name+ext)).write_bytes(overlay.ljust(size,b'\x00'))
     raw.unlink()
     return OUT/(name+'.PRG')
 if __name__=='__main__':

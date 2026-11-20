@@ -21,14 +21,31 @@ uint32_t cost[3];
 static uint32_t cycles(void){uint8_t a=*(volatile uint8_t*)0x9fb8,b=*(volatile uint8_t*)0x9fb9,c=*(volatile uint8_t*)0x9fba,d=*(volatile uint8_t*)0x9fbb;return(uint32_t)a|((uint32_t)b<<8)|((uint32_t)c<<16)|((uint32_t)d<<24);}
 #endif
 typedef struct {
+ uint16_t interval, remaining; /* Q8 units of one 60 Hz frame */
+ uint8_t pose, reverse;
+} FlagSpinner;
+typedef struct {
+ FlagSpinner spinner[2];
  uint16_t lane_flash[2],hazard_clear[2],bumper_decay[2],kick_timer[2],gate_flash[2];
  uint16_t hazard_flash[6],wormhole_timer,destination_flash,replay,hyper_timer;
  int16_t original_z;
- uint8_t gate_alert[2],blink,blink_clock,bumper_fire[7],rebounder_fire[4],bumper_level[2],lane_bits[2],hazard_bits[2],gate[2],kick_phase[2];
+ uint8_t opening_random,cross_hold,gate_alert[2],blink,blink_clock,bumper_fire[7],rebounder_fire[4],bumper_level[2],lane_bits[2],hazard_bits[2],gate[2],kick_phase[2];
  uint8_t wormhole_dest,wormhole_exit,hyper_count,gravity,capture_group,exit_group,original_mask;
 } RuleState;
 static RuleState rules;
 Game game;static uint16_t ramp_ignored[8];static uint8_t ramp_ignore_count;
+/* Resident trampolines may switch away from the caller's bank. */
+#define BANK_TRAMPOLINE __attribute__((section(".text.bank_trampolines"),noinline))
+#ifdef __CX16__
+#define MECHANIC_FN __attribute__((section(".mechanics"),noinline))
+#define MECHANIC_ENTER uint8_t mechanic_saved=*(volatile uint8_t*)0; *(volatile uint8_t*)0=10; __asm__ volatile("":::"memory")
+#define MECHANIC_LEAVE __asm__ volatile("":::"memory"); *(volatile uint8_t*)0=mechanic_saved
+#else
+#define MECHANIC_FN
+#define MECHANIC_ENTER
+#define MECHANIC_LEAVE
+#endif
+static BANK_TRAMPOLINE void rules_destination(bool);
 static uint8_t active[160],active_flags[160],active_count;
 static void touch(uint8_t c){if(!active_flags[c]){active_flags[c]=1;active[active_count++]=c;}}
 #ifdef CADET_BRUTE
@@ -102,9 +119,14 @@ bool game_load(void){cell_id=65535;
 #ifndef PHYSICS_FILE
 #define PHYSICS_FILE "CADET.PHY"
 #endif
+#ifndef MECHANICS_FILE
+#define MECHANICS_FILE "CADET.MEC"
+#endif
  *(volatile uint8_t*)0=62;cbm_k_setnam(PHYSICS_FILE);cbm_k_setlfs(1,8,2);ok=(uintptr_t)cbm_k_load(0,(void*)0xa000)>255;
  *(volatile uint8_t*)0=61;cbm_k_setnam(RULES_FILE);cbm_k_setlfs(1,8,2);ok=ok&&((uintptr_t)cbm_k_load(0,(void*)0xa000)>255);
  for(uint8_t i=0;i<3;++i){name[4]='0'+i;*(volatile uint8_t*)0=1+i*8;cbm_k_setnam(name);cbm_k_setlfs(1,8,2);ok=ok&&((uintptr_t)cbm_k_load(0,(void*)0xa000)>255);}
+ *(volatile uint8_t*)0=10;cbm_k_setnam(MECHANICS_FILE);cbm_k_setlfs(1,8,2);
+ ok=ok&&((uintptr_t)cbm_k_load(0,(void*)0xb608)>255);
  *(volatile uint8_t*)0=saved;return ok;
 #else
  FILE*f=fopen("cadet/play-build/MODEL.BIN","rb");if(!f)return false;bool ok=fread(model,1,sizeof model,f)>0;fclose(f);return ok;
@@ -127,9 +149,6 @@ void add_score(uint16_t n){if(game.overflow)return;game.score_dirty=true;uint16_
  for(uint8_t i=digit;i<40&&carry;++i){uint8_t add;
  if(carry<10){add=carry;carry=0;}else{add=carry%10;carry/=10;}uint8_t d=game.digits[i]+add;if(d>=10){d-=10;++carry;}game.digits[i]=d;}}
 #include "rules.inc"
-/* A bank-changing trampoline must stay resident even when its caller itself
- * runs in an overlay. Inlining it there would bank out the executing code. */
-#define BANK_TRAMPOLINE __attribute__((section(".text.bank_trampolines"),noinline))
 /* All overlay calls enter from unbanked RAM. Helpers called by the overlay
  * either leave RAM_BANK unchanged or restore it before returning. Resident
  * wrappers must not inline into an overlay: changing banks there would replace
@@ -141,9 +160,20 @@ void add_score(uint16_t n){if(game.overflow)return;game.score_dirty=true;uint16_
 #define RULE_ENTER
 #define RULE_LEAVE
 #endif
+static BANK_TRAMPOLINE void rules_spin(const Edge*e){
+ MECHANIC_ENTER;rule_spin_start(e->group==GROUP_489,e->param);MECHANIC_LEAVE;
+}
 static BANK_TRAMPOLINE void rules_reset(void){RULE_ENTER;rule_reset();RULE_LEAVE;}
-static RULE_FN void ring_tick(void);
-static BANK_TRAMPOLINE void rules_tick(void){RULE_ENTER;rule_tick();ring_tick();RULE_LEAVE;}
+static MECHANIC_FN void ring_tick(void);
+static BANK_TRAMPOLINE void rules_tick(void){
+ RULE_ENTER;rule_tick();RULE_LEAVE;
+ if(game.state==Ready||game.ring_flash||game.mission>=Practice||rules.spinner[0].interval||rules.spinner[1].interval){
+  MECHANIC_ENTER;
+  if(rules.spinner[0].interval||rules.spinner[1].interval)rule_spin_tick();
+  ring_tick();
+  MECHANIC_LEAVE;
+ }
+}
 static BANK_TRAMPOLINE void rules_capture(const Edge*e){RULE_ENTER;rule_capture(e);++game.visual_epoch;RULE_LEAVE;}
 static BANK_TRAMPOLINE void rules_release(void){RULE_ENTER;rule_release();++game.visual_epoch;RULE_LEAVE;}
 static BANK_TRAMPOLINE void rules_lane(uint16_t n){RULE_ENTER;rule_lane(n);++game.visual_epoch;RULE_LEAVE;}
@@ -156,7 +186,8 @@ static RULE_FN uint8_t startup_lamp(uint8_t group){
  if(game.wait<=StartupReadyFrames)return 0;
  return ((group^(group>>3)^game.ring_phase)&3u)<2;
 }
-BANK_TRAMPOLINE uint8_t game_lamp(uint16_t n){RULE_ENTER;uint8_t r=game.state==Ready?startup_lamp((uint8_t)n):rule_lamp(n);RULE_LEAVE;return r;}
+BANK_TRAMPOLINE uint8_t game_lamp(uint16_t n){RULE_ENTER;uint8_t r=n==254?(game.state==Ready&&rules.cross_hold!=0):
+  game.state==Ready?startup_lamp((uint8_t)n):rule_lamp(n);RULE_LEAVE;return r;}
 BANK_TRAMPOLINE uint8_t game_pose(uint16_t n){RULE_ENTER;uint8_t r=rule_pose(n);RULE_LEAVE;return r;}
 /* Rank steps persist across balls. The first-rank practice and launch
  * missions use the original target selection, counts and rank award. */
@@ -196,10 +227,18 @@ static void mission_ramp(void){
   add_score(10000);++game.visual_epoch;
  }
 }
-static RULE_FN void ring_tick(void){
+static MECHANIC_FN void ring_tick(void){
  if(game.state==Ready){
   if(game.wait==StartupFrames)sound(SoundStartup);
   --game.wait;
+  if(rules.cross_hold)--rules.cross_hold;
+  if(game.wait==StartupReadyFrames)rules.cross_hold=0;
+  else if(game.wait>StartupReadyFrames&&game.wait%12u==11u){
+   uint8_t random=rules.opening_random;
+   random=(random>>1)^((random&1)?0xb8:0);
+   rules.opening_random=random;
+   if(random<75)rules.cross_hold=6u+(random>>1);
+  }
   if(game.wait==StartupReadyFrames||(game.wait>StartupReadyFrames&&++game.ring_clock==15)){
    game.ring_clock=0;++game.ring_phase;++game.visual_epoch;
   }
@@ -216,14 +255,15 @@ static RULE_FN void ring_tick(void){
 }
 static void serve(){sound(255);rules.gate[0]=rules.gate[1]=1;rules.gate_flash[0]=rules.gate_flash[1]=600;++game.visual_epoch;game.ball_number=4-game.balls;game.state=Serving;game.x=serve_x;game.y=plunger_y-2;game.z=77;game.vx=game.vy=game.remx=game.remy=game.accx=game.accy=0;game.mask=1;game.ramp=false;game.charge=0;game.charge_clock=0;game.flags=0;game.nudges=0;game.last_group=GROUP_473;game.last_kind=Plunger;sound(SoundFeed);}
 static RULE_FN void reset_game(void){
- uint8_t epoch=game.visual_epoch;
+ uint8_t epoch=game.visual_epoch, spinner_epoch=game.spinner_epoch;
  active_count=0;memset(active_flags,0,sizeof active_flags);
- memset(&game,0,sizeof game);game.visual_epoch=epoch;
+ memset(&game,0,sizeof game);game.visual_epoch=epoch;game.spinner_epoch=spinner_epoch;
  game.balls=3;game.multiplier=1;game.rank=1;game.ball_number=1;game.score_dirty=true;
  rule_reset();
 }
 BANK_TRAMPOLINE void game_begin(bool show){
- RULE_ENTER;reset_game();RULE_LEAVE;
+ uint8_t seed=(uint8_t)game.tick;
+ RULE_ENTER;reset_game();rules.opening_random=seed?seed:1;RULE_LEAVE;
  if(show){game.wait=StartupFrames;sound(255);++game.visual_epoch;}else serve();
 }
 static void drain(){if(game.state!=InPlay)return;game.state=Between;game.mission=NoMission;game.mission_left=0;game.wait=120;game.vx=game.vy=0;game.mask=0;game.ramp=false;++game.drains;if(rules.replay)rules.replay=0;else if(game.balls)--game.balls;rules_reset();memset(game.lamps,0,sizeof game.lamps);memset(game.disabled,0,sizeof game.disabled);sound(5);}
@@ -252,7 +292,7 @@ static uint16_t ratio12(uint16_t n,uint16_t d){
  return whole+q;
 }
 #endif
-static int16_t rebound_core(int16_t nx,int16_t ny,uint8_t e,uint8_t smooth,uint8_t boost,int16_t inward){
+static MECHANIC_FN int16_t rebound_core(int16_t nx,int16_t ny,uint8_t e,uint8_t smooth,uint8_t boost,int16_t inward){
  if(inward<=0)return 0;
  uint16_t speed=isqrt(mul(game.vx,game.vx)+mul(game.vy,game.vy));
  int16_t normal_part=(int16_t)(umul(inward,(uint16_t)smooth+e)>>8);
@@ -265,11 +305,13 @@ static int16_t rebound_core(int16_t nx,int16_t ny,uint8_t e,uint8_t smooth,uint8
  if(boost){game.vx+=mul(nx,boost);game.vy+=mul(ny,boost);}
  limit();return inward;
 }
-static int16_t rebound(int16_t nx,int16_t ny,uint8_t e,uint8_t smooth,uint8_t boost,int16_t inward){
+static BANK_TRAMPOLINE int16_t rebound(int16_t nx,int16_t ny,uint8_t e,uint8_t smooth,uint8_t boost,int16_t inward){
 #ifdef CADET_PROFILE
  uint32_t before=cycles();
 #endif
+ MECHANIC_ENTER;
  int16_t result=rebound_core(nx,ny,e,smooth,boost,inward);
+ MECHANIC_LEAVE;
 #ifdef CADET_PROFILE
  cost[1]+=cycles()-before;
 #endif
@@ -408,7 +450,11 @@ static bool event_core(const Edge*e){
   if(m->action==1){game.ramp=true;game.param=e->param;game.mask=m->mask;++game.ramp_entries;if(original==101)mission_ramp();}
   else if(m->action>=2){game.ramp=false;game.mask=m->mask;if(m->zflag)game.z=m->az+77;}
   if(game.mask!=old)++game.layer_changes;return false;}
- if(e->kind==Pass||e->kind==Sensor||e->kind==Spinner){
+ if(e->kind==Spinner){
+  rules_spin(e);
+  return false;
+ }
+ if(e->kind==Pass||e->kind==Sensor){
   if(e->flags&4){
    if(e->flags&8){game.lamps[c]=0;game.disabled[c]=12;return false;}
    game.lamps[c]=1;fresh=true;
@@ -416,7 +462,6 @@ static bool event_core(const Edge*e){
   if(fresh){
    add_score(initial_award[c]);
    if((original>=520&&original<=522)||(original>=528&&original<=530))rules_lane(original);
-   if(e->kind==Spinner)rules_destination(false);
    if(original==523||original==527){uint8_t side=original==527;if(rules.gate[side]){rules.gate_alert[side]=1;++game.visual_epoch;}}
    game.last_group=c;game.last_kind=e->kind;sound(e->kind==Sensor?SoundLane:6);
   }return false;

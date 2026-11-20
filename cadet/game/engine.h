@@ -17,7 +17,7 @@ typedef struct {
  uint8_t mission,mission_left,rank,rank_progress,ring_phase,ring_clock;
  uint16_t ring_flash;
  uint16_t bumper_hits,flipper_hits,target_hits,returns,drains,guard_hits,escapes;
- uint8_t last_group,last_kind,charge_clock,ball_number,sound_value,visual_epoch,flipper_keys;uint16_t last_edge,events,ramp_entries,layer_changes;
+ uint8_t last_group,last_kind,charge_clock,ball_number,sound_value,visual_epoch,spinner_epoch,flipper_keys;uint16_t last_edge,events,ramp_entries,layer_changes;
 } Game;
 extern Game game;
 bool game_load(void);void game_begin(bool show);

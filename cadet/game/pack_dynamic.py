@@ -30,6 +30,9 @@ defs += [(501,0,[501,None]),(502,0,[502,None]),(505,0,[505,506]),(507,0,[507,508
 # TWall starts hidden; a qualifying rebound exposes bitmap 0 for 0.1 seconds.
 # The rest pose restores the original table rather than keeping the firing art.
 defs += [(g,0,[None,g]) for g in [471,472]]
+# Precompute flag poses from the installed game data using the existing
+# per-tile palette and transparent-mask path.
+defs += [(g,0,list(range(g,g+8))) for g in (481,489)]
 ring_groups = [196,160,197,159,198,158,199,157,200,156,201,155,202,154,203,153,204,152]
 ring_groups += list(range(205,214))
 defs += [(g,1,[None,g]) for g in ring_groups]
@@ -91,7 +94,12 @@ for gid,kind,poses in defs:
  report.append({'group':gid,'kind':kind,'pixels':len(px),'bytes':len(addresses),'runs':len(runs),'poses':len(poses),'fixed':fixed,'variable':variable})
  records.append((gid,kind,positions,runs,data))
 assert not any(len(used[t])>1 for t in alltiles),'Dynamic tile patterns must not alias other screen cells'
-blob=bytearray();ring_tail=bytearray();descs=[];packed_records=[]
+blob=bytearray();descs=[];packed_records=[]
+ring_tail=bytearray()
+overflow=bytearray()
+# The projection/UI file lives below BA00 in bank 11.
+overflow_address=0xba00
+assert 0xa000+len((o/'UI.BIN').read_bytes())<=overflow_address
 for gid,kind,positions,runs,data in records:
  addresses=[addr for run in runs for addr in run];n=len(addresses)
  raw=bytearray(struct.pack('<BBH',len(runs),len(data),n))
@@ -101,18 +109,25 @@ for gid,kind,positions,runs,data in records:
  assert len(raw)<=8192
  if len(blob)%8192+len(raw)>8192 and len(blob)<2*8192:
   blob.extend(bytes(8192-len(blob)%8192))
- if len(blob)+len(raw)<=3*8192 and not ring_tail:
+ if len(blob)+len(raw)<=3*8192 and not ring_tail and not overflow:
   offset=len(blob); bank=58+offset//8192; ptr=0xa000+offset%8192
   blob.extend(raw)
- else:
+ elif len(ring_tail)+len(raw)<=4096 and not overflow:
   assert gid in ring_groups
   offset=3*8192+len(ring_tail);bank=31;ptr=0xb000+len(ring_tail)
   ring_tail.extend(raw)
+ else:
+  assert gid in ring_groups
+  offset=4*8192+len(overflow);bank=11;ptr=overflow_address+len(overflow)
+  overflow.extend(raw)
  kind=3 if gid in ring_groups else kind
  descs.append((ring_groups.index(gid) if kind==3 else gid,bank,ptr,kind))
  packed_records.append({'group':gid,'offset':offset,'length':len(raw),'positions':addresses,'masks':[positions[a]for a in addresses],'poses':[[values[a]for a in addresses]for values in data]})
 assert ring_tail and len(ring_tail)<=4096,('ring bank budget exceeded',len(ring_tail))
+assert overflow_address+len(overflow)<=0xc000,('UI bank budget exceeded',len(overflow))
 (o/'RINGS.BIN').write_bytes(ring_tail)
+(o/'RINGS2.BIN').write_bytes(overflow)
+
 regular_used=len(blob);blob.extend(bytes(3*8192-len(blob)))
 # Lower rebounder rubber and its TLight glow overlap. The original control fires
 # both for the same 0.1 seconds; compose their DAT z-maps, then switch private
@@ -170,6 +185,28 @@ for gid,lamp in [(469,180),(470,181)]:
  fast_descs.append((gid,63,0xa000+offset%8192,2));blob.extend(raw)
  fast_records.append({'group':gid,'lamp_group':lamp,'offset':offset,'length':len(raw),'maps':meta,'rest':list(rest_data),'fire':list(fire_data)})
  report.append({'group':gid,'kind':2,'source_groups':[lamp,gid],'pixels':len(px),'bytes':len(rest_data),'tiles':len(meta),'poses':2})
+# The insert shares two tiles with the fast slingshot graphics. Use a
+# transparent sprite so neither writer can erase the other. The installation
+# supplied to the converter has a blue insert; the enhanced reference uses
+# red. Preserve the mask and model its red luminance ramp in the local palette.
+cross, cross_meta = bitmap(254)
+cross_dist = ((colors - np.array((187,0,0)))**2).sum(axis=2)
+cross_pen = int(cross_dist.argmin())
+cross_palette = cross_pen // 16
+assert cross_pen % 16
+ramp = colors[cross_palette]
+target = np.zeros((256,3),dtype=np.int32)
+target[:,0] = np.clip((source_brightness+2)//5,51,255)
+distance = ((ramp[None,:,:]-target[:,None,:])**2).sum(axis=2)
+distance[:,0] = 10**9
+cross_pixels = np.zeros((16,16),dtype=np.uint8)
+cross_pixels[:cross.shape[0],:cross.shape[1]] = np.where(cross!=0,distance.argmin(axis=1)[cross],0)
+cross_data = ((cross_pixels[:,::2]<<4)|cross_pixels[:,1::2]).tobytes()
+cross_ptr = 0xa000+len(blob)%8192
+assert len(blob)//8192==3
+blob.extend(cross_data)
+cross_vram=fast_end
+fast_end+=len(cross_data)
 assert fast_end<=0x1f9c0,('fast patterns overlap palette or sprite attributes',hex(fast_end))
 assert fast_base>=json.loads((o/'sprites.json').read_text())['end']+2048+128
 used_bytes=len(blob);assert used_bytes<=4*8192
@@ -178,17 +215,24 @@ for i in range(4):(o/f'DYN{i}.BIN').write_bytes(blob[i*8192:(i+1)*8192])
 descs=fast_descs+descs
 h=['#ifndef CADET_DYNAMIC_H','#define CADET_DYNAMIC_H','#include <stdint.h>','#include <stdbool.h>',
  '#define DYNAMIC_COUNT '+str(len(descs)), '#define DYNAMIC_FAST_COUNT '+str(len(fast_descs)),
- '#define FAST_TILE_END '+str(fast_end)+'UL', '#define DYNAMIC_BANK_COUNT 4','static const uint8_t dynamic_load_banks[]={58,59,60,63};',
+ '#define FAST_TILE_END '+str(fast_end)+'UL', '#define DYNAMIC_OVERFLOW_ADDRESS '+hex(overflow_address),
+ f'#define FLAG_DESCRIPTOR {next(i for i,desc in enumerate(descs) if desc[0]==481)}u',
+ f'#define CROSS_PATTERN_PTR {hex(cross_ptr)}u',
+ f'#define CROSS_PATTERN_VRAM {hex(cross_vram)}UL',
+ f'#define CROSS_X {cross_meta["x"]-tm["x"]+8}u',
+ f'#define CROSS_Y {cross_meta["y"]-tm["y"]+5}u',
+ f'#define CROSS_ATTR {0x50|cross_palette}u', '#define DYNAMIC_BANK_COUNT 4','static const uint8_t dynamic_load_banks[]={58,59,60,63};',
  'typedef struct {uint16_t group;uint8_t bank;uint16_t ptr;uint8_t lamp;} DynamicDesc;',
  'static const DynamicDesc dynamic_desc[]={'+','.join('{%d,%d,%d,%d}'%v for v in descs)+'};',
  'void dynamic_init(void);bool dynamic_update(uint8_t);','#endif']
 (o/'dynamic.h').write_text('\n'.join(h)+'\n')
-manifest={'ring_start':next(x['offset'] for x in packed_records if x['group']==ring_groups[0]),'ring_tail_bytes':len(ring_tail),'bytes':used_bytes,'regular_bytes':regular_used,'banks':[58,59,60,63],'affected_tiles':len(alltiles|fast_tiles),'fast_vram_base':fast_base,'fast_vram_end':fast_end,'components':report,'records':packed_records,'fast_records':fast_records}
+manifest={'ring_start':next(x['offset'] for x in packed_records if x['group']==ring_groups[0]),'ring_tail_bytes':len(ring_tail),'overflow_bytes':len(overflow),'bytes':used_bytes,'regular_bytes':regular_used,'banks':[58,59,60,63],'affected_tiles':len(alltiles|fast_tiles),'fast_vram_base':fast_base,'fast_vram_end':fast_end,'components':report,'records':packed_records,'fast_records':fast_records}
 (o/'dynamic.json').write_text(json.dumps(manifest,indent=2)+'\n')
 # Validate every pose and every transparent nibble against the packed source.
 for record in packed_records:
  at=record['offset'];payload=blob
- if at>=3*8192:payload=ring_tail;at-=3*8192
+ if at>=4*8192:payload=overflow;at-=4*8192
+ elif at>=3*8192:payload=ring_tail;at-=3*8192
  nr,nposes,n=struct.unpack_from('<BBH',payload,at);at+=4
  runs=[]
  for _ in range(nr):

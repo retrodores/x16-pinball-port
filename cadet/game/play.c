@@ -250,6 +250,7 @@ int main(void){
  for(uint8_t i=0;i<9;++i){char n[]="DEPTH00.BIN";n[6]+=i;*(volatile uint8_t*)0=i==0?10:i<3?16+i:i+42;if(!load(n,0,0xa000))goto fail;}
  *(volatile uint8_t*)0=57;if(!load("MSGFONT.BIN",0,0xa400))goto fail;
  *(volatile uint8_t*)0=31;if(!load("RINGS.BIN",0,0xb000))goto fail;
+ *(volatile uint8_t*)0=11;if(!load("RINGS2.BIN",0,DYNAMIC_OVERFLOW_ADDRESS))goto fail;
  for(uint8_t i=0;i<DYNAMIC_BANK_COUNT;++i){char n[]="DYN0.BIN";n[3]+=i;*(volatile uint8_t*)0=dynamic_load_banks[i];if(!load(n,0,0xa000))goto fail;}
  *(volatile uint8_t*)0=11;if(!load("UI.BIN",0,0xa000))goto fail;
  for(uint8_t i=0;i<128;++i)hide(i);

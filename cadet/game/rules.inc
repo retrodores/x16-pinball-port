@@ -9,7 +9,9 @@
 #endif
 static RULE_FN void rule_sound(uint8_t id,uint8_t group,uint8_t kind){game.last_group=group;game.last_kind=kind;sound(id);}
 static RULE_FN uint16_t countdown(uint16_t n){return n>2?n-2:0;}
-static RULE_FN void rule_reset(void){memset(&rules,0,sizeof rules);rules.blink=1;++game.visual_epoch;}
+static RULE_FN void rule_reset(void){
+ if(rules.spinner[0].pose||rules.spinner[1].pose)++game.spinner_epoch;
+ memset(&rules,0,sizeof rules);rules.blink=1;++game.visual_epoch;}
 static RULE_FN void rule_gate(uint8_t side,bool open){rules.gate[side]=open;rules.gate_flash[side]=open?600:0;rules.gate_alert[side]=0;++game.visual_epoch;rule_sound(open?SoundGateOpen:SoundGateClose,side?GROUP_502:GROUP_501,Gate);}
 static RULE_FN void rule_upgrade(uint8_t bank){
  if(rules.bumper_level[bank]<3){++rules.bumper_level[bank];++game.visual_epoch;
@@ -22,6 +24,54 @@ static RULE_FN void rule_upgrade(uint8_t bank){
  * fire bitmap and lower triangular light last 0.1s after a qualifying kick.
  * Unlike TBumper, the visible fire state does not inhibit another kick. */
 static RULE_FN void rule_rebounder(uint8_t group){rules.rebounder_fire[group-GROUP_469]=12;++game.visual_epoch;add_score(500);rule_sound(2,group,Wall);}
+/* Start at the first pose immediately. Later steps use sub-frame intervals
+ * so rendering at 60 Hz does not change the award or wrap count. */
+static MECHANIC_FN void rule_spin_step(FlagSpinner*s){
+ s->pose=(s->pose+(s->reverse?7:1))&7;
+ ++game.spinner_epoch;
+ if(!s->pose)rules_destination(false);
+}
+static MECHANIC_FN void spinner_sound(uint8_t side){
+ game.last_group=side?GROUP_489:GROUP_481;
+ game.last_kind=Spinner;
+ sound(6);
+}
+static MECHANIC_FN void rule_spin_start(uint8_t side,uint8_t reverse){
+ uint16_t magnitude=isqrt((uint32_t)mul(game.vx,game.vx)+mul(game.vy,game.vy));
+ uint8_t speed=(magnitude+128u)>>8;
+ FlagSpinner*s=&rules.spinner[side];
+ s->reverse=reverse;
+ rule_spin_step(s);
+ add_score(500);
+ spinner_sound(side);
+ ++game.visual_epoch;
+ /* 60*256/(20*0.65) is about 1182. Speed is in table units/second. */
+ s->interval=s->remaining=speed?1182u/speed:0;
+}
+static MECHANIC_FN void rule_spin_tick(void){
+ for(uint8_t side=0;side<2;++side){
+  FlagSpinner*s=&rules.spinner[side];
+  if(!s->interval)continue;
+  uint16_t time=256;
+  uint16_t award=0;
+  while(s->remaining<=time){
+   time-=s->remaining;
+   rule_spin_step(s);
+   award+=500;
+   /* Slow by 0.65 per step. Stop below five steps per second. */
+   s->interval=(s->interval*20u+6)/13u;
+   if(s->interval>3072){s->interval=0;break;}
+   s->remaining=s->interval;
+  }
+  if(s->interval)s->remaining-=time;
+  if(award){
+   add_score(award);
+   /* The mechanical PCM voice can start once per spinner per video frame. */
+   spinner_sound(side);
+   ++game.visual_epoch;
+  }
+ }
+}
 static RULE_FN void rule_tick(void){
  if(++rules.blink_clock==6){rules.blink_clock=0;rules.blink^=1;if(rules.lane_flash[0]||rules.lane_flash[1]||rules.hazard_clear[0]||rules.hazard_clear[1]||rules.wormhole_timer||rules.destination_flash||rules.gravity||rules.gate_flash[0]||rules.gate_flash[1]||rules.gate_alert[0]||rules.gate_alert[1])++game.visual_epoch;for(uint8_t i=0;i<6;++i)if(rules.hazard_flash[i]){++game.visual_epoch;break;}}
  for(uint8_t i=0;i<4;++i)if(rules.rebounder_fire[i]){rules.rebounder_fire[i]-=2;if(!rules.rebounder_fire[i])++game.visual_epoch;}
@@ -124,6 +174,7 @@ static RULE_FN uint8_t rule_pose(uint16_t gid){
  if(gid>=469&&gid<=472)return rules.rebounder_fire[gid-469]!=0;
  uint8_t b=255;if(gid>=372&&gid<=396&&(gid-372)%8==0)b=(gid-372)/8;else if(gid>=405&&gid<=421&&(gid-405)%8==0)b=4+(gid-405)/8;
  if(b<7)return 2*rules.bumper_level[b>=4]+(rules.bumper_fire[b]!=0);
+ if(gid==481||gid==489)return rules.spinner[gid==489].pose;
  if(gid==501||gid==502)return rules.gate[gid-501];
  if(gid==505||gid==507)return rules.kick_phase[(gid-505)/2]>=2;
  return 0;

@@ -8,13 +8,13 @@ class PackageTests(unittest.TestCase):
     def setUp(self):
         self.temp=tempfile.TemporaryDirectory(prefix='cadet-package-test-')
         self.root=Path(self.temp.name)
-        sizes={'CADET.PRG':2+0x96ff,'CADET.RUL':8192,'CADET.PHY':8192,'MAP.BIN':4096,
+        sizes={'CADET.PRG':2+0x96ff,'CADET.RUL':8192,'CADET.PHY':8192,'CADET.MEC':0x9f8,'MAP.BIN':4096,
           'TILES.BIN':98816,'PAL.BIN':512,'SPRITES.BIN':18560,'FONT.BIN':2048,
           'UI.BIN':6530,'GEOM0.BIN':65536,'GEOM1.BIN':65536,'GEOM2.BIN':16384,
           'MUSIC0.BIN':65536,'MUSIC1.BIN':37194,'PCM0.BIN':65536,
           'PCM1.BIN':32768,'PCM2.BIN':49938,
           **{f'DEPTH{i:02}.BIN':(5640 if i==0 else 6825 if i==8 else 8192)for i in range(9)},
-          'MSGFONT.BIN':6360,'STARTFX.BIN':55539,'RINGS.BIN':2542,**{f'DYN{i}.BIN':8192 for i in range(4)}}
+          'MSGFONT.BIN':6360,'STARTFX.BIN':55539,'RINGS.BIN':2542,'RINGS2.BIN':1028,**{f'DYN{i}.BIN':8192 for i in range(4)}}
         for name,size in sizes.items():
             data=bytes(size)
             if name=='CADET.PRG':data=b'\x01\x08'+data[2:]
@@ -24,7 +24,7 @@ class PackageTests(unittest.TestCase):
          'sprites.json':{'base':102912,'bytes':18560,'end':121472},
          'resident-audio.json':{'bytes':148242,'banks':list(range(19,31))+list(range(51,58)),'load_banks':[19,27,51]},
          'depth.json':{'codec':'packbits64-deduplicated','codec_exact_pixels':171550,'data_bytes':64169},
-         'dynamic.json':{'ring_tail_bytes':2542,'bytes':20434}}
+         'dynamic.json':{'ring_tail_bytes':2542,'overflow_bytes':1028,'bytes':20434}}
         for name,data in metadata.items():(self.root/name).write_text(json.dumps(data))
     def tearDown(self):self.temp.cleanup()
     def test_valid_asset_layout(self):

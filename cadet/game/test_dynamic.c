@@ -4,11 +4,12 @@
 #include "dynamic.h"
 #include "engine.h"
 Game game;
+static uint8_t cross;
 static uint8_t poses[DYNAMIC_COUNT],before[512];
 static volatile uint8_t *const v=(volatile uint8_t*)0x9f20;
 static uint16_t checks,errors;static uint32_t fast_max;
 uint8_t game_pose(uint16_t group){for(uint8_t i=0;i<DYNAMIC_COUNT;++i)if(dynamic_desc[i].lamp!=3&&dynamic_desc[i].group==group)return poses[i];return 0;}
-uint8_t game_lamp(uint16_t group){return game_pose(group);}
+uint8_t game_lamp(uint16_t group){return group==254?cross:game_pose(group);}
 uint8_t game_ring_lamp(uint8_t index){
  for(uint8_t i=0;i<DYNAMIC_COUNT;++i)if(dynamic_desc[i].lamp==3&&dynamic_desc[i].group==index)return poses[i];
  return 0;
@@ -31,8 +32,17 @@ static void fast_tick(void){uint32_t start=cycles();dynamic_update(0);uint32_t e
 int main(void){
  if(!load("TILES.BIN",2,4096)){text("# LOAD FAILED\n# DONE\n");return 1;}
  *(volatile uint8_t*)0=31;if(!load("RINGS.BIN",0,0xb000)){text("# LOAD FAILED\n# DONE\n");return 1;}
+ *(volatile uint8_t*)0=11;if(!load("RINGS2.BIN",0,DYNAMIC_OVERFLOW_ADDRESS)){text("# LOAD FAILED\n# DONE\n");return 1;}
  for(uint8_t i=0;i<DYNAMIC_BANK_COUNT;++i){char n[]="DYN0.BIN";n[3]+=i;*(volatile uint8_t*)0=dynamic_load_banks[i];if(!load(n,0,0xa000)){text("# LOAD FAILED\n# DONE\n");return 1;}}
  *(volatile uint8_t*)0=11;dynamic_init();
+ /* The X uses its own VERA sprite and also updates at zero tile budget. */
+ *(volatile uint8_t*)0=63;
+ const uint8_t*cross_data=(const uint8_t*)(uintptr_t)CROSS_PATTERN_PTR;
+ addr(CROSS_PATTERN_VRAM&65535u,CROSS_PATTERN_VRAM>>16);
+ for(uint8_t i=0;i<128;++i){if(v[3]!=cross_data[i])++errors;++checks;}
+ *(volatile uint8_t*)0=11;
+ cross=1;fast_tick();addr(0xfffeu,1);if(v[3]!=12)++errors;++checks;
+ game.state=Serving;cross=0;fast_tick();addr(0xfffeu,1);if(v[3]!=0)++errors;++checks;
  /* Alternate pixels and original-rest patterns must be preloaded exactly. */
  for(uint8_t i=0;i<DYNAMIC_FAST_COUNT;++i){
   const DynamicDesc*d=dynamic_desc+i;*(volatile uint8_t*)0=d->bank;

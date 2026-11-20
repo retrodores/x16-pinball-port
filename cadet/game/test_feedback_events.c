@@ -67,4 +67,73 @@ static void input_events(void){
  game.x=t.x+mul(nx,80)/256;game.y=t.y+mul(ny,80)/256;game.vx=game.vy=0;game.last_sound=255;paddle(0,0);
  CHECK(game.flipper_hits==1&&dot(game.vx,game.vy,nx,ny)>256&&game.last_sound==255);
 }
-int main(void){if(!game_load()){puts("# LOAD FAIL\n# DONE");return 1;}slingshots();input_events();printf("# FEEDBACK %s %u %u\n",failures?"FAIL":"PASS",checks,failures);puts("# DONE");return failures!=0;}
+static void spinners(void){
+ for(uint8_t side=0;side<2;++side){
+  uint16_t id=side?489:481;
+  Edge spinner[2];
+  uint8_t found=0;
+  uint16_t first=0;
+  for(uint16_t i=0;i<edge_count;++i){
+   Edge e=*edge(i);
+   if(original_groups[e.group]!=id)continue;
+   CHECK(e.kind==Spinner&&e.param==found);
+   if(found<2)spinner[found]=e;
+   if(!found)first=i;
+   ++found;
+  }
+  CHECK(found==2);
+  for(uint8_t reverse=0;reverse<2;++reverse){
+   for(uint8_t fast=0;fast<2;++fast){
+    game_start();
+    rules.wormhole_dest=1;
+    Edge*e=spinner+reverse;
+    game_place((e->x+e->ex)/2+e->nx/32,(e->y+e->ey)/2+e->ny/32,
+               0,fast?15360:256,1);
+#ifdef __CX16__
+    uint8_t saved=11;
+    *(volatile uint8_t*)0=saved;
+#endif
+    CHECK(!event(e));
+#ifdef __CX16__
+    CHECK(*(volatile uint8_t*)0==saved);
+#endif
+    CHECK(game_pose(id)==(reverse?7:1)&&game.last_kind==Spinner);
+    CHECK(score()==500&&rules.wormhole_dest==1&&game.last_sound==6);
+    for(uint8_t f=0;f<48;++f)rules_tick();
+    CHECK(!rules.spinner[side].interval);
+    CHECK(score()==(fast?6500:2000));
+    CHECK(rules.wormhole_dest==(fast?2:1));
+    CHECK(game_pose(id)==(fast?(reverse?3:5):4));
+    game_start();
+    CHECK(!game_pose(id));
+   }
+  }
+  /* Exercise the geometry and pass-through path with both directed edges. */
+  for(uint8_t reverse=0;reverse<2;++reverse){
+   game_start();
+   Edge*e=spinner+reverse;
+   game_place((e->x+e->ex)/2+e->nx/32,(e->y+e->ey)/2+e->ny/32,
+              -2*e->nx,-2*e->ny,1);
+   Hit hit;
+   CHECK(nearest(-e->nx/16,-e->ny/16,&hit)&&hit.id==first+reverse);
+   move_time(-e->nx/16,-e->ny/16,1,0);
+   CHECK(game.last_kind==Spinner&&score()==500);
+   CHECK(game_pose(id)==(reverse?7:1));
+  }
+ }
+}
+static void opening_cross(void){
+ game.tick=0;
+ game_begin(true);
+ uint8_t transitions=0;
+ bool was=false;
+ for(uint16_t i=0;i<StartupFrames;++i){
+  bool on=game_lamp(254);
+  if(on!=was){++transitions;was=on;}
+  if(game.wait<=StartupReadyFrames)CHECK(!on);
+  game_frame(false,false,false,false);
+ }
+ CHECK(transitions>=4);
+ CHECK(game.state==Serving&&!game_lamp(254));
+}
+int main(void){if(!game_load()){puts("# LOAD FAIL\n# DONE");return 1;}slingshots();input_events();spinners();opening_cross();printf("# FEEDBACK %s %u %u\n",failures?"FAIL":"PASS",checks,failures);puts("# DONE");return failures!=0;}
