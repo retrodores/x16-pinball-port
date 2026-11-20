@@ -48,6 +48,31 @@ with (output('ui.log')).open('w')as f:
      flashed.add(index)
    if len(flashed)==len(blink_boxes):break
   assert len(flashed)==len(blink_boxes),('new-ball gate lamps did not all animate',sorted(flashed))
+  # Check the real idle entry, an actual auto-play score, and two ways to exit.
+  if os.environ.get('CADET_TEST_DEMO')=='1':
+   caption=scaled((405,248,565,270))
+   score=scaled((438,197,566,227))
+   def changed(reference,current,box):
+    return ImageChops.difference(reference.crop(box),current.crop(box)).getbbox() is not None
+   deadline=time.monotonic()+45
+   while True:
+    time.sleep(.4);attract=shot('attract')
+    if changed(ready,attract,caption):break
+    assert time.monotonic()<deadline,'idle demo did not appear'
+   assert purple_glyphs(attract,(405,248,565,270))>40,'demo caption is missing purple text'
+   goal=scaled((405,260,565,270))
+   deadline=time.monotonic()+35
+   while True:
+    time.sleep(.4);playing_demo=shot('attract-playing')
+    if changed(ready,playing_demo,score) and changed(attract,playing_demo,goal):break
+    assert time.monotonic()<deadline,'demo never scored and advanced an objective through normal play'
+   action('key','F2');time.sleep(.4);manual=shot('attract-f2')
+   assert not changed(ready,manual,caption) and not changed(ready,manual,score),'F2 did not reset demo'
+   action('key','F3');time.sleep(.4);manual_demo=shot('attract-f3')
+   assert changed(ready,manual_demo,caption),'F3 did not start demo'
+   action('keydown','z');time.sleep(.4);takeover=shot('attract-takeover')
+   action('keyup','z')
+   assert not changed(ready,takeover,caption),'flipper did not end demo'
   action('keydown','space');time.sleep(2);pulled=shot('pulled')
   assert ImageChops.difference(ready.crop(scaled((320,375,370,437))),pulled.crop(scaled((320,375,370,437)))).getbbox(),'plunger not animated'
   action('keyup','space');time.sleep(.8);launched=shot('launched')

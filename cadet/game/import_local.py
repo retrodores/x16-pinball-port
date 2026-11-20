@@ -23,7 +23,7 @@ STEPS = (
 )
 SOURCES = STEPS + tuple('cadet/game/' + name for name in (
     'import_local.py', 'package_development.py', 'analyze_dat.pl', 'engine.c',
-    'engine.h', 'play.c', 'rules.inc', 'flipper_sweep.h', 'audio_events.h',
+    'engine.h', 'play.c', 'attract.c', 'attract.h', 'rules.inc', 'flipper_sweep.h', 'audio_events.h',
     'audio.s', 'music_lz.s.inc', 'depth.c', 'dynamic.c', 'signedmul.s', 'fraction.s',
     'ratio.s', 'bounds.s', 'depth_quant.s', 'mask_pixels.s', 'depth_rect.s',
     'IMPORT.md',

@@ -25,9 +25,8 @@ def pitch_voice(t,v,n,ch):
 patch={38:([1,1,2,3],[28,42,47,53],31,10,1,5,6),
        28:([1,2,3,4],[30,44,52,59],31,13,7,6,8),
        11:([1,3,4,7],[30,47,57,64],31,8,4,7,6)}
-# Boost the melodic voices at conversion time, preserving note timing.
-# Keep the percussion gain from the previous Beta mix.
-FM_GAIN_STEPS=20  # YM2151 total level is in 0.75 dB steps.
+# Track and percussion gains for the effects-forward reference mix.
+FM_GAIN_STEPS=8  # YM2151 total level is in 0.75 dB steps.
 PSG_GAIN=2
 def levels(t,v,ch,vel):
  add=round(-20*math.log10(max(1,vel)/127*volume[ch]/127)/.75)

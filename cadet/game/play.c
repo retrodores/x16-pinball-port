@@ -9,6 +9,9 @@
 #include "verify_milestone_input.h"
 #endif
 #include "dynamic.h"
+#ifndef GAME_TEST
+#include "attract.h"
+#endif
 extern int32_t signedmul(int16_t,int16_t);
 extern uint16_t fastsqrt(uint32_t),depth_mask(int16_t,int16_t,uint8_t);
 extern uint8_t depth_quant(uint32_t);
@@ -65,10 +68,18 @@ void audio_effect(uint8_t id){
  effect((uint8_t)e,(uint8_t)(e>>8),voice);
 }
 
-static void status(const char*s){
- for(uint8_t i=0;i<40;++i){uint8_t c=*s?*s++:32;if(status_cache[i]==c)continue;status_cache[i]=c;
+static __attribute__((section(".physics"),noinline)) void status_banked(const char*s,uint8_t digit){
+ for(uint8_t i=0;i<40;++i){uint8_t c=*s?*s++:32;if(digit&&i==34)c=digit;if(status_cache[i]==c)continue;status_cache[i]=c;
   tile(33+i,FONT_BASE/32+c-32,405+(i%20)*8,248+(i/20)*12,FONT_STATUS_BANK);
  }
+}
+static void status(const char *s,uint8_t digit){
+ uint8_t saved=*(volatile uint8_t*)0;
+ *(volatile uint8_t*)0=62;
+ __asm__ volatile("":::"memory");
+ status_banked(s,digit);
+ __asm__ volatile("":::"memory");
+ *(volatile uint8_t*)0=saved;
 }
 #ifdef PROFILE_DISPLAY
 static uint32_t mask_cycles,copy_cycles,prefetch_cycles;
@@ -126,9 +137,23 @@ static void display(bool update_panel){
   game.score_dirty=false;
  }
  uint8_t number=game.ball_number;if(update_panel&&number!=ball_cache){frame(32,31+number,553,152,1);ball_cache=number;}
- if(update_panel&&previous_state!=game.state){
+ uint8_t panel_state=game.state;
+#ifndef GAME_TEST
+ if(attract_caption)panel_state=5+attract_caption;
+#endif
+ if(update_panel&&previous_state!=panel_state){
   static const char*const labels[]={"F2: NEW GAME","HOLD SPACE          " "RELEASE TO LAUNCH","BALL IN PLAY","CAPTURE / RETURN","NEXT BALL","GAME OVER           F2: NEW GAME"};
-  status(labels[game.state]);previous_state=game.state;
+#ifndef GAME_TEST
+  if(attract_caption){
+   if(attract_caption<DemoRamps)
+    status("DEMO - F2 TO PLAY   BUMPERS LEFT: 0",'0'+attract_caption);
+   else if(attract_caption<DemoTourComplete)
+    status("DEMO - F2 TO PLAY   RAMPS LEFT:   0",'0'+attract_caption-DemoRamps+1);
+   else status(attract_caption==DemoFinalScore?"DEMO - F2 TO PLAY   FINAL SCORE":"DEMO - F2 TO PLAY   TOUR COMPLETE",0);
+  }else
+#endif
+   status(labels[game.state],0);
+  previous_state=panel_state;
  }
  if(update_panel&&music_cache!=music_enabled){
   const char*label=music_enabled==0?"OFF":music_enabled==1?"ON ":"...";
@@ -137,9 +162,9 @@ static void display(bool update_panel){
  }
  dynamic_update(update_panel?128:0);
  /* 128-bit score remains exact. Flag a panel overflow instead of silently truncating. */
- if(update_panel&&wide_score)status("SCORE EXCEEDS PANEL  SEE EXACT SCORE LOG");
+ if(update_panel&&wide_score)status("SCORE EXCEEDS PANEL  SEE EXACT SCORE LOG",0);
 }
-static void compact_footer(void){
+static __attribute__((section(".physics"),noinline)) void compact_footer(void){
  /* Row 25 contains the bottom of the backbox frame and the first line of
   * old footer text. Copy its 13 right-side tiles, blanking only y >= 406.
   * These replacement patterns occupy the gap after the fast dynamic tiles. */
@@ -199,7 +224,12 @@ int main(void){
  *(volatile uint8_t*)0=11;if(!load("UI.BIN",0,0xa000))goto fail;
  for(uint8_t i=0;i<128;++i)hide(i);
  for(uint8_t i=0;i<9;++i)score_cache[i]=254;
- compact_footer();controls_panel();
+ *(volatile uint8_t*)0=62;
+ __asm__ volatile("":::"memory");
+ compact_footer();
+ __asm__ volatile("":::"memory");
+ *(volatile uint8_t*)0=11;
+ controls_panel();
  /* Fill the 640x480 signal with the playable viewport. Keep the backbox
   * entirely visible while reducing the empty strip below the cabinet. */
  v[5]=0;v[9]=0x51;v[10]=119;v[11]=117;v[12]=0;
@@ -211,7 +241,7 @@ int main(void){
 #endif
 
  uint16_t last=lab_clock(),count=0,gaps=0,over=0;uint32_t maximum=0,total=0;
- uint8_t old_m=0,old_new=0;echo("# PLAY READY\n");
+ uint8_t old_m=0;echo("# PLAY READY\n");
 #ifdef GAME_TEST
  *(volatile uint8_t*)0x9fb8=0;
 #endif
@@ -235,10 +265,14 @@ int main(void){
   if(game.state==GameOver)game_start();
 #else
   if(keys[110])break;
-  if(keys[113]&&!old_new){game_start();previous_state=255;}
   if(keys[52]&&!old_m){if(music_enabled)music_stop();else music_start();}
-  old_new=keys[113];old_m=keys[52];
-  game_frame(keys[44]||keys[46],keys[55]||keys[57],keys[61],keys[83]);
+  old_m=keys[52];
+  uint8_t buttons=(keys[44]||keys[46]?DemoLeft:0)|(keys[55]||keys[57]?DemoRight:0)|
+    (keys[61]?DemoLaunch:0)|(keys[83]?DemoNudge:0)|(keys[114]?DemoToggle:0)|
+    (keys[113]?DemoNew:0);
+  buttons=attract_input(buttons,now);
+  if(buttons&DemoReset){game_start();previous_state=255;}
+  game_frame(buttons&DemoLeft,buttons&DemoRight,buttons&DemoLaunch,buttons&DemoNudge);
 #endif
 
 #ifdef PROFILE_DISPLAY
