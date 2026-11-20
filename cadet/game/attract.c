@@ -74,7 +74,7 @@ static PHYSICS uint8_t controls(uint8_t buttons, uint16_t now){
  uint8_t pressed=buttons & ~previous_buttons;
  previous_buttons=buttons;
  bool terminal=game.state==GameOver;
- if(pressed&DemoNew || (attract_caption&&(buttons&15 || pressed&DemoToggle))){
+ if(buttons&DemoNew || (attract_caption&&(buttons&15 || pressed&DemoToggle))){
   attract_caption=0;
   idle_allowed=false;
   idle_started=false;

@@ -8,7 +8,8 @@ from build_cover_balance import read_verified
 from build_backbox_preview import sha
 
 
-def build(releases, runtime, out, source, startup_audio, opening_show=False):
+def build(releases, runtime, out, source, startup_audio, opening_show=False, quick_reset=False):
+    opening_show = opening_show or quick_reset
     archives = {}
     manifests = {}
     for base, ram, program in (('Backbox', '512', 'CADET'),
@@ -42,6 +43,11 @@ def build(releases, runtime, out, source, startup_audio, opening_show=False):
                     files['README.txt'] += b'The installed opening sound plays on cold start and F2.\n'
                 else:
                     files['README.txt'] += b'Original electronic pulses play on cold start and F2.\n'
+            if quick_reset:
+                title = 'Quick-Reset'
+                files['README.txt'] = files['README.txt'].replace(
+                    b'Opening Show Preview', b'Quick Reset Preview')
+                files['README.txt'] += b'F2 clears the screen and starts the lamps before loading the opening sound.\n'
             path = out/f'{edition}-{title}-{ram}KB-Preview.zip'
             with zipfile.ZipFile(path,'w') as z:
                 for name,data in sorted(files.items()):
@@ -65,6 +71,7 @@ if __name__ == '__main__':
     p.add_argument('source')
     p.add_argument('--startup-audio', action='store_true')
     p.add_argument('--opening-show', action='store_true')
+    p.add_argument('--quick-reset', action='store_true')
     a = p.parse_args()
     a.output.mkdir(parents=True,exist_ok=True)
-    build(a.releases,a.runtime,a.output,a.source,a.startup_audio,a.opening_show)
+    build(a.releases,a.runtime,a.output,a.source,a.startup_audio,a.opening_show,a.quick_reset)

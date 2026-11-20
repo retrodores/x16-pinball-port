@@ -28,8 +28,9 @@ extern volatile uint8_t pcm_select_bank,music_enabled,music_error,music_loops;
 extern volatile uint16_t pcm_select_ptr,pcm_remaining,pcm_underruns;
 extern volatile uint32_t irq_max,irq_start;
 __attribute__((used)) volatile uint8_t keys[128];
+__attribute__((used)) volatile uint8_t new_game_request;
 __attribute__((naked,used)) void keyboard(void){__asm__ volatile(
- "phx\npha\nand #127\ntax\npla\nbmi 1f\nlda #1\nbra 2f\n1: lda #0\n2: sta keys,x\nplx\nlda #0\nrts");}
+ "phx\npha\nand #127\ntax\npla\nbmi 1f\ncpx #113\nbne 3f\nlda keys,x\nbne 3f\ninc new_game_request\n3: lda #1\nbra 2f\n1: lda #0\n2: sta keys,x\nplx\nlda #0\nrts");}
 static volatile uint8_t *const v=(volatile uint8_t*)0x9f20;
 static uint8_t priority,previous_state=255,phase_cache[2]={255,255},plunger_cache=255;
 static uint8_t score_cache[9],ball_cache=255;
@@ -281,6 +282,7 @@ int main(void){
  uint16_t last=lab_clock(),count=0,gaps=0,over=0;uint32_t maximum=0,total=0;
 #ifndef GAME_TEST
  uint8_t old_m=0;
+ bool opening_pending=false;
 #endif
  echo("# PLAY READY\n");
 #ifdef GAME_TEST
@@ -312,14 +314,33 @@ int main(void){
   if(keys[110])break;
   if(keys[52]&&!old_m){if(music_enabled)music_stop();else music_start();}
   old_m=keys[52];
+  __asm__ volatile("php\nsei":::"memory");
+  uint8_t new_game=new_game_request;new_game_request=0;
+  __asm__ volatile("plp":::"memory");
   uint8_t buttons=(keys[44]||keys[46]?DemoLeft:0)|(keys[55]||keys[57]?DemoRight:0)|
     (keys[61]?DemoLaunch:0)|(keys[83]?DemoNudge:0)|(keys[114]?DemoToggle:0)|
-    (keys[113]?DemoNew:0);
+    (new_game?DemoNew:0);
   buttons=attract_input(buttons,now);
   if(buttons&DemoReset){
    bool show=game.state!=Ready&&!attract_caption&&!(buttons&15);
-   if((show||game.state==Ready)&&!startup_pcm(show))goto audio_load_failed;
-   game_begin(show);previous_state=255;
+   previous_state=255;
+   if(show){
+    game_begin(true);
+    /* Acknowledge the reset with the first lamp phase and clear the
+     * previous ball and messages before the blocking PCM bank load. */
+    hide(0);update_status();dynamic_update(96);
+    /* Let VERA finish a frame before the KERNAL can block on storage. */
+    opening_pending=true;
+    continue;
+   }else{
+    if(game.state==Ready&&!opening_pending&&!startup_pcm(false))goto audio_load_failed;
+    opening_pending=false;
+    game_start();
+   }
+  }
+  if(opening_pending){
+   if(!startup_pcm(true))goto audio_load_failed;
+   opening_pending=false;
   }
   if(game.state==Ready&&game.wait==1&&!startup_pcm(false))goto audio_load_failed;
   game_frame(buttons&DemoLeft,buttons&DemoRight,buttons&DemoLaunch,buttons&DemoNudge);
