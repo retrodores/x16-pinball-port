@@ -26,15 +26,23 @@ with (output('ui.log')).open('w')as f:
    red,green,blue=np.asarray(image.crop(scaled(box)),dtype=np.int16).transpose(2,0,1)
    return np.count_nonzero((blue>=green+25)&(red>=green+20)&(blue>=red+20))
   large_messages=os.environ.get('CADET_TEST_LARGE_MESSAGES')=='1'
-  message=(405,244,555,288) if large_messages else (405,248,565,270)
+  split_panes=os.environ.get('CADET_TEST_SPLIT_PANES')=='1'
+  message=(405,306,570,378) if split_panes else (405,244,555,288) if large_messages else (405,248,565,270)
+  player=(405,244,570,288)
   ready=shot('ready')
-  if large_messages:
+  if split_panes:
+   assert purple_glyphs(ready,player)>60,'Player 1 is missing from upper pane'
+   assert purple_glyphs(ready,(405,261,570,288))==0,'upper pane has extra message rows'
+   for top in (306,324,342):
+    assert purple_glyphs(ready,(405,top,570,top+15))>25,('launch message row missing',top)
+   assert ready.crop(scaled((405,361,570,387))).getbbox() is None,'controls legend remains'
+  elif large_messages:
    for top in (244,259,274):
     assert purple_glyphs(ready,(405,top,555,top+14))>25,('launch message row missing',top)
-  assert purple_glyphs(ready,(405,248,565,270))>40,'plunger status is missing purple text'
+  assert purple_glyphs(ready,message)>40,'plunger status is missing purple text'
   margin=480-ready.crop((0,0,400,480)).getbbox()[3]
   assert 4<=margin<=12,('cabinet bottom margin',margin)
-  assert ready.crop(scaled((405,308,530,379))).getbbox(), 'controls panel is empty'
+  if not split_panes:assert ready.crop(scaled((405,308,530,379))).getbbox(), 'controls panel is empty'
   assert ready.crop(scaled((398,407,583,433))).getbbox() is None, 'stray footer text'
   packed=Image.open(r/'cadet/play-build/dynamic-rest.png').convert('RGB')
   # Original new-ball gate lamps flash; compare the static region independently.
@@ -64,8 +72,8 @@ with (output('ui.log')).open('w')as f:
     time.sleep(.4);attract=shot('attract')
     if changed(ready,attract,caption):break
     assert time.monotonic()<deadline,'idle demo did not appear'
-   assert purple_glyphs(attract,(405,248,565,270))>40,'demo caption is missing purple text'
-   goal=scaled((405,259,555,274) if large_messages else (405,260,565,270))
+   assert purple_glyphs(attract,message)>40,'demo caption is missing purple text'
+   goal=scaled((405,324,570,340) if split_panes else (405,259,555,274) if large_messages else (405,260,565,270))
    deadline=time.monotonic()+35
    while True:
     time.sleep(.4);playing_demo=shot('attract-playing')
@@ -78,27 +86,35 @@ with (output('ui.log')).open('w')as f:
    action('keydown','z');time.sleep(.4);takeover=shot('attract-takeover')
    action('keyup','z')
    assert not changed(ready,takeover,caption),'flipper did not end demo'
+   if split_panes:
+    for scene in (attract,playing_demo,manual,manual_demo,takeover):
+     assert not changed(ready,scene,scaled(player)),'demo modified Player 1 pane'
   action('keydown','space');time.sleep(2);pulled=shot('pulled')
   assert ImageChops.difference(ready.crop(scaled((320,375,370,437))),pulled.crop(scaled((320,375,370,437)))).getbbox(),'plunger not animated'
   action('keyup','space');time.sleep(.8);launched=shot('launched')
   assert purple_glyphs(launched,message)>30,'in-play status is missing purple text'
-  if large_messages:
+  if split_panes:
+   assert purple_glyphs(launched,(405,324,570,378))==0,'stale lower pane rows during play'
+   assert ImageChops.difference(ready.crop(scaled(player)),launched.crop(scaled(player))).getbbox() is None,'launch modified Player 1 pane'
+  elif large_messages:
    assert purple_glyphs(launched,(405,259,555,288))==0,'stale launch glyphs after ball entered play'
   action('keydown','z');action('keydown','slash');time.sleep(.3);raised=shot('flippers')
   assert ImageChops.difference(ready.crop(scaled((120,355,260,420))),raised.crop(scaled((120,355,260,420)))).getbbox(),'flippers not animated'
   action('keyup','z');action('keyup','slash');time.sleep(8);shot('playing')
   action('key','F2');time.sleep(.5);shot('new-game')
-  music_on=shot('music-on')
-  action('key','m');time.sleep(.3);music_off=shot('music-off')
-  box=scaled((533,372,557,380))
-  assert purple_glyphs(music_off,(533,372,557,380))>15,'music status is missing purple text'
-  assert ImageChops.difference(music_on.crop(box),music_off.crop(box)).getbbox(),'music OFF indicator unchanged'
-  restart_started=time.monotonic();action('key','m')
-  while True:
-   time.sleep(.1);music_again=shot('music-restarted')
-   if ImageChops.difference(music_on.crop(box),music_again.crop(box)).getbbox()is None:break
-   assert time.monotonic()-restart_started<5,'music ON indicator did not recover within five seconds'
-  music_restart_seconds=time.monotonic()-restart_started
+  music_restart_seconds=None
+  if not split_panes:
+   music_on=shot('music-on')
+   action('key','m');time.sleep(.3);music_off=shot('music-off')
+   box=scaled((533,372,557,380))
+   assert purple_glyphs(music_off,(533,372,557,380))>15,'music status is missing purple text'
+   assert ImageChops.difference(music_on.crop(box),music_off.crop(box)).getbbox(),'music OFF indicator unchanged'
+   restart_started=time.monotonic();action('key','m')
+   while True:
+    time.sleep(.1);music_again=shot('music-restarted')
+    if ImageChops.difference(music_on.crop(box),music_again.crop(box)).getbbox()is None:break
+    assert time.monotonic()-restart_started<5,'music ON indicator did not recover within five seconds'
+   music_restart_seconds=time.monotonic()-restart_started
   action('key','Escape');time.sleep(.4)
   assert '# DONE'in(output('ui.log')).read_text(errors='replace'),'exit failed'
  finally:

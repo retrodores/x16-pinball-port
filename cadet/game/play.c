@@ -34,7 +34,6 @@ static volatile uint8_t *const v=(volatile uint8_t*)0x9f20;
 static uint8_t priority,previous_state=255,phase_cache[2]={255,255},plunger_cache=255;
 static uint8_t score_cache[9],ball_cache=255;
 static bool wide_score;
-static uint8_t music_cache=255;
 static void addr(uint32_t a){v[5]=0;v[0]=a;v[1]=a>>8;v[2]=0x10|(a>>16);}
 static void word(uint16_t a){v[3]=a;v[3]=a>>8;}
 static void hide(uint8_t n){addr(0x1fc06UL+(uint16_t)n*8);v[3]=0;}
@@ -144,31 +143,26 @@ static void display(bool update_panel){
  if(wide_score)panel_state=254;
  if(update_panel&&previous_state!=panel_state){
   static const char*const labels[]={
-   "READY\nF2 NEW GAME",
-   "HOLD SPACE\nRELEASE TO\nLAUNCH",
-   "IN PLAY",
-   "BALL HELD\nRETURN SOON",
-   "NEXT BALL",
-   "GAME OVER\nF2 NEW GAME",
+   "Ready\nF2 for new game",
+   "Hold Space\nRelease to\nlaunch",
+   "In play",
+   "Ball held\nReturn soon",
+   "Next ball",
+   "Game over\nF2 for new game",
   };
-  if(wide_score)status("LONG SCORE\nVIEW EXACT\nSCORE LOG",0);
+  if(wide_score)status("Long score\nView exact\nscore log",0);
 #ifndef GAME_TEST
   else if(attract_caption){
    if(attract_caption<DemoRamps)
-    status("DEMO\nHITS LEFT #\nF2 TO PLAY",'0'+attract_caption);
+    status("Demo\n# bumper hits\nF2 to play",'0'+attract_caption);
    else if(attract_caption<DemoTourComplete)
-    status("DEMO\n# RAMPS\nF2 TO PLAY",'0'+attract_caption-DemoRamps+1);
+    status("Demo\n# ramps\nF2 to play",'0'+attract_caption-DemoRamps+1);
    else status(attract_caption==DemoFinalScore?
-    "DEMO\nFINAL SCORE\nF2 TO PLAY":"DEMO\nTOUR DONE\nF2 TO PLAY",0);
+    "Demo\nFinal score\nF2 to play":"Demo\nTour complete\nF2 to play",0);
   }
 #endif
   else status(labels[game.state],0);
   previous_state=panel_state;
- }
- if(update_panel&&music_cache!=music_enabled){
-  const char*label=music_enabled==0?"OFF":music_enabled==1?"ON ":"...";
-  for(uint8_t i=0;i<3;++i)tile(73+i,FONT_BASE/32+label[i]-32,533+i*8,372,FONT_STATUS_BANK);
-  music_cache=music_enabled;
  }
  dynamic_update(update_panel?128:0);
 }
@@ -188,21 +182,6 @@ static __attribute__((section(".physics"),noinline)) void compact_footer(void){
   addr((uint16_t)row*128+48);
   for(uint8_t col=0;col<13;++col){v[3]=lo;v[3]=hi;}
  }
-}
-static void controls_panel(void){
- static const char*const labels[]={
-  "FLIPPERS  Z /",
-  "PLUNGER   SPACE",
-  "NEW GAME  F2",
-  "EXIT      ESC",
-  "MUSIC     M",
- };
- uint8_t sprite=76;
- for(uint8_t row=0;row<sizeof(labels)/sizeof(labels[0]);++row)
-  for(uint8_t i=0;labels[row][i];++i){
-   uint8_t c=labels[row][i];
-   if(c!=' ')tile(sprite++,FONT_BASE/32+c-32,405+i*8,308+row*16,FONT_BANK);
-  }
 }
 int main(void){
  uint8_t oldbank=*(volatile uint8_t*)0;uint16_t oldkey=*(volatile uint16_t*)0x032e;
@@ -224,11 +203,10 @@ int main(void){
  for(uint8_t i=0;i<9;++i)score_cache[i]=254;
  *(volatile uint8_t*)0=62;
  __asm__ volatile("":::"memory");
- upload_message_font();
+ init_messages();
  compact_footer();
  __asm__ volatile("":::"memory");
  *(volatile uint8_t*)0=11;
- controls_panel();
  /* Fill the 640x480 signal with the playable viewport. Keep the backbox
   * entirely visible while reducing the empty strip below the cabinet. */
  v[5]=0;v[9]=0x51;v[10]=119;v[11]=117;v[12]=0;
