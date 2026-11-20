@@ -1,0 +1,51 @@
+{
+  "engine_source_commit": "ff93d06df2041f4b8fa2a4b801f93f02ca99fca4",
+  "emulator": "Linux r49, stock 65C02, 8 MHz, 2 MB",
+  "emulator_sha256": "59bc86b8d24632f602339dd722eaf77317fc4fb6b76393a479216d3efd37228e",
+  "rom_sha256": "b81654cc8c87ed96e3ffc7c8e7c312c9f3b7b870c7bb34de61e61eac931b819a",
+  "fresh_zip_smoke_tests": {
+    "SpaceCadet-X16-Cover-Balance-2048KB-Preview.zip": {
+      "seconds": 9.942020971573687,
+      "muted_windows": [
+        40,
+        54
+      ],
+      "peak_stereo_difference_rms": 3224.57494237492,
+      "exit_ok": true
+    },
+    "SpaceCmdr2D-Cover-Balance-2048KB-Preview.zip": {
+      "seconds": 8.446977144261488,
+      "muted_windows": [
+        39,
+        52
+      ],
+      "peak_stereo_difference_rms": 3172.0334088960676,
+      "exit_ok": true
+    }
+  },
+  "windows_launcher_tested": false,
+  "native_attract_fixture": {
+    "frames": 7200,
+    "peak_cycles": 748486,
+    "mean_cycles": 136219,
+    "frames_over_133333": 1883,
+    "missed_intervals": 122,
+    "irq_peak_cycles": 106855,
+    "music_error": 0,
+    "cover_loops": 2,
+    "pcm_underruns": 0
+  },
+  "music_banks": "Byte-identical to the Attract Fidelity Preview",
+  "matched_music_windows_delta_db": [
+    0.0616,
+    -0.033,
+    0.0399
+  ],
+  "flipper_clip_gain_delta_db": 1.94,
+  "flipper_to_music_windows_db": [
+    5.84,
+    1.17,
+    4.54
+  ],
+  "reference_audio_limit": "The side-by-side recording contains a single stereo stream."
+}
