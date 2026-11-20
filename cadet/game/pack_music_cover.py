@@ -17,7 +17,7 @@ def address(offset, bank):
     return bank + offset // BANK, 0xa000 + offset % BANK
 
 
-def pack(source, out):
+def pack(source, out, extra_db=0):
     data = source.read_bytes()
     if hashlib.sha256(data).hexdigest() != SOURCE_SHA256:
         raise ValueError('Expected the original Pinball_R6.zsm export from pinball.7z')
@@ -47,8 +47,12 @@ def pack(source, out):
                        f'{frames & 255},{frames >> 8 & 255},{frames >> 16}')
 
     out.mkdir(parents=True, exist_ok=True)
+    if extra_db:
+        ratio = 10**(-extra_db/20)
+        scale = bytes(round((v if v < 128 else v-256)*ratio) & 255 for v in range(256))
+        samples = samples.translate(scale)
     (out / 'COVER.PCM').write_bytes(samples)
-    commands = attenuate(commands)
+    commands = attenuate(commands, extra_db)
     (out / 'COVER.CMD').write_bytes(commands[:LOW_COMMAND_BYTES])
     (out / 'COVER.HI').write_bytes(commands[LOW_COMMAND_BYTES:])
     (out / 'music_cover_data.inc').write_text(
@@ -63,5 +67,6 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('zsm', type=Path)
     parser.add_argument('output', type=Path, nargs='?', default=Path('cadet/play-build'))
+    parser.add_argument('--extra-db', type=float, choices=(0, 4), default=0)
     args = parser.parse_args()
-    pack(args.zsm, args.output)
+    pack(args.zsm, args.output, args.extra_db)
