@@ -10,6 +10,7 @@ from PIL import ImageChops, ImageGrab
 
 ram, stem, *flags = sys.argv[1:]
 audio = "--audio" in flags
+show_frames = "--show-frames" in flags
 player = (430, 260, 610, 306)
 message = (430, 333, 610, 430)
 table = (85, 75, 295, 360)
@@ -56,15 +57,26 @@ with log.open('w') as output:
                 if test(frame):
                     return frame
                 time.sleep(.1)
+            frame.save('startup-failure.png')
             raise AssertionError('Expected startup stage was not shown')
 
         start = snap()
         assert not lit(start,player) and not lit(start,message)
         until(lambda f: changed(f,start,table) and not lit(f,player))
+        if show_frames:
+            reference = Path('lamp-frames')
+            reference.mkdir(exist_ok=True)
+            for i in range(12):
+                frame = snap()
+                assert not lit(frame,player)
+                frame.save(reference/f'{i:02d}.png')
+                time.sleep(.11)
         until(lambda f: lit(f,player) and not lit(f,message))
         until(lambda f: lit(f,player) and lit(f,message))
-        time.sleep(.5)
+        time.sleep(1.5)
         ready = snap()
+        if show_frames:
+            ready.save(reference/'ready.png')
         for action in ('keydown','keyup'):
             sp.run(['xdotool',action,'--window',win,'space'],check=True)
             time.sleep(.5)

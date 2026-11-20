@@ -1,0 +1,150 @@
+{
+  "engine_source_commit": "853f8ae883e83d2f609cc79602b5726c8fa93fba",
+  "platform": "Linux r49 emulator, stock 65C02 at 8 MHz",
+  "windows_launcher_tested": false,
+  "fresh_zip_checks": {
+    "SpaceCadet-X16-Opening-Show-512KB-Preview.zip": {
+      "ram_kb": 512,
+      "cold_start": true,
+      "changing_lamps": true,
+      "player_before_prompt": true,
+      "plunger_after_serve": true,
+      "f2_restart_and_skip": true,
+      "f3_enters_demo_during_show": true,
+      "exit": true,
+      "show_pixels_changing_by_at_least_34": {
+        "upper_playfield": 417,
+        "middle_left": 267,
+        "middle_right": 234,
+        "center_rings": 1584
+      },
+      "opening_sample_audio_matches": {
+        "cold_start": [
+          1.026,
+          0.999
+        ],
+        "f2_music_muted": [
+          8.485,
+          0.989
+        ]
+      },
+      "timing_smoke": {
+        "frames": 517,
+        "peak_cycles": 302865,
+        "mean_cycles": 44950,
+        "over_133333": 8,
+        "missed_intervals": 1,
+        "irq_peak_cycles": 38345,
+        "music_error": 0
+      }
+    },
+    "SpaceCmdr2D-Opening-Show-512KB-Preview.zip": {
+      "ram_kb": 512,
+      "cold_start": true,
+      "changing_lamps": true,
+      "player_before_prompt": true,
+      "plunger_after_serve": true,
+      "f2_restart_and_skip": true,
+      "f3_enters_demo_during_show": true,
+      "exit": true,
+      "show_pixels_changing_by_at_least_34": {
+        "upper_playfield": 417,
+        "middle_left": 267,
+        "middle_right": 234,
+        "center_rings": 1584
+      },
+      "opening_sample_audio_matches": {
+        "cold_start": [
+          0.975,
+          0.999
+        ],
+        "f2_music_muted": [
+          8.585,
+          0.99
+        ]
+      },
+      "timing_smoke": {
+        "frames": 544,
+        "peak_cycles": 222812,
+        "mean_cycles": 45039,
+        "over_133333": 5,
+        "missed_intervals": 0,
+        "irq_peak_cycles": 38345,
+        "music_error": 0
+      }
+    },
+    "SpaceCadet-X16-Opening-Show-2048KB-Preview.zip": {
+      "ram_kb": 2048,
+      "cold_start": true,
+      "changing_lamps": true,
+      "player_before_prompt": true,
+      "plunger_after_serve": true,
+      "f2_restart_and_skip": true,
+      "f3_enters_demo_during_show": true,
+      "exit": true,
+      "show_pixels_changing_by_at_least_34": {
+        "upper_playfield": 417,
+        "middle_left": 267,
+        "middle_right": 234,
+        "center_rings": 1584
+      },
+      "opening_sample_audio_matches": {
+        "cold_start": [
+          1.323,
+          0.87
+        ],
+        "f2_music_muted": [
+          9.646,
+          0.999
+        ]
+      },
+      "timing_smoke": {
+        "frames": 559,
+        "peak_cycles": 318569,
+        "mean_cycles": 99801,
+        "over_133333": 65,
+        "missed_intervals": 3,
+        "irq_peak_cycles": 97996,
+        "music_error": 0
+      }
+    },
+    "SpaceCmdr2D-Opening-Show-2048KB-Preview.zip": {
+      "ram_kb": 2048,
+      "cold_start": true,
+      "changing_lamps": true,
+      "player_before_prompt": true,
+      "plunger_after_serve": true,
+      "f2_restart_and_skip": true,
+      "f3_enters_demo_during_show": true,
+      "exit": true,
+      "show_pixels_changing_by_at_least_34": {
+        "upper_playfield": 417,
+        "middle_left": 267,
+        "middle_right": 234,
+        "center_rings": 1584
+      },
+      "opening_sample_audio_matches": {
+        "cold_start": [
+          1.424,
+          0.87
+        ],
+        "f2_music_muted": [
+          9.443,
+          0.999
+        ]
+      },
+      "timing_smoke": {
+        "frames": 561,
+        "peak_cycles": 351823,
+        "mean_cycles": 97735,
+        "over_133333": 68,
+        "missed_intervals": 1,
+        "irq_peak_cycles": 98026,
+        "music_error": 0
+      }
+    }
+  },
+  "lamp_test": "Pixel range across 12 captured show frames, with ball and message panes hidden.",
+  "audio_test": "Normalized correlation with converted SOUND1 sample windows.",
+  "physical_storage_and_extended_timing_tested": false
+}
