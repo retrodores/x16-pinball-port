@@ -1,0 +1,76 @@
+{
+  "engine_source_commit": "173da3a5736367e112ba77f2c3846a041905c6b2",
+  "emulator": "Linux x16emu r49, stock 65C02 at 8 MHz",
+  "windows_launcher_tested": false,
+  "rom_sha256": "b81654cc8c87ed96e3ffc7c8e7c312c9f3b7b870c7bb34de61e61eac931b819a",
+  "fresh_zip_checks": {
+    "SpaceCadet-X16-Spinner-2-512KB-Preview.zip": {
+      "ram_kb": 512,
+      "cold_start": true,
+      "changing_lamps": true,
+      "f2_visible_ms": 284.1,
+      "f2_audio_file_size_at_keydown": 1695744,
+      "red_cross_on_start_and_f2": true,
+      "red_cross_over_upper_insert": true,
+      "player_before_prompt": true,
+      "plunger_after_serve": true,
+      "f2_restart_and_skip": true,
+      "f3_enters_demo_during_show": true,
+      "exit": true
+    },
+    "SpaceCmdr2D-Spinner-2-512KB-Preview.zip": {
+      "ram_kb": 512,
+      "cold_start": true,
+      "changing_lamps": true,
+      "f2_visible_ms": 231.1,
+      "f2_audio_file_size_at_keydown": 1740800,
+      "red_cross_on_start_and_f2": true,
+      "red_cross_over_upper_insert": true,
+      "player_before_prompt": true,
+      "plunger_after_serve": true,
+      "f2_restart_and_skip": true,
+      "f3_enters_demo_during_show": true,
+      "exit": true
+    },
+    "SpaceCadet-X16-Spinner-2-2048KB-Preview.zip": {
+      "ram_kb": 2048,
+      "cold_start": true,
+      "changing_lamps": true,
+      "f2_visible_ms": 186.2,
+      "f2_audio_file_size_at_keydown": 1765376,
+      "red_cross_on_start_and_f2": true,
+      "red_cross_over_upper_insert": true,
+      "player_before_prompt": true,
+      "plunger_after_serve": true,
+      "f2_restart_and_skip": true,
+      "f3_enters_demo_during_show": true,
+      "exit": true
+    },
+    "SpaceCmdr2D-Spinner-2-2048KB-Preview.zip": {
+      "ram_kb": 2048,
+      "cold_start": true,
+      "changing_lamps": true,
+      "f2_visible_ms": 186.5,
+      "f2_audio_file_size_at_keydown": 1757184,
+      "red_cross_on_start_and_f2": true,
+      "red_cross_over_upper_insert": true,
+      "player_before_prompt": true,
+      "plunger_after_serve": true,
+      "f2_restart_and_skip": true,
+      "f3_enters_demo_during_show": true,
+      "exit": true
+    }
+  },
+  "native_tests_passed": {
+    "feedback": [
+      512,
+      2048
+    ],
+    "vera_compositing": [
+      512,
+      2048
+    ]
+  },
+  "extended_timing_retested": false,
+  "previous_extended_timing": "../Spinner-Preview/VALIDATION.json"
+}
