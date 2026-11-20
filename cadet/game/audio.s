@@ -287,8 +287,8 @@ pcm_prime:
  sta pcm_started
  stz pcm_phase
  stz pcm_phase+1
- lda #$0a
- sta $9f3b ; Effects-forward reference mix; preserve format and FIFO.
+ lda #$05
+ sta $9f3b ; Lower effects volume for the music-forward mix; preserve format and FIFO.
  bra pcm_fill
 pcm_regular:
  ; rate29 * 800 * 525 / 65536 = 185 + 55840/65536 samples per VGA VBL.
