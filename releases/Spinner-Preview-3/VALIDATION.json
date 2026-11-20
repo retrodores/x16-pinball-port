@@ -1,0 +1,118 @@
+{
+  "engine_source_commit": "4c7cde9ac214afdd21067c579997d5a0eb2d7237",
+  "emulator": "Linux x16emu r49, stock 65C02 at 8 MHz",
+  "rom_sha256": "b81654cc8c87ed96e3ffc7c8e7c312c9f3b7b870c7bb34de61e61eac931b819a",
+  "windows_launcher_tested": false,
+  "frame_budget_cycles": 133333,
+  "fresh_zip_checks": {
+    "SpaceCadet-X16-Spinner-3-512KB-Preview.zip": {
+      "ram_kb": 512,
+      "cold_start": true,
+      "changing_lamps": true,
+      "f2_visible_ms": 335.7,
+      "f2_audio_file_size_at_keydown": 1990656,
+      "red_cross_on_start_and_f2": true,
+      "red_cross_over_upper_insert": true,
+      "player_before_prompt": true,
+      "plunger_after_serve": true,
+      "f2_restart_and_skip": true,
+      "f3_enters_demo_during_show": true,
+      "tilt_input_and_flash": true,
+      "exit": true,
+      "audio_capture_frames": 574117
+    },
+    "SpaceCmdr2D-Spinner-3-512KB-Preview.zip": {
+      "ram_kb": 512,
+      "cold_start": true,
+      "changing_lamps": true,
+      "f2_visible_ms": 228.9,
+      "f2_audio_file_size_at_keydown": 1994752,
+      "red_cross_on_start_and_f2": true,
+      "red_cross_over_upper_insert": true,
+      "player_before_prompt": true,
+      "plunger_after_serve": true,
+      "f2_restart_and_skip": true,
+      "f3_enters_demo_during_show": true,
+      "tilt_input_and_flash": true,
+      "exit": true,
+      "audio_capture_frames": 574117
+    },
+    "SpaceCadet-X16-Spinner-3-2048KB-Preview.zip": {
+      "ram_kb": 2048,
+      "cold_start": true,
+      "changing_lamps": true,
+      "f2_visible_ms": 307.4,
+      "f2_audio_file_size_at_keydown": 2023424,
+      "red_cross_on_start_and_f2": true,
+      "red_cross_over_upper_insert": true,
+      "player_before_prompt": true,
+      "plunger_after_serve": true,
+      "f2_restart_and_skip": true,
+      "f3_enters_demo_during_show": true,
+      "tilt_input_and_flash": true,
+      "exit": true,
+      "audio_capture_frames": 569166
+    },
+    "SpaceCmdr2D-Spinner-3-2048KB-Preview.zip": {
+      "ram_kb": 2048,
+      "cold_start": true,
+      "changing_lamps": true,
+      "f2_visible_ms": 175.5,
+      "f2_audio_file_size_at_keydown": 2039808,
+      "red_cross_on_start_and_f2": true,
+      "red_cross_over_upper_insert": true,
+      "player_before_prompt": true,
+      "plunger_after_serve": true,
+      "f2_restart_and_skip": true,
+      "f3_enters_demo_during_show": true,
+      "tilt_input_and_flash": true,
+      "exit": true,
+      "audio_capture_frames": 578148
+    }
+  },
+  "native_feedback_checks": {
+    "input-512": 80,
+    "input-2048": 80,
+    "spin-512": 152,
+    "spin-2048": 152,
+    "tilt-512": 14,
+    "tilt-2048": 14
+  },
+  "vera_readback_ram_kb": [
+    512,
+    2048
+  ],
+  "mission_notice_proof": "512 KB scripted capture fixture, independent-status-fixture.png",
+  "extended_gameplay": {
+    "512": {
+      "frames": 12000,
+      "max_cycles": 213957,
+      "mean_cycles": 73228,
+      "over_budget": 349,
+      "missed_frame_starts": 0,
+      "irq_max": 39950,
+      "music_errors": 0,
+      "ram": 512,
+      "mhz": 8,
+      "expected_frames": 12000,
+      "program": "TEST.PRG",
+      "pcm_underruns": 0,
+      "budget_pass": false
+    },
+    "2048": {
+      "frames": 12000,
+      "max_cycles": 451573,
+      "mean_cycles": 149657,
+      "over_budget": 4358,
+      "missed_frame_starts": 166,
+      "irq_max": 124338,
+      "music_errors": 0,
+      "ram": 2048,
+      "mhz": 8,
+      "expected_frames": 12000,
+      "program": "COVTEST.PRG",
+      "pcm_underruns": 0,
+      "budget_pass": false
+    }
+  }
+}

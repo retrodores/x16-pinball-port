@@ -105,13 +105,23 @@ with log.open('w') as output:
             time.sleep(.5)
         until(lambda f: lit(f,message) and changed(f,ready,message),5)
         if tilt:
-            for step in range(3):
-                if step:
-                    time.sleep(1.18)
+            # Submit pulses until the game has accepted three. The minimum
+            # spacing is measured in simulated frames, so host load matters.
+            for step in range(22):
                 sp.run(['xdotool','keydown','--window',win,'Up'],check=True)
                 time.sleep(.13)
                 sp.run(['xdotool','keyup','--window',win,'Up'],check=True)
-            tilted = until(lambda f: cross_visible(f) and changed(f,ready,player), 3)
+                for sample in range(4):
+                    tilted = snap()
+                    if cross_visible(tilted) and changed(tilted,ready,player):
+                        break
+                    time.sleep(.05)
+                else:
+                    continue
+                break
+            else:
+                tilted.save('tilt-failure.png')
+                raise AssertionError('Expected the in-play tilt indicator')
             tilted.save('tilt.png')
         if audio:
             key('m')
