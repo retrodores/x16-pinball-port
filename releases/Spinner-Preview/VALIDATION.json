@@ -1,0 +1,232 @@
+{
+  "engine_source_commit": "1fb88deb606824b7e8b6d2cb20376c4837831046",
+  "baseline_engine_commit": "131d56322c73439fa126f37e1b9b977f4fa3dcaa",
+  "specification_commit": "898276b21c124afddbb242fb4dba0ff933feb049",
+  "emulator": "Linux x16emu r49 stock 65C02 at 8 MHz",
+  "rom_sha256": "b81654cc8c87ed96e3ffc7c8e7c312c9f3b7b870c7bb34de61e61eac931b819a",
+  "windows_launcher_tested": false,
+  "frame_budget_cycles": 133333,
+  "fresh_zip_checks": {
+    "SpaceCadet-X16-Spinner-512KB-Preview.zip": {
+      "ram_kb": 512,
+      "cold_start": true,
+      "changing_lamps": true,
+      "f2_visible_ms": 276.7,
+      "f2_audio_file_size_at_keydown": 1744896,
+      "red_cross_on_start_and_f2": true,
+      "player_before_prompt": true,
+      "plunger_after_serve": true,
+      "f2_restart_and_skip": true,
+      "f3_enters_demo_during_show": true,
+      "exit": true,
+      "captured_audio_peak": 12634,
+      "timing_smoke": {
+        "frames": 574,
+        "peak_cycles": 209038,
+        "mean_cycles": 46302,
+        "over_budget": 6,
+        "missed_frame_starts": 0,
+        "irq_max": 38388,
+        "music_errors": 0,
+        "pcm_underruns": 0
+      }
+    },
+    "SpaceCmdr2D-Spinner-512KB-Preview.zip": {
+      "ram_kb": 512,
+      "cold_start": true,
+      "changing_lamps": true,
+      "f2_visible_ms": 230.1,
+      "f2_audio_file_size_at_keydown": 1712128,
+      "red_cross_on_start_and_f2": true,
+      "player_before_prompt": true,
+      "plunger_after_serve": true,
+      "f2_restart_and_skip": true,
+      "f3_enters_demo_during_show": true,
+      "exit": true,
+      "captured_audio_peak": 14073,
+      "timing_smoke": {
+        "frames": 689,
+        "peak_cycles": 281695,
+        "mean_cycles": 44470,
+        "over_budget": 5,
+        "missed_frame_starts": 1,
+        "irq_max": 38388,
+        "music_errors": 0,
+        "pcm_underruns": 0
+      }
+    },
+    "SpaceCadet-X16-Spinner-2048KB-Preview.zip": {
+      "ram_kb": 2048,
+      "cold_start": true,
+      "changing_lamps": true,
+      "f2_visible_ms": 217.2,
+      "f2_audio_file_size_at_keydown": 1851392,
+      "red_cross_on_start_and_f2": true,
+      "player_before_prompt": true,
+      "plunger_after_serve": true,
+      "f2_restart_and_skip": true,
+      "f3_enters_demo_during_show": true,
+      "exit": true,
+      "captured_audio_peak": 18361,
+      "timing_smoke": {
+        "frames": 675,
+        "peak_cycles": 370433,
+        "mean_cycles": 93571,
+        "over_budget": 68,
+        "missed_frame_starts": 3,
+        "irq_max": 98955,
+        "music_errors": 0,
+        "pcm_underruns": 0
+      }
+    },
+    "SpaceCmdr2D-Spinner-2048KB-Preview.zip": {
+      "ram_kb": 2048,
+      "cold_start": true,
+      "changing_lamps": true,
+      "f2_visible_ms": 211.2,
+      "f2_audio_file_size_at_keydown": 1814528,
+      "red_cross_on_start_and_f2": true,
+      "player_before_prompt": true,
+      "plunger_after_serve": true,
+      "f2_restart_and_skip": true,
+      "f3_enters_demo_during_show": true,
+      "exit": true,
+      "captured_audio_peak": 18833,
+      "timing_smoke": {
+        "frames": 575,
+        "peak_cycles": 250048,
+        "mean_cycles": 97908,
+        "over_budget": 70,
+        "missed_frame_starts": 0,
+        "irq_max": 99132,
+        "music_errors": 0,
+        "pcm_underruns": 0
+      }
+    }
+  },
+  "extended_gameplay": {
+    "quick_reset_baseline": {
+      "512": {
+        "frames": 12000,
+        "max_cycles": 213720,
+        "mean_cycles": 72505,
+        "over_budget": 310,
+        "missed_frame_starts": 0,
+        "irq_max": 39895,
+        "music_errors": 0,
+        "ram": 512,
+        "mhz": 8,
+        "expected_frames": 12000,
+        "program": "TEST.PRG",
+        "pcm_underruns": 0,
+        "budget_pass": false
+      },
+      "2048": {
+        "frames": 12000,
+        "max_cycles": 395833,
+        "mean_cycles": 148327,
+        "over_budget": 4245,
+        "missed_frame_starts": 157,
+        "irq_max": 117505,
+        "music_errors": 0,
+        "ram": 2048,
+        "mhz": 8,
+        "expected_frames": 12000,
+        "program": "COVTEST.PRG",
+        "pcm_underruns": 0,
+        "budget_pass": false
+      }
+    },
+    "spinner_preview": {
+      "512": {
+        "frames": 12000,
+        "max_cycles": 213140,
+        "mean_cycles": 73018,
+        "over_budget": 335,
+        "missed_frame_starts": 0,
+        "irq_max": 39652,
+        "music_errors": 0,
+        "ram": 512,
+        "mhz": 8,
+        "expected_frames": 12000,
+        "program": "TEST.PRG",
+        "pcm_underruns": 0,
+        "budget_pass": false
+      },
+      "2048": {
+        "frames": 12000,
+        "max_cycles": 500726,
+        "mean_cycles": 149107,
+        "over_budget": 4302,
+        "missed_frame_starts": 154,
+        "irq_max": 117527,
+        "music_errors": 0,
+        "ram": 2048,
+        "mhz": 8,
+        "expected_frames": 12000,
+        "program": "COVTEST.PRG",
+        "pcm_underruns": 0,
+        "budget_pass": false
+      }
+    }
+  },
+  "native_feedback_checks": {
+    "512": 232,
+    "2048": 232
+  },
+  "native_rule_checks": {
+    "512": [
+      52,
+      67,
+      186
+    ],
+    "2048": [
+      52,
+      67,
+      186
+    ]
+  },
+  "native_vera_readback": {
+    "assets_sha256": {
+      "TILES.BIN": "0f5cbf23dd41122d60da927c68899a55c27f51da0f2159356442d23fe4905d05",
+      "RINGS.BIN": "6e1127dc4a24cf46ee5f46c4f56ceea5d8681dad3fe5e48b6bb1267ee3f4c2a9",
+      "RINGS2.BIN": "fc2a2fee5fb1f1225b166a9d4440e6d934ef99bba46e91c53e8025c7a3ab4e22",
+      "DYN0.BIN": "91ff6f13d5f400003a456c17a3af74a21b9cac98db6c0785f0052c0dd11b64fd",
+      "DYN1.BIN": "6b2fe859745b70c27abcb0e665cb542f0aab9be9649daef76c816d4d00907d03",
+      "DYN2.BIN": "6fa2897b1be0f81a764e65baab8c4f3bead996d4e693afda11b8489a41d9de9f",
+      "DYN3.BIN": "904476e5ba278cf4e4ee8459190f1bcf6242fb6f2452b5c7539aba24f9ab0736"
+    },
+    "runs": [
+      {
+        "ram_kb": 512,
+        "checks": 26039,
+        "errors": 0,
+        "max_fast_cycles": 5845,
+        "first_call_with_zero_budget": true,
+        "visible_frames": 6
+      },
+      {
+        "ram_kb": 2048,
+        "checks": 26039,
+        "errors": 0,
+        "max_fast_cycles": 5845,
+        "first_call_with_zero_budget": true,
+        "visible_frames": 6
+      }
+    ]
+  },
+  "native_spinner_pcm_waveform": {
+    "512": {
+      "seconds": 7.072929466699435,
+      "correlation": 0.9640791109761552
+    },
+    "2048": {
+      "seconds": 7.072908986647006,
+      "correlation": 0.9640791109761552
+    }
+  },
+  "known_gaps": [
+    "Frame budget exceeded at both RAM sizes",
+    "Spinner boost, Time Warp, skill-shot rules, wider lamp coverage, drain blocker and independent status queues pending"
+  ]
+}
