@@ -1,0 +1,54 @@
+{
+  "engine_source_commit": "a65c79437e02d5f8095949b7b30eed6a7b0e58c3",
+  "packaging_source_commit": "c13635c99d3f29e2652a5b1aa9f7c9eb5b720d71",
+  "emulator": "Linux r49, stock 65C02, 8 MHz",
+  "windows_launcher_tested": false,
+  "extraction_smoke": {
+    "SpaceCadet-X16-Backbox-2048KB-Preview.zip": {
+      "ram_kb": 2048,
+      "center_animates": true,
+      "launch_demo_reset_distinct": true,
+      "player_stays_visible": true,
+      "plunger_and_flipper_input": true,
+      "exit": true,
+      "wav_seconds": 6.450110592283116
+    },
+    "SpaceCadet-X16-Backbox-512KB-Preview.zip": {
+      "ram_kb": 512,
+      "center_animates": true,
+      "launch_demo_reset_distinct": true,
+      "player_stays_visible": true,
+      "plunger_and_flipper_input": true,
+      "exit": true,
+      "wav_seconds": 6.2791021545015155
+    },
+    "SpaceCmdr2D-Backbox-2048KB-Preview.zip": {
+      "ram_kb": 2048,
+      "center_animates": true,
+      "launch_demo_reset_distinct": true,
+      "player_stays_visible": true,
+      "plunger_and_flipper_input": true,
+      "exit": true,
+      "wav_seconds": 7.961538461538462
+    },
+    "SpaceCmdr2D-Backbox-512KB-Preview.zip": {
+      "ram_kb": 512,
+      "center_animates": true,
+      "launch_demo_reset_distinct": true,
+      "player_stays_visible": true,
+      "plunger_and_flipper_input": true,
+      "exit": true,
+      "wav_seconds": 6.667731629392971
+    }
+  },
+  "label": "RGB-identical red BALL label in emulator screenshots at both RAM sizes.",
+  "music_test": "Three aligned steady soundtrack windows, versus the Attract Fidelity Preview.",
+  "music_delta_db": [
+    -3.854,
+    -3.8764,
+    -3.8376
+  ],
+  "isolated_flipper_retest": "seconds 4.902412550176129 fx onset 3.8008314901286147 correlation 0.9920794536489913 gain 71.47130104155485",
+  "default_cover_bank_reproduction": "Byte-identical to Attract Fidelity Preview",
+  "scope": "Only tilemap, tiles, cover music banks, README and cover credits differ. No new extended timing test."
+}

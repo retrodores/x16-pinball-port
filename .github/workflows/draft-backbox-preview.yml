@@ -1,0 +1,64 @@
+name: Prepare Backbox Preview draft
+on:
+  push:
+    branches: [x16-attract-fidelity]
+    paths:
+      - 'releases/Backbox-Preview/**'
+      - '.github/workflows/draft-backbox-preview.yml'
+permissions:
+  contents: write
+concurrency:
+  group: draft-backbox-preview
+  cancel-in-progress: false
+jobs:
+  draft:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Create draft and verify upload
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          TARGET_COMMIT: ${{ github.sha }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          tag=v1.0-backbox-preview.1
+          release_dir=releases/Backbox-Preview
+          (cd "$release_dir" && sha256sum -c SHA256SUMS)
+          mapfile -t archives < <(awk '{print $2}' "$release_dir/SHA256SUMS")
+          assets=()
+          for file in "${archives[@]}" SHA256SUMS PACKAGE-MANIFEST.json VALIDATION.json; do
+            assets+=("$release_dir/$file")
+          done
+          if gh release view "$tag" --json isDraft,targetCommitish >/tmp/attract-fidelity-existing.json 2>/dev/null; then
+            jq -e --arg target "$TARGET_COMMIT" '.isDraft and .targetCommitish == $target' /tmp/attract-fidelity-existing.json
+            gh release upload "$tag" "${assets[@]}" --clobber
+          else
+            gh release create "$tag" "${assets[@]}" --draft --prerelease --target "$TARGET_COMMIT" --title 'X16 Pinball Backbox Preview' --notes-file "$release_dir/RELEASE-NOTES.md"
+          fi
+          mkdir -p docs/release-status
+          gh release view "$tag" --json url,isDraft,isPrerelease,tagName,targetCommitish,assets > docs/release-status/backbox-preview.json
+          python3 - <<'PY'
+          import hashlib, json, os
+          from pathlib import Path
+          r = json.loads(Path('docs/release-status/backbox-preview.json').read_text())
+          assert r['isDraft'] and r['isPrerelease']
+          assert r['targetCommitish'] == os.environ['TARGET_COMMIT']
+          directory = Path('releases/Backbox-Preview')
+          archives = [line.split()[1] for line in (directory/'SHA256SUMS').read_text().splitlines()]
+          expected = {*archives, 'SHA256SUMS', 'PACKAGE-MANIFEST.json', 'VALIDATION.json'}
+          assert {item['name'] for item in r['assets']} == expected
+          for item in r['assets']:
+              digest = hashlib.sha256((directory/item['name']).read_bytes()).hexdigest()
+              assert item['digest'] == f'sha256:{digest}', item['name']
+          PY
+      - name: Record verified draft status
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs/release-status/backbox-preview.json
+          if ! git diff --cached --quiet; then
+            git commit -m "Record Backbox Preview draft release assets"
+            git push origin HEAD:x16-attract-fidelity
+          fi
