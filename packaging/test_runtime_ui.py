@@ -25,7 +25,12 @@ with (output('ui.log')).open('w')as f:
   def purple_glyphs(image,box):
    red,green,blue=np.asarray(image.crop(scaled(box)),dtype=np.int16).transpose(2,0,1)
    return np.count_nonzero((blue>=green+25)&(red>=green+20)&(blue>=red+20))
+  large_messages=os.environ.get('CADET_TEST_LARGE_MESSAGES')=='1'
+  message=(405,244,555,288) if large_messages else (405,248,565,270)
   ready=shot('ready')
+  if large_messages:
+   for top in (244,259,274):
+    assert purple_glyphs(ready,(405,top,555,top+14))>25,('launch message row missing',top)
   assert purple_glyphs(ready,(405,248,565,270))>40,'plunger status is missing purple text'
   margin=480-ready.crop((0,0,400,480)).getbbox()[3]
   assert 4<=margin<=12,('cabinet bottom margin',margin)
@@ -50,7 +55,7 @@ with (output('ui.log')).open('w')as f:
   assert len(flashed)==len(blink_boxes),('new-ball gate lamps did not all animate',sorted(flashed))
   # Check the real idle entry, an actual auto-play score, and two ways to exit.
   if os.environ.get('CADET_TEST_DEMO')=='1':
-   caption=scaled((405,248,565,270))
+   caption=scaled(message)
    score=scaled((438,197,566,227))
    def changed(reference,current,box):
     return ImageChops.difference(reference.crop(box),current.crop(box)).getbbox() is not None
@@ -60,7 +65,7 @@ with (output('ui.log')).open('w')as f:
     if changed(ready,attract,caption):break
     assert time.monotonic()<deadline,'idle demo did not appear'
    assert purple_glyphs(attract,(405,248,565,270))>40,'demo caption is missing purple text'
-   goal=scaled((405,260,565,270))
+   goal=scaled((405,259,555,274) if large_messages else (405,260,565,270))
    deadline=time.monotonic()+35
    while True:
     time.sleep(.4);playing_demo=shot('attract-playing')
@@ -76,7 +81,9 @@ with (output('ui.log')).open('w')as f:
   action('keydown','space');time.sleep(2);pulled=shot('pulled')
   assert ImageChops.difference(ready.crop(scaled((320,375,370,437))),pulled.crop(scaled((320,375,370,437)))).getbbox(),'plunger not animated'
   action('keyup','space');time.sleep(.8);launched=shot('launched')
-  assert purple_glyphs(launched,(405,248,565,270))>30,'in-play status is missing purple text'
+  assert purple_glyphs(launched,message)>30,'in-play status is missing purple text'
+  if large_messages:
+   assert purple_glyphs(launched,(405,259,555,288))==0,'stale launch glyphs after ball entered play'
   action('keydown','z');action('keydown','slash');time.sleep(.3);raised=shot('flippers')
   assert ImageChops.difference(ready.crop(scaled((120,355,260,420))),raised.crop(scaled((120,355,260,420)))).getbbox(),'flippers not animated'
   action('keyup','z');action('keyup','slash');time.sleep(8);shot('playing')

@@ -173,25 +173,15 @@ static void display(bool update_panel){
  dynamic_update(update_panel?128:0);
 }
 static __attribute__((section(".physics"),noinline)) void compact_footer(void){
- /* Row 25 contains the bottom of the backbox frame and the first line of
-  * old footer text. Copy its 13 right-side tiles, blanking only y >= 406.
-  * These replacement patterns occupy the gap after the fast dynamic tiles. */
- const uint16_t first=960;
- for(uint8_t col=0;col<13;++col){
-  uint16_t cell=25u*128+(24+col)*2;
-  addr(cell);uint8_t lo=v[3],hi=v[3];
+ /* The supported maps use private tiles in this part of row 25. The
+  * shared blank tiles already have zero in the rows we erase. */
+ for(uint8_t col=24;col<37;++col){
+  addr(25u*128+col*2);
+  uint8_t lo=v[3],hi=v[3];
   uint16_t tile_index=lo|((uint16_t)(hi&3)<<8);
-  uint32_t source=4096UL+(uint32_t)tile_index*128;
-  uint32_t dest=4096UL+(uint32_t)(first+col)*128;
-  uint8_t data[128];
-  addr(source);
-  for(uint8_t i=0;i<128;++i){
-   uint8_t pixel=v[3];
-   bool keep=(hi&8)?i>=80:i<48;
-   data[i]=keep?pixel:0;
-  }
-  addr(dest);for(uint8_t i=0;i<128;++i)v[3]=data[i];
-  addr(cell);v[3]=(uint8_t)(first+col);v[3]=(hi&0xfc)|((first+col)>>8);
+  uint32_t pattern=4096UL+(uint32_t)tile_index*128;
+  addr(pattern+((hi&8)?0:48));
+  for(uint8_t i=0;i<80;++i)v[3]=0;
  }
  addr(29u*128+39*2);uint8_t lo=v[3],hi=v[3];
  for(uint8_t row=26;row<30;++row){
@@ -231,10 +221,10 @@ int main(void){
  for(uint8_t i=0;i<DYNAMIC_BANK_COUNT;++i){char n[]="DYN0.BIN";n[3]+=i;*(volatile uint8_t*)0=dynamic_load_banks[i];if(!load(n,0,0xa000))goto fail;}
  *(volatile uint8_t*)0=11;if(!load("UI.BIN",0,0xa000))goto fail;
  for(uint8_t i=0;i<128;++i)hide(i);
- upload_message_font();
  for(uint8_t i=0;i<9;++i)score_cache[i]=254;
  *(volatile uint8_t*)0=62;
  __asm__ volatile("":::"memory");
+ upload_message_font();
  compact_footer();
  __asm__ volatile("":::"memory");
  *(volatile uint8_t*)0=11;

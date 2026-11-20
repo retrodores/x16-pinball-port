@@ -4,7 +4,7 @@
 #include <stdint.h>
 
 /* Original 5x7 dot designs, stored as seven rows of five bits. */
-static const uint8_t message_glyphs[][7] = {
+static const uint8_t message_glyphs[][7] __attribute__((section(".physics.rodata"))) = {
     {14,17,17,31,17,17,17}, /* A */
     {30,17,17,30,17,17,30},
     {14,17,16,16,16,17,14},
@@ -46,28 +46,26 @@ static const uint8_t message_glyphs[][7] = {
 #define MESSAGE_COLUMNS 11u
 #define MESSAGE_ROWS 3u
 #define MESSAGE_FIRST_SPRITE 33u
-#define MESSAGE_GLYPH_BYTES 128u
+#define MESSAGE_GLYPH_BYTES 64u
 #define MESSAGE_GLYPH_COUNT (sizeof(message_glyphs) / sizeof(message_glyphs[0]))
-/* Leave the existing 16x16 ball scratch sprite immediately after FONT.BIN. */
-#define MESSAGE_FONT_BASE (FONT_BASE + 2048UL + 128UL)
+/* Start after the private slingshot tiles, leaving PSG memory untouched. */
+#define MESSAGE_FONT_BASE FAST_TILE_END
 
 _Static_assert(MESSAGE_FONT_BASE + MESSAGE_GLYPH_COUNT * MESSAGE_GLYPH_BYTES <= 0x1f9c0UL,
                "Message font overlaps reserved VERA memory");
 _Static_assert(MESSAGE_FIRST_SPRITE + MESSAGE_COLUMNS * MESSAGE_ROWS <= 73u,
                "Message sprites overlap the music indicator");
 
-static void upload_message_font(void){
+static __attribute__((section(".physics"),noinline)) void upload_message_font(void){
     addr(MESSAGE_FONT_BASE);
     for(uint8_t glyph=0;glyph<MESSAGE_GLYPH_COUNT;++glyph){
         for(uint8_t y=0;y<16;++y){
             uint8_t dots=(y<14 && !(y&1)) ? message_glyphs[glyph][y/2] : 0;
-            /* Dot pairs are separated by one dark pixel. */
-            uint8_t pixel=0;
-            for(uint8_t x=0;x<16;++x){
-                uint8_t color=(x<15 && x%3<2 && (dots&(16u>>(x/3)))) ? FONT_PEN : 0;
-                if(x&1)v[3]=pixel|color;
-                else pixel=color<<4;
-            }
+            /* Five columns over eight pixels, with dark rows between dots. */
+            v[3]=(dots&16)?FONT_PEN<<4:0;
+            v[3]=((dots&8)?FONT_PEN<<4:0)|((dots&4)?FONT_PEN:0);
+            v[3]=(dots&2)?FONT_PEN:0;
+            v[3]=(dots&1)?FONT_PEN:0;
         }
     }
 }
@@ -79,7 +77,7 @@ static void draw_message(const char *message,uint8_t digit,uint8_t *cache){
     uint16_t y=244;
     for(uint8_t row=0;row<MESSAGE_ROWS;++row,y+=15){
         uint16_t x=405;
-        for(uint8_t column=0;column<MESSAGE_COLUMNS;++column,++slot,x+=15){
+        for(uint8_t column=0;column<MESSAGE_COLUMNS;++column,++slot,x+=14){
             uint8_t c=*message && *message!='\n' ? *message++ : ' ';
             if(c=='#')c=digit;
             if(cache[slot]==c)continue;
@@ -89,8 +87,8 @@ static void draw_message(const char *message,uint8_t digit,uint8_t *cache){
             if(c>='A'&&c<='Z')glyph=c-'A';
             else if(c>='0'&&c<='9')glyph=26+c-'0';
             else{hide(sprite);continue;}
-            tile(sprite,(uint16_t)(MESSAGE_FONT_BASE/32)+4u*glyph,x,y,
-                 0x50|FONT_STATUS_BANK);
+            tile(sprite,(uint16_t)(MESSAGE_FONT_BASE/32)+2u*glyph,x,y,
+                 0x40|FONT_STATUS_BANK);
         }
         while(*message && *message!='\n')++message;
         if(*message)++message;

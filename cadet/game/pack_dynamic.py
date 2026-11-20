@@ -99,6 +99,15 @@ def zmap(gid):
 original_z=zmap(107)
 fast_base=(json.loads((o/'sprites.json').read_text())['end']+2048+128+127)&~127
 fast_end=fast_base;fast_records=[];fast_descs=[];fast_tiles=set()
+# The message font uses the former footer copies' VRAM. In-place erasure
+# must leave any reused tile unchanged and must avoid mechanism patches.
+for column in range(24,37):
+ cell=(25*64+column)*2
+ word=struct.unpack_from('<H',mapping,cell)[0]
+ tile=word&1023
+ offset=tile*128+(0 if word&0x800 else 48)
+ assert tile not in alltiles, ('footer tile belongs to a mechanism',tile)
+ assert len(used[tile])==1 or not any(base[offset:offset+80]), ('shared nonblank footer',tile)
 regular_tiles={((a-4096)//128) for rec in packed_records for a in rec['positions']}
 for gid,lamp in [(469,180),(470,181)]:
  active_table=table.copy();active_z=original_z.copy();px=set()
@@ -143,7 +152,7 @@ for i in range(4):(o/f'DYN{i}.BIN').write_bytes(blob[i*8192:(i+1)*8192])
 descs=fast_descs+descs
 h=['#ifndef CADET_DYNAMIC_H','#define CADET_DYNAMIC_H','#include <stdint.h>','#include <stdbool.h>',
  '#define DYNAMIC_COUNT '+str(len(descs)), '#define DYNAMIC_FAST_COUNT '+str(len(fast_descs)),
- '#define DYNAMIC_BANK_COUNT 4','static const uint8_t dynamic_load_banks[]={58,59,60,63};',
+ '#define FAST_TILE_END '+str(fast_end)+'UL', '#define DYNAMIC_BANK_COUNT 4','static const uint8_t dynamic_load_banks[]={58,59,60,63};',
  'typedef struct {uint16_t group;uint8_t bank;uint16_t ptr;uint8_t lamp;} DynamicDesc;',
  'static const DynamicDesc dynamic_desc[]={'+','.join('{%d,%d,%d,%d}'%v for v in descs)+'};',
  'void dynamic_init(void);bool dynamic_update(uint8_t);','#endif']
