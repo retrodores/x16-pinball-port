@@ -45,6 +45,9 @@ report={'bytes':len(data),'banks':banks,'load_banks':[x[2]for x in segments],'ef
 # Compact status text is provisional; the numeric display uses original glyphs.
 pal=(o/'PAL.BIN').read_bytes();colors=np.array([((pal[i+1]&15)*17,(pal[i]>>4)*17,(pal[i]&15)*17)for i in range(0,512,2)])
 i=int(np.argmin(((colors-(221,221,204))**2).sum(axis=1)));bank,pen=divmod(i,16);assert pen
+# The same glyph pen can select a separate purple palette for live messages.
+status_colors=colors[pen::16]
+status_bank=int(np.argmin(((status_colors-(204,170,238))**2).sum(axis=1)))
 base=json.loads((o/'sprites.json').read_text())['end'];font=ImageFont.truetype(os.environ.get('CADET_FONT', '/usr/share/fonts/truetype/dejavu/DejaVuSansMono.ttf'),9);data=bytearray()
 for code in range(32,96):
  a=Image.new('1',(8,8));ImageDraw.Draw(a).text((0,-2),chr(code),font=font,fill=1)
@@ -56,7 +59,7 @@ depths=[]
 for gid in range(108,115):
  p=next(e['values'][1:]for e in inv['groups'][gid]['entries']if e['type']==11 and e['values'][0]==501)
  depths.append(round(math.sqrt(p[0]**2+(-.913545*p[1]+.406737*p[2]+3.791398)**2+(24.675402-.406737*p[1]-.913545*p[2])**2)*256))
-(o/'ui.h').write_text(f'#define FONT_BASE {base}UL\n#define FONT_BANK {bank}\nstatic const int16_t ball_depths[]={{'+','.join(map(str,depths))+'};\n')
+(o/'ui.h').write_text(f'#define FONT_BASE {base}UL\n#define FONT_BANK {bank}\n#define FONT_STATUS_BANK {status_bank}\nstatic const int16_t ball_depths[]={{'+','.join(map(str,depths))+'};\n')
 print('PCM resident',sum(x[2]for x in effects),'font end',hex(base+len(data)),'ball depths',depths)
 
 (o/'projection.h').write_text('#define projection_scale ((const uint16_t*)0xa800)\n')

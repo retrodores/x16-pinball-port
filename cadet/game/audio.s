@@ -287,8 +287,8 @@ pcm_prime:
  sta pcm_started
  stz pcm_phase
  stz pcm_phase+1
- lda #$0b
- sta $9f3b ; Volume/format only; bit7 FIFO RESET is deliberately clear.
+ lda #$05
+ sta $9f3b ; Lower effects volume for the music-forward mix; preserve format and FIFO.
  bra pcm_fill
 pcm_regular:
  ; rate29 * 800 * 525 / 65536 = 185 + 55840/65536 samples per VGA VBL.

@@ -22,7 +22,11 @@ with (output('ui.log')).open('w')as f:
   def scaled(box):
    x1,y1,x2,y2=box
    return x1*128//119,y1*128//117,x2*128//119,y2*128//117
+  def purple_glyphs(image,box):
+   red,green,blue=np.asarray(image.crop(scaled(box)),dtype=np.int16).transpose(2,0,1)
+   return np.count_nonzero((blue>=green+25)&(red>=green+20)&(blue>=red+20))
   ready=shot('ready')
+  assert purple_glyphs(ready,(405,248,565,270))>40,'plunger status is missing purple text'
   margin=480-ready.crop((0,0,400,480)).getbbox()[3]
   assert 4<=margin<=12,('cabinet bottom margin',margin)
   assert ready.crop(scaled((405,308,530,379))).getbbox(), 'controls panel is empty'
@@ -43,7 +47,8 @@ with (output('ui.log')).open('w')as f:
   assert flashed,'original new-ball gate lamps do not animate'
   action('keydown','space');time.sleep(2);pulled=shot('pulled')
   assert ImageChops.difference(ready.crop(scaled((320,375,370,437))),pulled.crop(scaled((320,375,370,437)))).getbbox(),'plunger not animated'
-  action('keyup','space');time.sleep(.8);shot('launched')
+  action('keyup','space');time.sleep(.8);launched=shot('launched')
+  assert purple_glyphs(launched,(405,248,565,270))>30,'in-play status is missing purple text'
   action('keydown','z');action('keydown','slash');time.sleep(.3);raised=shot('flippers')
   assert ImageChops.difference(ready.crop(scaled((120,355,260,420))),raised.crop(scaled((120,355,260,420)))).getbbox(),'flippers not animated'
   action('keyup','z');action('keyup','slash');time.sleep(8);shot('playing')
@@ -51,6 +56,7 @@ with (output('ui.log')).open('w')as f:
   music_on=shot('music-on')
   action('key','m');time.sleep(.3);music_off=shot('music-off')
   box=scaled((533,372,557,380))
+  assert purple_glyphs(music_off,(533,372,557,380))>15,'music status is missing purple text'
   assert ImageChops.difference(music_on.crop(box),music_off.crop(box)).getbbox(),'music OFF indicator unchanged'
   restart_started=time.monotonic();action('key','m')
   while True:

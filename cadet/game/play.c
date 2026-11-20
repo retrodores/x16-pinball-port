@@ -67,7 +67,7 @@ void audio_effect(uint8_t id){
 
 static void status(const char*s){
  for(uint8_t i=0;i<40;++i){uint8_t c=*s?*s++:32;if(status_cache[i]==c)continue;status_cache[i]=c;
-  tile(33+i,FONT_BASE/32+c-32,405+(i%20)*8,248+(i/20)*8,FONT_BANK);
+  tile(33+i,FONT_BASE/32+c-32,405+(i%20)*8,248+(i/20)*12,FONT_STATUS_BANK);
  }
 }
 #ifdef PROFILE_DISPLAY
@@ -132,7 +132,7 @@ static void display(bool update_panel){
  }
  if(update_panel&&music_cache!=music_enabled){
   const char*label=music_enabled==0?"OFF":music_enabled==1?"ON ":"...";
-  for(uint8_t i=0;i<3;++i)tile(73+i,FONT_BASE/32+label[i]-32,533+i*8,372,FONT_BANK);
+  for(uint8_t i=0;i<3;++i)tile(73+i,FONT_BASE/32+label[i]-32,533+i*8,372,FONT_STATUS_BANK);
   music_cache=music_enabled;
  }
  dynamic_update(update_panel?128:0);

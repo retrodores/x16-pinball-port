@@ -82,6 +82,10 @@ int main(void){
  for(uint16_t f=0;f<240;++f){frame();music_prefetch();if(f==100)cue(SOUND43,0);if(f==112)cue(SOUND104,1);if(f==124)cue(SOUND22,2);}
  CHECK(!music_error&&!pcm_underruns&&music_enabled==1);
  music_stop();for(uint8_t i=0;i<90;++i)frame();
+ /* Replay the same cue sequence on its own for a level comparison. */
+ text("# EFFECTS ONLY ");hex(lab_clock());text("\n");
+ for(uint16_t f=0;f<240;++f){frame();if(f==100)cue(SOUND43,0);if(f==112)cue(SOUND104,1);if(f==124)cue(SOUND22,2);}
+ for(uint8_t f=0;f<90;++f)frame();
  /* Each one-byte source finishes in a single batch. End/start every VBL
     must not cause repeated256 priming or an increasing FIFO backlog. */
  *(volatile uint8_t*)0=1;*(volatile uint8_t*)0xa000=127;

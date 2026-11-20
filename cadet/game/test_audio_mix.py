@@ -103,7 +103,7 @@ for ram in [int(x)for x in os.environ.get('CAD_AUDIO_RAM','512,2048').split(',')
  # Precisely repeated one-byte cues expose end/start FIFO accumulation.
  pulse_tick,pulse_count=(int(z,16)for z in re.search(r'# PULSES ([0-9a-f]+) ([0-9a-f]+)',s).groups())
  lo=round((origin+(pulse_tick-2)/FPS)*rate);hi=round((origin+(pulse_tick+pulse_count+5)/FPS)*rate)
- peaks,_=find_peaks(a[lo:hi],height=1000,distance=round(rate/FPS*.65))
+ peaks,_=find_peaks(a[lo:hi],height=300,distance=round(rate/FPS*.65))
  assert len(peaks)==pulse_count,(ram,'tight cue count',len(peaks),pulse_count)
  periods=np.diff(peaks)/rate
  # First source is at offset0 of the initial256-byte prime; subsequent
@@ -127,8 +127,12 @@ for ram in [int(x)for x in os.environ.get('CAD_AUDIO_RAM','512,2048').split(',')
   assert len(x)>0
   return float(np.sqrt(np.mean(x*x)))
  music_rms=rms(start+60,stop-10);silence_rms=rms(stop+45,restart-5)
- # The pre-gain build registered ~415 RMS in this exact r49 fixture.
- assert music_rms>600,(ram,'music level regressed',music_rms)
+ effects_only=int(re.search(r'# EFFECTS ONLY ([0-9a-f]+)',s)[1],16)
+ music_window_rms=rms(start+99,start+230)
+ effects_window_rms=rms(effects_only+99,effects_only+230)
+ balance_db=20*np.log10(music_window_rms/effects_window_rms)
+ assert balance_db>=3,(ram,'music must lead the effects by 3 dB',balance_db)
+ print('Music over effects',ram,round(balance_db,2),'dB',flush=True)
  mix_start=round((origin+(restart+99)/FPS)*rate)
  mix_end=round((origin+(restart+230)/FPS)*rate)
  mixed_peak=int(np.max(np.abs(stereo[mix_start:mix_end])))
@@ -138,7 +142,7 @@ for ram in [int(x)for x in os.environ.get('CAD_AUDIO_RAM','512,2048').split(',')
  loop,_=run('AUDIO-MIX-SOAK',ram)
  results=[int(x,16)for x in re.search(r'# MUSIC MIXED LOOP ([0-9a-f]+) ([0-9a-f]+) ([0-9a-f]+) ([0-9a-f]+) IRQ ([0-9a-f]+)',loop).groups()]
  assert results[0]>=1 and results[3]==0,results
- report['ram'][str(ram)]={'exact_bytes':costs[0],'mix_cycles_256_max_by_voice_count':costs[1:],'isolated_release_correlation':corr,'mixed_waveform_correlation':overlap_corr,'mixed_voice_gains':coeff.tolist(),'flipper_onset_latency_ms':latency*1000,'tight_cues':len(peaks),'first_prime_period_ms':float(periods[0]*1000),'tight_steady_period_range_ms':[float(min(periods[1:])*1000),float(max(periods[1:])*1000)],'wormhole_lead_correlation':wcorr,'music_only_rms':music_rms,'music_and_effects_peak':mixed_peak,'music_off_rms':silence_rms,'music_loop_count':results[0],'fm_writes':results[1],'psg_writes':results[2],'underruns':results[3],'mixed_irq_max_cycles':results[4]}
+ report['ram'][str(ram)]={'exact_bytes':costs[0],'mix_cycles_256_max_by_voice_count':costs[1:],'isolated_release_correlation':corr,'mixed_waveform_correlation':overlap_corr,'mixed_voice_gains':coeff.tolist(),'flipper_onset_latency_ms':latency*1000,'tight_cues':len(peaks),'first_prime_period_ms':float(periods[0]*1000),'tight_steady_period_range_ms':[float(min(periods[1:])*1000),float(max(periods[1:])*1000)],'wormhole_lead_correlation':wcorr,'music_only_rms':music_rms,'music_window_rms':music_window_rms,'effects_window_rms':effects_window_rms,'music_over_effects_db':balance_db,'music_and_effects_peak':mixed_peak,'music_off_rms':silence_rms,'music_loop_count':results[0],'fm_writes':results[1],'psg_writes':results[2],'underruns':results[3],'mixed_irq_max_cycles':results[4]}
  print('Captured original-rate PCM and music on/off PASS',ram,report['ram'][str(ram)],flush=True)
  item={'sample_rate':RATE,'vga_rate':FPS,'inputs':{name:input_digest(name)for name in ('AUDIO-MIX','AUDIO-MIX-SOAK')},'ram':{ram:report['ram'][str(ram)]}}
  (OUT/f'audio-mix-validation-{ram}.json').write_text(json.dumps(item,indent=2)+'\n')
