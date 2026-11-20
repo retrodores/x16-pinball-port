@@ -45,6 +45,20 @@ static void frame(uint8_t n,uint8_t f,int16_t x,int16_t y,uint8_t reserved){
  }
 }
 static uint8_t load(const char*n,uint8_t mode,uint16_t a){cbm_k_setnam(n);cbm_k_setlfs(1,8,2);return(uintptr_t)cbm_k_load(mode,(void*)a)>255;}
+#ifdef COVER_AUDIO
+#include "music_cover_data.h"
+extern volatile uint16_t cover_triggers;
+static bool cover_high_ram(void){
+ volatile uint8_t *const bank=(volatile uint8_t*)0;
+ volatile uint8_t *const probe=(volatile uint8_t*)0xa000;
+ uint8_t saved=*bank;*bank=0;uint8_t low=*probe;
+ *bank=COVER_LAST_BANK;uint8_t high=*probe;
+ *probe=low^255u;bool writable=*probe==(uint8_t)(low^255u);
+ *bank=0;bool independent=*probe==low;
+ *bank=COVER_LAST_BANK;*probe=high;*bank=0;*probe=low;*bank=saved;
+ return writable&&independent;
+}
+#endif
 static void print(const char*s){while(*s)cbm_k_bsout(*s++);}
 static void echo(const char*s){while(*s)*(volatile uint8_t*)0x9fbb=*s++;}
 static void hex(uint32_t a){for(uint8_t i=0;i<8;++i){*(volatile uint8_t*)0x9fbb="0123456789abcdef"[a>>28];a<<=4;}}
@@ -185,6 +199,9 @@ static __attribute__((section(".physics"),noinline)) void compact_footer(void){
 }
 int main(void){
  uint8_t oldbank=*(volatile uint8_t*)0;uint16_t oldkey=*(volatile uint16_t*)0x032e;
+#ifdef COVER_AUDIO
+ if(!cover_high_ram()){print("GTR3QQ MUSIC PREVIEW REQUIRES 2 MB BANKED RAM\r");echo("# COVER NEEDS 2 MB\n");return 1;}
+#endif
  print("\x93" "CMDRX CADET - ORIGINAL TABLE\rLOADING...\r");v[5]=0;v[9]=1;
  if(!game_load()||!load("MAP.BIN",2,0)||!load("TILES.BIN",2,0x1000)||!load("PAL.BIN",3,0xfa00)||
  !load("SPRITES.BIN",3,SPRITE_BASE&65535)||!load("FONT.BIN",3,FONT_BASE&65535))goto fail;
@@ -194,7 +211,13 @@ int main(void){
   addr((uint16_t)row*128);
   for(uint8_t col=0;col<24;++col){v[3]=blank_lo;v[3]=blank_hi;}
  }
+#ifdef COVER_AUDIO
+ *(volatile uint8_t*)0=32;if(!load("COVER.CMD",0,0xa000))goto fail;
+ *(volatile uint8_t*)0=64;if(!load("COVER.PCM",0,0xa000))goto fail;
+ *(volatile uint8_t*)0=COVER_CMD_HIGH;if(!load("COVER.HI",0,0xa000))goto fail;
+#else
  for(uint8_t i=0;i<2;++i){char n[]="MUSIC0.BIN";n[5]+=i;*(volatile uint8_t*)0=32+i*8;if(!load(n,0,0xa000))goto fail;}
+#endif
  for(uint8_t i=0;i<PCM_PARTS;++i){char n[]="PCM0.BIN";n[3]+=i;*(volatile uint8_t*)0=pcm_load_banks[i];if(!load(n,0,0xa000))goto fail;}
  for(uint8_t i=0;i<9;++i){char n[]="DEPTH00.BIN";n[6]+=i;*(volatile uint8_t*)0=i==0?10:i<3?16+i:i+42;if(!load(n,0,0xa000))goto fail;}
  for(uint8_t i=0;i<DYNAMIC_BANK_COUNT;++i){char n[]="DYN0.BIN";n[3]+=i;*(volatile uint8_t*)0=dynamic_load_banks[i];if(!load(n,0,0xa000))goto fail;}
@@ -277,6 +300,9 @@ int main(void){
   if(count>=TEST_FRAMES)break;
 #endif
  }
+#ifdef COVER_AUDIO
+ echo("# COVER LOOPS ");hex(music_loops);echo(" TRIGGERS ");hex(cover_triggers);echo("\n");
+#endif
  echo("# RESULT ");hex(count);echo(" ");hex(maximum);echo(" ");hex(total/count);echo(" ");hex(over);echo(" ");hex(gaps);echo(" ");hex(irq_max);echo(" ");hex(music_error);echo("\n# PCM UNDERRUNS ");hex(pcm_underruns);echo("\n# DONE\n");
  lab_uninstall();__asm__ volatile("sei");*(volatile uint16_t*)0x032e=oldkey;__asm__ volatile("cli");
  *(volatile uint8_t*)0=oldbank;

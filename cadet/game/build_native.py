@@ -48,10 +48,15 @@ if __name__=='__main__':
       'cadet/game/bounds.s','cadet/game/audio.s','cadet/game/engine.c',
       'cadet/game/depth_quant.s','cadet/game/mask_pixels.s','cadet/game/depth_rect.s',
       'cadet/game/depth.c','cadet/game/dynamic.c','cadet/game/attract.c','cadet/game/play.c']
-    targets = ('CADET',) if os.environ.get('CADET_BUILD_PLAYER_ONLY') == '1' else ('CADET', 'TEST')
-    for name in targets:
+    cover = os.environ.get('CADET_COVER_AUDIO') == '1'
+    targets = [('COVER' if cover else 'CADET', False)]
+    if os.environ.get('CADET_BUILD_PLAYER_ONLY') != '1':
+        targets.append(('COVTEST' if cover else 'TEST', True))
+    for name, fixture in targets:
         defs=['-DPIN_AUDIO']
-        if name=='TEST':
+        if cover:
+            defs+=['-DCOVER_AUDIO','-Wa,-defsym,COVER_AUDIO=1']
+        if fixture:
             defs+=['-DGAME_TEST','-DTEST_FRAMES='+os.environ.get('CADET_TEST_FRAMES','12000')]
             if os.environ.get('CADET_MILESTONE_INPUT','1')=='1':defs+=['-DMILESTONE_INPUT']
         build_native(name,sources,defs)

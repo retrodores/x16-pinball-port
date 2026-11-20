@@ -72,3 +72,35 @@ in the current music bank allocation. Resident samples would remove the
 measured file-read cost while keeping the original stereo. This has yet to
 be implemented or validated in-game. A 512 KB build still needs a separate
 storage/mixing design and a native timing check.
+
+## Resident 2 MB preview
+
+Build separately with:
+
+```sh
+python3 cadet/game/pack_music_cover.py /path/to/Pinball_R6.zsm
+CADET_COVER_AUDIO=1 CADET_MILESTONE_INPUT=0 CADET_TEST_FRAMES=7200 python3 cadet/game/build_native.py
+python3 cadet/game/test_build_native.py COVER COVTEST
+```
+
+The packer validates the source SHA-256 and copies the ZSM sample data and
+commands byte-for-byte. The command cursor traverses banks 32–44, then
+249–254. Drum samples occupy banks 64–248. Files load before play and the
+preview probes for independent high RAM. The 512 KB executable and overlays
+rebuilt to their original SHA-256 values.
+
+The 92 Hz music scheduler is slaved to VGA vertical blank using a rational
+accumulator, so individual writes are quantized to the video interval.
+The stereo VERA FIFO runs at rate 73. The mixer halves each drum channel
+and adds mono effects at one-quarter amplitude, with sample-and-hold
+conversion from the existing effects rate. Instrument triggers replace
+the source cursor for subsequent FIFO fills. Already queued samples
+remain audible for the FIFO lead. This preview has no disk I/O during play.
+
+The first 7,200-frame native gameplay test at 2 MB and 8 MHz finished
+two full soundtrack loops and 51 instrument triggers. The engine reported
+zero PCM underruns and zero music decoder errors, 19 intervals with
+missed frames, mean 121,332 cycles, peak 383,777 cycles and 1,062 frames over
+133,333 cycles. This is an experimental build with substantial timing
+overruns. The reported mix settings have not been verified against the
+Windows game's loudness.

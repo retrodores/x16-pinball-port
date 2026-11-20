@@ -54,6 +54,11 @@ lab_uninstall:
  sei
  jsr music_stop
  jsr pcm_stop
+.ifdef COVER_AUDIO
+ stz $9f3c
+ lda #$80
+ sta $9f3b
+.endif
  lda old_irq
  sta $0314
  lda old_irq+1
@@ -85,16 +90,20 @@ lab_clock:
 pcm_stop:
  php
  sei
+.ifndef COVER_AUDIO
  stz $9f3c
  lda #$80
  sta $9f3b
+.endif
  stz pcm_remaining
  stz pcm_remaining+1
  stz pcm_flipper_remaining
  stz pcm_flipper_remaining+1
  stz pcm_plunger_remaining
  stz pcm_plunger_remaining+1
+ .ifndef COVER_AUDIO
  stz pcm_started
+ .endif
  stz pcm_fresh
  plp
  rts
@@ -148,9 +157,13 @@ music_start:
  jsr music_reset
  stz music_delay
  stz music_phase
+.ifdef COVER_AUDIO
+ lda #1
+.else
  ; State 2 requests bounded main-thread priming. Do not decode 2048 bytes
  ; while IRQs are masked: that froze physics/input on every M-key restart.
  lda #2
+.endif
  sta music_enabled
  plp
  rts
@@ -158,6 +171,11 @@ music_stop:
  php
  sei
  stz music_enabled
+.ifdef COVER_AUDIO
+ stz cover_remaining
+ stz cover_remaining+1
+ stz cover_remaining+2
+.endif
  ldx #0
 1:
  txa
@@ -173,7 +191,11 @@ music_stop:
  cpx #8
  bne 1b
  jsr save_address
+.ifdef COVER_AUDIO
+ ldx #0
+.else
  ldx #4
+.endif
 3:
  txa
  asl
@@ -209,6 +231,10 @@ lab_irq:
  bne 2f
  inc lab_ticks+1
 2:
+.ifdef COVER_AUDIO
+ jsr cover_tick
+ jsr cover_pcm_service
+.else
 .ifndef AUDIO_STREAM_FIXTURE
  jsr pcm_service
 .endif
@@ -221,6 +247,7 @@ lab_irq:
  stz music_phase
  jsr music_service
 6:
+.endif
  sec
  lda $9fb8
  sbc irq_start
@@ -562,6 +589,9 @@ music_fm_loop:
  bne music_fm_loop
  bra music_command
 music_extension:
+.ifdef COVER_AUDIO
+ jmp cover_extension
+.else
  ; Extensions are structurally skipped. Generated theme uses none.
  jsr music_byte
  and #$3f
@@ -572,6 +602,7 @@ music_extension:
  dec music_count
  bne 5b
  bra music_command
+.endif
 music_wait:
  and #$7f
  beq music_eof
@@ -579,15 +610,24 @@ music_wait:
  bra music_return
 music_eof:
  inc music_loops
+.ifdef COVER_AUDIO
+ jsr cover_loop
+ jmp music_command
+.else
  ; Start the next loop on the next video tick.
  lda #1
  sta music_delay
+.endif
 music_return:
  jsr restore_address
  pla
  sta $00
  rts
+.ifdef COVER_AUDIO
+.include "cadet/game/music_cover.s.inc"
+.else
 .include "cadet/game/music_lz.s.inc"
+.endif
 .section .bss.lab,"aw",@nobits
 .globl pcm_remaining,music_enabled,music_loops,lab_ticks,music_error,irq_max,fm_writes,psg_writes
 old_irq: .zero 2
