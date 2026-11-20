@@ -84,7 +84,16 @@ with log.open('w') as output:
         if audio:
             key('m')
             time.sleep(.5)
-        key('F2')
+        # Measure from the input submission to the first visible reset.
+        f2_audio_bytes = Path('startup.wav').stat().st_size if audio else 0
+        f2_start = time.monotonic()
+        sp.run(['xdotool','keydown','--window',win,'F2'],check=True)
+        deadline = f2_start+5
+        while lit(snap(),player):
+            assert time.monotonic()<deadline
+            time.sleep(.005)
+        f2_visible_ms = round((time.monotonic()-f2_start)*1000,1)
+        sp.run(['xdotool','keyup','--window',win,'F2'],check=True)
         until(lambda f: not lit(f,player) and not lit(f,message),5)
         # Allow a few reset cues in the audio capture before testing skip.
         if audio:
@@ -105,6 +114,7 @@ with log.open('w') as output:
             p.terminate()
             try: p.wait(5)
             except sp.TimeoutExpired: p.kill();p.wait()
-print(json.dumps({'ram_kb':int(ram),'cold_start':True,'changing_lamps':True,
+print(json.dumps({'ram_kb':int(ram),'cold_start':True,'changing_lamps':True,'f2_visible_ms':f2_visible_ms,
+                  'f2_audio_file_size_at_keydown':f2_audio_bytes,
                   'player_before_prompt':True,'plunger_after_serve':True,'f2_restart_and_skip':True,
                   'f3_enters_demo_during_show':True,'exit':True}))

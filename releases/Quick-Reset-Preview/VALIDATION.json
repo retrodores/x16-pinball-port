@@ -1,0 +1,138 @@
+{
+  "engine_source_commit": "131d56322c73439fa126f37e1b9b977f4fa3dcaa",
+  "emulator": "Linux r49, stock 65C02 at 8 MHz",
+  "windows_launcher_tested": false,
+  "fresh_zip_checks": {
+    "SpaceCadet-X16-Quick-Reset-512KB-Preview.zip": {
+      "ram_kb": 512,
+      "cold_start": true,
+      "changing_lamps": true,
+      "f2_visible_ms": 154.2,
+      "player_before_prompt": true,
+      "plunger_after_serve": true,
+      "f2_restart_and_skip": true,
+      "f3_enters_demo_during_show": true,
+      "exit": true,
+      "opening_sample_audio_matches": {
+        "cold_start": [
+          0.958,
+          0.999
+        ],
+        "f2_music_muted": [
+          9.342,
+          0.995
+        ]
+      },
+      "f2_audio_delay_ms_buffered_wav_estimate": 72.8,
+      "pcm_underruns": 0,
+      "timing_smoke": {
+        "frames": 590,
+        "peak_cycles": 183525,
+        "mean_cycles": 45537,
+        "over_133333": 5,
+        "missed_intervals": 0,
+        "irq_peak_cycles": 38345,
+        "music_error": 0
+      }
+    },
+    "SpaceCmdr2D-Quick-Reset-512KB-Preview.zip": {
+      "ram_kb": 512,
+      "cold_start": true,
+      "changing_lamps": true,
+      "f2_visible_ms": 145.6,
+      "player_before_prompt": true,
+      "plunger_after_serve": true,
+      "f2_restart_and_skip": true,
+      "f3_enters_demo_during_show": true,
+      "exit": true,
+      "opening_sample_audio_matches": {
+        "cold_start": [
+          0.925,
+          0.999
+        ],
+        "f2_music_muted": [
+          8.972,
+          0.999
+        ]
+      },
+      "f2_audio_delay_ms_buffered_wav_estimate": 59.3,
+      "pcm_underruns": 0,
+      "timing_smoke": {
+        "frames": 562,
+        "peak_cycles": 202271,
+        "mean_cycles": 45285,
+        "over_133333": 5,
+        "missed_intervals": 0,
+        "irq_peak_cycles": 38345,
+        "music_error": 0
+      }
+    },
+    "SpaceCadet-X16-Quick-Reset-2048KB-Preview.zip": {
+      "ram_kb": 2048,
+      "cold_start": true,
+      "changing_lamps": true,
+      "f2_visible_ms": 147.3,
+      "player_before_prompt": true,
+      "plunger_after_serve": true,
+      "f2_restart_and_skip": true,
+      "f3_enters_demo_during_show": true,
+      "exit": true,
+      "opening_sample_audio_matches": {
+        "cold_start": [
+          1.472,
+          0.864
+        ],
+        "f2_music_muted": [
+          9.286,
+          0.999
+        ]
+      },
+      "f2_audio_delay_ms_buffered_wav_estimate": 79.7,
+      "pcm_underruns": 0,
+      "timing_smoke": {
+        "frames": 560,
+        "peak_cycles": 311940,
+        "mean_cycles": 95628,
+        "over_133333": 58,
+        "missed_intervals": 2,
+        "irq_peak_cycles": 99102,
+        "music_error": 0
+      }
+    },
+    "SpaceCmdr2D-Quick-Reset-2048KB-Preview.zip": {
+      "ram_kb": 2048,
+      "cold_start": true,
+      "changing_lamps": true,
+      "f2_visible_ms": 214.2,
+      "player_before_prompt": true,
+      "plunger_after_serve": true,
+      "f2_restart_and_skip": true,
+      "f3_enters_demo_during_show": true,
+      "exit": true,
+      "opening_sample_audio_matches": {
+        "cold_start": [
+          1.34,
+          0.869
+        ],
+        "f2_music_muted": [
+          9.54,
+          0.999
+        ]
+      },
+      "f2_audio_delay_ms_buffered_wav_estimate": 82.0,
+      "pcm_underruns": 0,
+      "timing_smoke": {
+        "frames": 578,
+        "peak_cycles": 304229,
+        "mean_cycles": 97520,
+        "over_133333": 66,
+        "missed_intervals": 1,
+        "irq_peak_cycles": 98046,
+        "music_error": 0
+      }
+    }
+  },
+  "prior_2mb_space_cadet_f2_visible_ms": 204.4,
+  "visual_measurement": "Host time from xdotool input submission to the first screenshot with the player pane cleared. Includes host scheduling and screen presentation.",
+  "audio_measurement": "WAV position estimated from file length at input submission, before matching the F2 effect. Approximate due to host buffering."
+}
