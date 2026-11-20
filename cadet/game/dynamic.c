@@ -32,7 +32,7 @@ static bool fast_update(void){
  fast_epoch=game.visual_epoch;return changed;
 }
 static void cross_update(void){
- uint8_t on=game_lamp(254);
+ uint8_t on=game_lamp(OpeningCrossLamp);
  if(on==cross_shown)return;
  cross_shown=on;
  /* Sprite 127 stays behind the ball and doesn't own slingshot tiles. */

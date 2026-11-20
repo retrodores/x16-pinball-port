@@ -128,12 +128,12 @@ static void opening_cross(void){
  uint8_t transitions=0;
  bool was=false;
  for(uint16_t i=0;i<StartupFrames;++i){
-  bool on=game_lamp(254);
+  bool on=game_lamp(OpeningCrossLamp);
   if(on!=was){++transitions;was=on;}
   if(game.wait<=StartupReadyFrames)CHECK(!on);
   game_frame(false,false,false,false);
  }
  CHECK(transitions>=4);
- CHECK(game.state==Serving&&!game_lamp(254));
+ CHECK(game.state==Serving&&!game_lamp(OpeningCrossLamp));
 }
 int main(void){if(!game_load()){puts("# LOAD FAIL\n# DONE");return 1;}slingshots();input_events();spinners();opening_cross();printf("# FEEDBACK %s %u %u\n",failures?"FAIL":"PASS",checks,failures);puts("# DONE");return failures!=0;}

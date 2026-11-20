@@ -16,11 +16,12 @@ player = (430, 260, 610, 306)
 message = (430, 333, 610, 430)
 table = (85, 75, 295, 360)
 log = Path('startup.log')
-cross = (142, 338, 160, 353)
+cross = (124, 288, 143, 305)
+old_cross = (142, 338, 160, 353)
 
 
-def cross_visible(img):
-    colors = img.crop(cross).getdata()
+def cross_visible(img, box=cross):
+    colors = img.crop(box).getdata()
     return sum(r >= 136 and r - max(g, b) >= 80 for r, g, b in colors) >= 12
 
 
@@ -72,7 +73,9 @@ with log.open('w') as output:
         until(lambda f: changed(f,start,table) and not lit(f,player))
         if red_cross:
             image = until(cross_visible)
+            assert not cross_visible(image, old_cross)
             image.save('red-cross.png')
+            opening_cross = image
         if show_frames:
             reference = Path('lamp-frames')
             reference.mkdir(exist_ok=True)
@@ -87,6 +90,13 @@ with log.open('w') as output:
         ready = snap()
         if red_cross:
             assert not cross_visible(ready)
+            # Verify that the red sprite covers the blue insert pixels.
+            on = opening_cross.crop(cross).getdata()
+            off = ready.crop(cross).getdata()
+            overlap = sum(r >= 136 and r - max(g, b) >= 80 and
+                          lb - max(lr, lg) >= 18
+                          for (r, g, b), (lr, lg, lb) in zip(on, off))
+            assert overlap >= 12, overlap
         if show_frames:
             ready.save(reference/'ready.png')
         for action in ('keydown','keyup'):
@@ -109,6 +119,7 @@ with log.open('w') as output:
         until(lambda f: not lit(f,player) and not lit(f,message),5)
         if red_cross:
             image = until(cross_visible, 5)
+            assert not cross_visible(image, old_cross)
             image.save('red-cross-f2.png')
         # Allow a few reset cues in the audio capture before testing skip.
         if audio:
@@ -131,6 +142,6 @@ with log.open('w') as output:
             except sp.TimeoutExpired: p.kill();p.wait()
 print(json.dumps({'ram_kb':int(ram),'cold_start':True,'changing_lamps':True,'f2_visible_ms':f2_visible_ms,
                   'f2_audio_file_size_at_keydown':f2_audio_bytes,
-                  'red_cross_on_start_and_f2':red_cross,
+                  'red_cross_on_start_and_f2':red_cross, 'red_cross_over_upper_insert':red_cross,
                   'player_before_prompt':True,'plunger_after_serve':True,'f2_restart_and_skip':True,
                   'f3_enters_demo_during_show':True,'exit':True}))

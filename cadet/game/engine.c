@@ -186,7 +186,7 @@ static RULE_FN uint8_t startup_lamp(uint8_t group){
  if(game.wait<=StartupReadyFrames)return 0;
  return ((group^(group>>3)^game.ring_phase)&3u)<2;
 }
-BANK_TRAMPOLINE uint8_t game_lamp(uint16_t n){RULE_ENTER;uint8_t r=n==254?(game.state==Ready&&rules.cross_hold!=0):
+BANK_TRAMPOLINE uint8_t game_lamp(uint16_t n){RULE_ENTER;uint8_t r=n==OpeningCrossLamp?(game.state==Ready&&rules.cross_hold!=0):
   game.state==Ready?startup_lamp((uint8_t)n):rule_lamp(n);RULE_LEAVE;return r;}
 BANK_TRAMPOLINE uint8_t game_pose(uint16_t n){RULE_ENTER;uint8_t r=rule_pose(n);RULE_LEAVE;return r;}
 /* Rank steps persist across balls. The first-rank practice and launch

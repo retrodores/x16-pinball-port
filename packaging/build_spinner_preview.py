@@ -11,13 +11,15 @@ from build_backbox_preview import sha
 from build_cover_balance import read_verified
 
 
-def build(previous, runtime, output, source):
+def build(previous, runtime, output, source, revision=1):
     baseline = json.loads((previous / 'PACKAGE-MANIFEST.json').read_text())
     output.mkdir(parents=True, exist_ok=True)
     dynamic = json.loads((runtime / 'dynamic.json').read_text())
     first_flag = next(record['offset'] for record in dynamic['records'] if record['group'] == 481)
     assert 2 * 8192 < first_flag < 3 * 8192
     boundary = first_flag - 2 * 8192
+    title = 'Spinner Preview' if revision == 1 else f'Spinner Preview {revision}'
+    name_part = 'Spinner' if revision == 1 else f'Spinner-{revision}'
     archives = {}
     for original in baseline['archives']:
         program = 'COVER' if '2048KB' in original else 'CADET'
@@ -45,12 +47,12 @@ def build(previous, runtime, output, source):
         batch = files['RUN-WINDOWS.bat']
         assert batch.count(batch_prefix) == 1
         files['RUN-WINDOWS.bat'] = batch.replace(batch_prefix, batch_prefix + required)
-        readme = files['README.txt'].decode('ascii').replace('Quick Reset Preview', 'Spinner Preview')
+        readme = files['README.txt'].decode('ascii').replace('Quick Reset Preview', title)
         readme = readme.replace(baseline['engine_source_commit'], source).rstrip()
         readme += ('\n\nBoth flag spinners react to a passing ball. The red X flashes during the opening.\n'
                    'The larger Time Warp mission is still pending.\n')
         files['README.txt'] = readme.encode('ascii')
-        path = output / original.replace('Quick-Reset', 'Spinner')
+        path = output / original.replace('Quick-Reset', name_part)
         with zipfile.ZipFile(path, 'w') as archive:
             for name, data in sorted(files.items()):
                 info = zipfile.ZipInfo(name, (2026, 11, 20, 0, 0, 0))
@@ -73,5 +75,6 @@ if __name__ == '__main__':
     for name in ('previous', 'runtime', 'output'):
         parser.add_argument(name, type=Path)
     parser.add_argument('source')
+    parser.add_argument('--revision', type=int, choices=(1, 2), default=1)
     args = parser.parse_args()
-    build(args.previous, args.runtime, args.output, args.source)
+    build(args.previous, args.runtime, args.output, args.source, args.revision)

@@ -5,7 +5,7 @@
 enum Kind {Wall,Bumper,Plunger,Drain,Ramp,Target,Drop,Sensor,Spinner,Gate,Kickback,Sink,Kickout,Hole,Pass};
 enum SoundEvent {SoundCapture=7,SoundRelease,SoundKickback,SoundGateOpen,SoundGateClose,SoundLane,SoundUpgrade,SoundHazard,SoundWormholeAdvance,SoundFeed,SoundStartup};
 enum Mission {NoMission, SelectPractice, SelectLaunch, Practice, LaunchTraining};
-enum { StartupFrames=360, StartupReadyFrames=60 };
+enum { StartupFrames=360, StartupReadyFrames=60, OpeningCrossLamp=179 };
 enum State {Ready,Serving,InPlay,Captured,Between,GameOver};
 typedef struct {int16_t x,y;} Vec;
 typedef struct {int16_t x,y,ex,ey,nx,ny,r,xlo,ylo,xhi,yhi;uint8_t group,smooth,kind,mask,elastic,boost,param,flags;int16_t threshold;} Edge;

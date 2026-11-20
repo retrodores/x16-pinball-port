@@ -9,7 +9,7 @@ static uint8_t poses[DYNAMIC_COUNT],before[512];
 static volatile uint8_t *const v=(volatile uint8_t*)0x9f20;
 static uint16_t checks,errors;static uint32_t fast_max;
 uint8_t game_pose(uint16_t group){for(uint8_t i=0;i<DYNAMIC_COUNT;++i)if(dynamic_desc[i].lamp!=3&&dynamic_desc[i].group==group)return poses[i];return 0;}
-uint8_t game_lamp(uint16_t group){return group==254?cross:game_pose(group);}
+uint8_t game_lamp(uint16_t group){return group==OpeningCrossLamp?cross:game_pose(group);}
 uint8_t game_ring_lamp(uint8_t index){
  for(uint8_t i=0;i<DYNAMIC_COUNT;++i)if(dynamic_desc[i].lamp==3&&dynamic_desc[i].group==index)return poses[i];
  return 0;
