@@ -44,7 +44,6 @@ static MECHANIC_FN void rule_spin_start(uint8_t side,uint8_t reverse){
  rule_spin_step(s);
  add_score(500);
  spinner_sound(side);
- ++game.visual_epoch;
  /* 60*256/(20*0.65) is about 1182. Speed is in table units/second. */
  s->interval=s->remaining=speed?1182u/speed:0;
 }
@@ -68,7 +67,6 @@ static MECHANIC_FN void rule_spin_tick(void){
    add_score(award);
    /* The mechanical PCM voice can start once per spinner per video frame. */
    spinner_sound(side);
-   ++game.visual_epoch;
   }
  }
 }

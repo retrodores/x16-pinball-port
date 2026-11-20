@@ -33,8 +33,8 @@ int main(void){
  text("# AUDIO START ");hex(start_max);text(" ");hex(prefetch_max);text("\n");
  if(start_max>20000UL||prefetch_max>60000UL)goto fail_installed;
  /* Full real IRQ playback, including SOUND43 crossing bank30 -> bank51. */
- const uint8_t ids[]={SOUND43,SOUND17,SOUND49D,SOUND14,SOUND35};
- for(uint8_t n=0;n<5;++n){
+ const uint8_t ids[]={SOUND43,SOUND17,SOUND49D,SOUND14,SOUND35,SOUND131};
+ for(uint8_t n=0;n<sizeof(ids);++n){
   for(uint8_t i=0;i<30;++i)frame();
   const Effect*e=effects+ids[n];pcm_select_bank=e->bank;pcm_select_ptr=e->ptr;
   text("# PCM ");hex(ids[n]);text(" ");hex(e->length);text("\n");

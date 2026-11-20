@@ -47,7 +47,6 @@ bool dynamic_update(uint8_t budget){
  bool changed=false;
 again:
  if(active==255){
-  if(shown_epoch==game.visual_epoch)goto done;
   if(spinner_epoch!=game.spinner_epoch){
    for(uint8_t i=FLAG_DESCRIPTOR;i<FLAG_DESCRIPTOR+2;++i){
     uint8_t pose=game_pose(dynamic_desc[i].group);
@@ -55,6 +54,7 @@ again:
    }
    if(active==255)spinner_epoch=game.spinner_epoch;
   }
+  if(active==255&&shown_epoch==game.visual_epoch)goto done;
   uint8_t checked=0;
   while(active==255&&checked++<DYNAMIC_COUNT-DYNAMIC_FAST_COUNT){
    uint8_t i=next_component;if(++next_component==DYNAMIC_COUNT)next_component=DYNAMIC_FAST_COUNT;

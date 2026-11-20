@@ -32,7 +32,7 @@ __attribute__((used)) volatile uint8_t new_game_request;
 __attribute__((naked,used)) void keyboard(void){__asm__ volatile(
  "phx\npha\nand #127\ntax\npla\nbmi 1f\ncpx #113\nbne 3f\nlda keys,x\nbne 3f\ninc new_game_request\n3: lda #1\nbra 2f\n1: lda #0\n2: sta keys,x\nplx\nlda #0\nrts");}
 static volatile uint8_t *const v=(volatile uint8_t*)0x9f20;
-static uint8_t priority,previous_state=255,phase_cache[2]={255,255},plunger_cache=255;
+static uint8_t priority,mechanical_sample,previous_state=255,phase_cache[2]={255,255},plunger_cache=255;
 static uint8_t score_cache[9],ball_cache=255;
 static bool wide_score;
 static void addr(uint32_t a){v[5]=0;v[0]=a;v[1]=a>>8;v[2]=0x10|(a>>16);}
@@ -87,16 +87,19 @@ static void effect(uint8_t id,uint8_t rank,uint8_t voice){
  if(id==255)return;
  if(!voice){
   uint16_t remaining;__asm__ volatile("php\nsei":::"memory");remaining=pcm_remaining;__asm__ volatile("plp":::"memory");
-  if(remaining&&rank<priority)return;
+  /* Let the spinner click reach its transient on the single mechanical
+   * voice. Closely spaced steps otherwise keep replaying its quiet lead-in. */
+  if(remaining&&(rank<priority||(id==SOUND131&&mechanical_sample==SOUND131)))return;
  }
  const Effect*e=effects+id;pcm_select_bank=e->bank;pcm_select_ptr=e->ptr;
  if(voice==1)pcm_flipper_start(e->length);
  else if(voice==2)pcm_plunger_start(e->length);
- else{priority=rank;pcm_start(e->length);}
+ else{priority=rank;mechanical_sample=id;pcm_start(e->length);}
 }
 void audio_stop(void){pcm_stop();priority=0;}
 void audio_effect(uint8_t id){
  if(id==SoundStartup){
+  mechanical_sample=255;
   pcm_select_bank=19;pcm_select_ptr=0xa000;
   pcm_start(55539);return;
  }

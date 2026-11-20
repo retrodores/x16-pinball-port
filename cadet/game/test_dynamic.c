@@ -72,7 +72,10 @@ int main(void){
   for(uint8_t pose=0;pose<count;++pose){
    uint16_t at=0;
    for(uint8_t r=0;r<runs;++r){const uint8_t*q=rp+(uint16_t)r*4;addr(word(q),q[2]);for(uint8_t k=0;k<q[3];++k)before[at++]=v[3];}
-   poses[i]=pose;++game.visual_epoch;*(volatile uint8_t*)0=11;
+   poses[i]=pose;
+   if(i==FLAG_DESCRIPTOR||i==FLAG_DESCRIPTOR+1)++game.spinner_epoch;
+   else ++game.visual_epoch;
+   *(volatile uint8_t*)0=11;
    uint16_t calls=0;while(dynamic_update(17)){if(*(volatile uint8_t*)0!=11)++errors;if(++calls>128){++errors;break;}}
    *(volatile uint8_t*)0=d->bank;at=0;const uint8_t*expected=values+(uint16_t)pose*bytes;
    for(uint8_t r=0;r<runs;++r){const uint8_t*q=rp+(uint16_t)r*4;addr(word(q),q[2]);

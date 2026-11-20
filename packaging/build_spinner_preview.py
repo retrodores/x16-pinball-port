@@ -14,6 +14,10 @@ from build_cover_balance import read_verified
 def build(previous, runtime, output, source):
     baseline = json.loads((previous / 'PACKAGE-MANIFEST.json').read_text())
     output.mkdir(parents=True, exist_ok=True)
+    dynamic = json.loads((runtime / 'dynamic.json').read_text())
+    first_flag = next(record['offset'] for record in dynamic['records'] if record['group'] == 481)
+    assert 2 * 8192 < first_flag < 3 * 8192
+    boundary = first_flag - 2 * 8192
     archives = {}
     for original in baseline['archives']:
         program = 'COVER' if '2048KB' in original else 'CADET'
@@ -23,7 +27,16 @@ def build(previous, runtime, output, source):
         updated += [f'{stem}{i}.BIN' for stem, count in (('DYN', 4), ('GEOM', 3)) for i in range(count)]
         updated += ['RINGS.BIN', 'RINGS2.BIN']
         for name in updated:
-            files[name] = (runtime / name).read_bytes()
+            data = (runtime / name).read_bytes()
+            if name in ('DYN0.BIN', 'DYN1.BIN'):
+                assert files[name] == data
+            if name == 'DYN2.BIN':
+                # The 2D artwork masks around the kickbacks are already in
+                # this prefix. The new spinners and relocated rings follow it.
+                if original.startswith('SpaceCadet-X16'):
+                    assert files[name][:boundary] == data[:boundary]
+                data = files[name][:boundary] + data[boundary:]
+            files[name] = data
         assert len(files[f'{program}.MEC']) == 0x9f8
         assert 0 < len(files['RINGS2.BIN']) <= 0x600
         assert len(files['UI.BIN']) <= 0x1a00

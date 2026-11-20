@@ -46,7 +46,7 @@ for ram in (512,2048):
  with wave.open(str(o/f'audio-start-{ram}.wav'))as f:
   rate=f.getframerate();a=np.frombuffer(f.readframes(f.getnframes()),'<i2').reshape(-1,f.getnchannels()).mean(axis=1)
  matches={}
- for name in ['SOUND43','SOUND17','SOUND49D','SOUND14','SOUND35']:
+ for name in ['SOUND43','SOUND17','SOUND49D','SOUND14','SOUND35','SOUND131']:
   b=np.frombuffer((r/'cadet/build/PCM'/(name+'.PCM')).read_bytes(),np.int8).astype(float)
   b=resample(b,round(len(b)*rate/11062.6220703125));b-=b.mean();n=len(b)
   corr=fftconvolve(a,b[::-1],mode='valid');cs=np.r_[0,np.cumsum(a*a)];power=cs[n:]-cs[:-n]
@@ -56,4 +56,4 @@ for ram in (512,2048):
  report['ram'][ram]={'music_start_cycles':costs[0],'prefetch_max_cycles':costs[1],'waveforms':matches,'music_lz_compared_bytes':856956}
  print('Native audio PASS',ram,costs,flush=True)
 (o/'audio-validation.json').write_text(json.dumps(report,indent=2)+'\n')
-print('Exact storage, four music loops, staged restart/cancel, routing and five sample playbacks PASS',flush=True)
+print('Exact storage, four music loops, staged restart/cancel, routing and six sample playbacks PASS',flush=True)

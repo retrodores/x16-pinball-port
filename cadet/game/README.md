@@ -14,7 +14,8 @@ Do not label the current play-build binaries as the accepted 0.2 release.
 Both flag spinners use the directed crossings and their installed eight-pose
 data. The integer timer keeps scoring and wormhole rotation independent of
 which poses VERA can show at 60 Hz. Spinner steps within the same video frame
-share one PCM cue. The opening red X uses its own sprite so a flash can coexist
+share a PCM cue. A spinner tick lets its audible transient play before
+retriggering the same sample. The opening red X uses its own sprite so a flash can coexist
 with an active slingshot.
 
 Keep the executable with its matching PHY, RUL and MEC overlays. The MEC
