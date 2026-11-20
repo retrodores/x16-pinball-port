@@ -1,0 +1,94 @@
+{
+  "SpaceCadet-X16-1.0-Beta-512KB.zip": {
+    "assets": [
+      {
+        "apiUrl": "https://api.github.com/repos/retrodores/p8inball/releases/assets/773234647",
+        "contentType": "application/zip",
+        "createdAt": "2026-11-20T20:28:12Z",
+        "digest": "sha256:cbbb5eaa10f2f4adaca766947dd070953fb729ac14930d829e97648189454d6c",
+        "downloadCount": 0,
+        "id": "RA_kwDOV0z_kc4uFp_X",
+        "label": "",
+        "name": "SpaceCadet-X16-1.0-Beta-512KB.zip",
+        "size": 657100,
+        "state": "uploaded",
+        "updatedAt": "2026-11-20T20:28:12Z",
+        "url": "https://github.com/retrodores/p8inball/releases/download/untagged-44a5de42f57964d617d9/SpaceCadet-X16-1.0-Beta-512KB.zip"
+      }
+    ],
+    "isDraft": true,
+    "isPrerelease": true,
+    "tagName": "v1.0-beta-spacecadet-x16-512kb-emulator",
+    "targetCommitish": "02dfeb6747559e4c10c472b5d38b3c847b87c02b",
+    "url": "https://github.com/retrodores/p8inball/releases/tag/untagged-44a5de42f57964d617d9"
+  },
+  "SpaceCadet-X16-1.0-Beta-2MB.zip": {
+    "assets": [
+      {
+        "apiUrl": "https://api.github.com/repos/retrodores/p8inball/releases/assets/773234784",
+        "contentType": "application/zip",
+        "createdAt": "2026-11-20T20:28:15Z",
+        "digest": "sha256:7f53d3c17e16f0c4dbd1800f4ed3f4bb4cb5ed4a9b16a8058080303f5b069479",
+        "downloadCount": 0,
+        "id": "RA_kwDOV0z_kc4uFqBg",
+        "label": "",
+        "name": "SpaceCadet-X16-1.0-Beta-2MB.zip",
+        "size": 1749392,
+        "state": "uploaded",
+        "updatedAt": "2026-11-20T20:28:15Z",
+        "url": "https://github.com/retrodores/p8inball/releases/download/untagged-7721984ffaa3521fae7c/SpaceCadet-X16-1.0-Beta-2MB.zip"
+      }
+    ],
+    "isDraft": true,
+    "isPrerelease": true,
+    "tagName": "v1.0-beta-spacecadet-x16-2mb-emulator",
+    "targetCommitish": "02dfeb6747559e4c10c472b5d38b3c847b87c02b",
+    "url": "https://github.com/retrodores/p8inball/releases/tag/untagged-7721984ffaa3521fae7c"
+  },
+  "SpaceCmdrX16-1.0-Beta-512KB.zip": {
+    "assets": [
+      {
+        "apiUrl": "https://api.github.com/repos/retrodores/p8inball/releases/assets/773234921",
+        "contentType": "application/zip",
+        "createdAt": "2026-11-20T20:28:18Z",
+        "digest": "sha256:7adc352beb6b39f73a441e56aa3ab285c9025b8b0bff55bf12854107810a916b",
+        "downloadCount": 0,
+        "id": "RA_kwDOV0z_kc4uFqDp",
+        "label": "",
+        "name": "SpaceCmdrX16-1.0-Beta-512KB.zip",
+        "size": 657022,
+        "state": "uploaded",
+        "updatedAt": "2026-11-20T20:28:18Z",
+        "url": "https://github.com/retrodores/p8inball/releases/download/untagged-d29980719f34592173b5/SpaceCmdrX16-1.0-Beta-512KB.zip"
+      }
+    ],
+    "isDraft": true,
+    "isPrerelease": true,
+    "tagName": "v1.0-beta-spacecmdrx16-512kb-emulator",
+    "targetCommitish": "02dfeb6747559e4c10c472b5d38b3c847b87c02b",
+    "url": "https://github.com/retrodores/p8inball/releases/tag/untagged-d29980719f34592173b5"
+  },
+  "SpaceCmdrX16-1.0-Beta-2MB.zip": {
+    "assets": [
+      {
+        "apiUrl": "https://api.github.com/repos/retrodores/p8inball/releases/assets/773235013",
+        "contentType": "application/zip",
+        "createdAt": "2026-11-20T20:28:21Z",
+        "digest": "sha256:e94ccc0ec55bee23a87b197d599d58829c4f575afdb79966ec0ba3bc7835cc75",
+        "downloadCount": 0,
+        "id": "RA_kwDOV0z_kc4uFqFF",
+        "label": "",
+        "name": "SpaceCmdrX16-1.0-Beta-2MB.zip",
+        "size": 1749314,
+        "state": "uploaded",
+        "updatedAt": "2026-11-20T20:28:21Z",
+        "url": "https://github.com/retrodores/p8inball/releases/download/untagged-3300fed669e61334b147/SpaceCmdrX16-1.0-Beta-2MB.zip"
+      }
+    ],
+    "isDraft": true,
+    "isPrerelease": true,
+    "tagName": "v1.0-beta-spacecmdrx16-2mb-emulator",
+    "targetCommitish": "02dfeb6747559e4c10c472b5d38b3c847b87c02b",
+    "url": "https://github.com/retrodores/p8inball/releases/tag/untagged-3300fed669e61334b147"
+  }
+}
