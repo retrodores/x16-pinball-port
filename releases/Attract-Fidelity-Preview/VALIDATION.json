@@ -1,0 +1,144 @@
+{
+  "source_commit": "a65c79437e02d5f8095949b7b30eed6a7b0e58c3",
+  "emulator": "Linux r49, stock 65C02, 8 MHz",
+  "emulator_sha256": "59bc86b8d24632f602339dd722eaf77317fc4fb6b76393a479216d3efd37228e",
+  "rom_sha256": "b81654cc8c87ed96e3ffc7c8e7c312c9f3b7b870c7bb34de61e61eac931b819a",
+  "windows_launcher_tested": false,
+  "native_attract": {
+    "512_long_attempt": "Earlier 450-second run timed out",
+    "512_prior_build_profile_1100": {
+      "frames": 1100,
+      "peak_cycles": 495466,
+      "mean_cycles": 69583,
+      "over_133333": 35,
+      "missed_intervals": 7,
+      "irq_peak_cycles": 38718,
+      "music_error": 0,
+      "final_state": 2,
+      "drains": 0,
+      "flipper_contacts": 7,
+      "escapes": 0,
+      "pcm_underruns": 0
+    },
+    "512_bounded": {
+      "frames": 12000,
+      "peak_cycles": 494422,
+      "mean_cycles": 64869,
+      "over_133333": 307,
+      "missed_intervals": 20,
+      "irq_peak_cycles": 38718,
+      "music_error": 0,
+      "final_state": 2,
+      "drains": 1,
+      "flipper_contacts": 116,
+      "escapes": 0,
+      "pcm_underruns": 0
+    },
+    "2048_cover_full": {
+      "frames": 20260,
+      "peak_cycles": 727156,
+      "mean_cycles": 131342,
+      "over_133333": 4835,
+      "missed_intervals": 211,
+      "irq_peak_cycles": 108938,
+      "music_error": 0,
+      "final_state": 5,
+      "drains": 3,
+      "flipper_contacts": 214,
+      "escapes": 0,
+      "pcm_underruns": 0,
+      "cover_loops": 5,
+      "native_stereo_sample_triggers": 142
+    },
+    "512_profile_source_commit": "9845aa9"
+  },
+  "fresh_zip_extractions": {
+    "SpaceCadet-X16-Attract-Fidelity-2048KB-Preview.zip": {
+      "ram_kb": 2048,
+      "center_animates": true,
+      "launch_demo_reset_distinct": true,
+      "player_stays_visible": true,
+      "plunger_and_flipper_input": true,
+      "exit": true,
+      "wav_seconds": 7.556463504546572,
+      "cover_mute_restart": {
+        "seconds": 9.877754567051692,
+        "muted_windows": [
+          47,
+          62
+        ],
+        "peak_stereo_difference_rms": 3004.5763945236063,
+        "exit_ok": true
+      }
+    },
+    "SpaceCadet-X16-Attract-Fidelity-512KB-Preview.zip": {
+      "ram_kb": 512,
+      "center_animates": true,
+      "launch_demo_reset_distinct": true,
+      "player_stays_visible": true,
+      "plunger_and_flipper_input": true,
+      "exit": true,
+      "wav_seconds": 7.961251740804457
+    },
+    "SpaceCmdr2D-Attract-Fidelity-2048KB-Preview.zip": {
+      "ram_kb": 2048,
+      "center_animates": true,
+      "launch_demo_reset_distinct": true,
+      "player_stays_visible": true,
+      "plunger_and_flipper_input": true,
+      "exit": true,
+      "wav_seconds": 8.16220201523716,
+      "cover_mute_restart": {
+        "seconds": 10.664762021790775,
+        "muted_windows": [
+          46,
+          66
+        ],
+        "peak_stereo_difference_rms": 3216.4386203062327,
+        "exit_ok": true
+      }
+    },
+    "SpaceCmdr2D-Attract-Fidelity-512KB-Preview.zip": {
+      "ram_kb": 512,
+      "center_animates": true,
+      "launch_demo_reset_distinct": true,
+      "player_stays_visible": true,
+      "plunger_and_flipper_input": true,
+      "exit": true,
+      "wav_seconds": 6.88527074629311
+    }
+  },
+  "native_mechanism_checks_each_ram_size": [
+    49,
+    64,
+    183
+  ],
+  "host_mechanism_checks": 252,
+  "host_attract": {
+    "frames": 180000,
+    "completed_demos": 3,
+    "missions_accepted": 16
+  },
+  "audio_a_b": {
+    "reference": "Center and Demo Preview, same r49 and ROM",
+    "512_opening_first_music_window_db": 0.0396,
+    "512_opening_feed_fx_window_db": 0,
+    "2048_opening_aligned_steady_music_windows_db": [
+      -5.9902,
+      -6.0318,
+      -6.0145
+    ],
+    "2048_isolated_flipper_waveform_fit_gains": [
+      71.3716,
+      71.4487
+    ],
+    "candidate_commit": "d8160f2"
+  },
+  "specification_commit": "898276b21c124afddbb242fb4dba0ff933feb049",
+  "packaging_code_commit": "3076e84",
+  "idle_entry_and_flipper_takeover": {
+    "512": "Pass in the extracted runtime, Linux r49 warp mode",
+    "2048": "Pass in the extracted runtime, Linux r49 warp mode"
+  },
+  "message_fit": "Checked all status captions and substituted digits against width and VRAM capacity"
+}
