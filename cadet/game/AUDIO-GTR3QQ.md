@@ -35,3 +35,40 @@ Schedule the command stream at its declared rate and honor the loop offset.
 Validate audio across the loop, simultaneous effects, and toggle/reset behavior.
 Measure FIFO underruns, music/effects balance and worst frame cycles at 8 MHz
 on 512 KB and 2 MB before deciding whether it can ship as the default.
+
+## Streaming feasibility at the cover's native PCM rate
+
+The YM2151/VERA export plays 8-bit stereo drums at VERA rate 73
+(27,847.3 stereo frames/s, 55,694.6 bytes/s). The creator explicitly calls
+out the stereo drum balance. The fixture keeps stereo and rate 73 while
+mixing the existing flipper, plunger and table effects from rate 29.
+
+Run `python3 cadet/game/test_music_stream.py` on the VM after generating the
+resident effects. Add `--frames 100 --sd-image /path/to/sdcard.img` for the
+emulated r49 FAT32 SD-card path. Requires mtools for the SD run. An over-budget
+result intentionally exits nonzero. The fixture uses synthetic stereo PCM
+at the same data rate and the production effects renderer. It exercises
+sequential MACPTR reads, an assembly mixer and VERA FIFO writes. It excludes
+ZSM PSG/FM playback, instrument seeks, physics and graphics.
+
+| r49 at 8 MHz | RAM | Intervals | Mean cycles | Peak cycles | Over 133,333 |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| HostFS | 512 KB | 3,500 | 63,940 | 279,614 | 36 |
+| HostFS | 2 MB | 3,500 | 63,641 | 252,475 | 22 |
+| SD image | 512 KB | 100 | 163,265 | 234,164 | 79 |
+| SD image | 2 MB | 100 | 162,038 | 234,066 | 78 |
+
+The HostFS runs consumed about 3.27 MB each. No FIFO empty or full flag
+was seen at the fixture's sampling points. The SD runs skipped 33 and 32
+video intervals with measured work spanning multiple intervals. They
+represent the emulated SD path, and hardware SD performance is unverified.
+The direct KERNAL read and software mix approach misses the cycle budget
+before the game workload is added. The current runtime stays selected.
+
+For a separate 2 MB feasibility build, the original PCM area fits in 185 of
+the 192 banks above the 512 KB boundary. The original 152,030-byte command
+stream packs to 25,829 bytes with the project's LZSS algorithm, which fits
+in the current music bank allocation. Resident samples would remove the
+measured file-read cost while keeping the original stereo. This has yet to
+be implemented or validated in-game. A 512 KB build still needs a separate
+storage/mixing design and a native timing check.

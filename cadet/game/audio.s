@@ -209,7 +209,9 @@ lab_irq:
  bne 2f
  inc lab_ticks+1
 2:
+.ifndef AUDIO_STREAM_FIXTURE
  jsr pcm_service
+.endif
  jsr music_service
  ; VGA refresh is 25 MHz / (800 * 525): 60 ticks = 126/125 frames.
  inc music_phase
