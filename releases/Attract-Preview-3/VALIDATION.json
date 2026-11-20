@@ -1,0 +1,185 @@
+{
+  "engine_source_commit": "60173c1724f987e23e32c3e49c4977b3d955f23a",
+  "emulator": "r49 Pyrite af102408",
+  "rom_sha256": "b81654cc8c87ed96e3ffc7c8e7c312c9f3b7b870c7bb34de61e61eac931b819a",
+  "platform": "Linux Xvfb; stock 65C02 8 MHz",
+  "windows_launcher_executed": false,
+  "frame_cycle_budget": 133333,
+  "checks": [
+    "ZIP CRC and exact extracted runtime bytes",
+    "Player 1 in the upper pane throughout launch, play and attract transitions",
+    "Purple launch and demo messages in the lower pane; stale glyphs and prior legend absent",
+    "Idle and F3 entry, score and objective progression, F2 and flipper takeover",
+    "Gate lights, plunger and flipper animation",
+    "Native PRG and overlay extraction verified against the ELF sections"
+  ],
+  "archive_ui_tests": {
+    "SpaceCadet-X16": {
+      "512": {
+        "ram_kb": 512,
+        "music_restart_seconds": null,
+        "audio_rms": 3018.017320129105,
+        "peak": 12733.0,
+        "samples": 2754440,
+        "inputs_sha256": {
+          "CADET.PRG": "4351ab280f97e0c733572a2385f87ce8df4068f507376b78876d5f41226f584d",
+          "CADET.RUL": "80c0fb8eb6bd96ec265a7b36a160fc5d46b088f76ea6e3fdef41b965370811ab",
+          "CADET.PHY": "224041d9f68da0d6d246ecfe597c49b1d3e1abf69ffb5caead2dccf842bc0cdf"
+        },
+        "reported_frame": 1663,
+        "worst_cycles": 175690,
+        "mean_cycles": 51287
+      },
+      "2048": {
+        "ram_kb": 2048,
+        "music_restart_seconds": null,
+        "audio_rms": 3022.092142133112,
+        "peak": 12970.0,
+        "samples": 2769210,
+        "inputs_sha256": {
+          "CADET.PRG": "4351ab280f97e0c733572a2385f87ce8df4068f507376b78876d5f41226f584d",
+          "CADET.RUL": "80c0fb8eb6bd96ec265a7b36a160fc5d46b088f76ea6e3fdef41b965370811ab",
+          "CADET.PHY": "224041d9f68da0d6d246ecfe597c49b1d3e1abf69ffb5caead2dccf842bc0cdf"
+        },
+        "reported_frame": 1671,
+        "worst_cycles": 172237,
+        "mean_cycles": 51211
+      }
+    },
+    "SpaceCmdr2D": {
+      "512": {
+        "ram_kb": 512,
+        "music_restart_seconds": null,
+        "audio_rms": 3020.156042839208,
+        "peak": 12230.0,
+        "samples": 2713330,
+        "inputs_sha256": {
+          "CADET.PRG": "4351ab280f97e0c733572a2385f87ce8df4068f507376b78876d5f41226f584d",
+          "CADET.RUL": "80c0fb8eb6bd96ec265a7b36a160fc5d46b088f76ea6e3fdef41b965370811ab",
+          "CADET.PHY": "224041d9f68da0d6d246ecfe597c49b1d3e1abf69ffb5caead2dccf842bc0cdf"
+        },
+        "reported_frame": 1634,
+        "worst_cycles": 172295,
+        "mean_cycles": 51351
+      },
+      "2048": {
+        "ram_kb": 2048,
+        "music_restart_seconds": null,
+        "audio_rms": 3015.882852903492,
+        "peak": 12733.0,
+        "samples": 2721314,
+        "inputs_sha256": {
+          "CADET.PRG": "4351ab280f97e0c733572a2385f87ce8df4068f507376b78876d5f41226f584d",
+          "CADET.RUL": "80c0fb8eb6bd96ec265a7b36a160fc5d46b088f76ea6e3fdef41b965370811ab",
+          "CADET.PHY": "224041d9f68da0d6d246ecfe597c49b1d3e1abf69ffb5caead2dccf842bc0cdf"
+        },
+        "reported_frame": 1638,
+        "worst_cycles": 175629,
+        "mean_cycles": 51390
+      }
+    }
+  },
+  "native_timing": {
+    "512": {
+      "frames": 12000,
+      "max_cycles": 213514,
+      "mean_cycles": 69116,
+      "over_budget": 74,
+      "missed_frame_starts": 0,
+      "irq_max": 42341,
+      "music_errors": 0,
+      "ram": 512,
+      "mhz": 8,
+      "expected_frames": 12000,
+      "program": "TEST.PRG",
+      "pcm_underruns": 0,
+      "budget_pass": false
+    },
+    "2048": {
+      "frames": 12000,
+      "max_cycles": 213524,
+      "mean_cycles": 69116,
+      "over_budget": 75,
+      "missed_frame_starts": 0,
+      "irq_max": 42341,
+      "music_errors": 0,
+      "ram": 2048,
+      "mhz": 8,
+      "expected_frames": 12000,
+      "program": "TEST.PRG",
+      "pcm_underruns": 0,
+      "budget_pass": false
+    }
+  },
+  "audio_fixture_source": "Attract Preview 2; audio code and packaged PCM and music banks unchanged",
+  "audio_fixture": {
+    "512": {
+      "exact_bytes": 19369,
+      "mix_cycles_256_max_by_voice_count": [
+        15594,
+        26112,
+        38638
+      ],
+      "isolated_release_correlation": 0.9973560119252993,
+      "mixed_waveform_correlation": 0.9869571529543906,
+      "mixed_voice_gains": [
+        39.43633708095518,
+        39.430344756724715,
+        39.86390782282411
+      ],
+      "flipper_onset_latency_ms": 23.315138296568115,
+      "tight_cues": 128,
+      "first_prime_period_ms": 23.14245924469567,
+      "tight_steady_period_range_ms": [
+        16.711722782010323,
+        16.814123044154993
+      ],
+      "wormhole_lead_correlation": 0.984669341494996,
+      "music_only_rms": 2267.965941852404,
+      "music_window_rms": 2583.601237856471,
+      "effects_window_rms": 1359.3191448695898,
+      "music_over_effects_db": 5.578081006705615,
+      "music_and_effects_peak": 11597,
+      "music_off_rms": 14.371430804254752,
+      "music_loop_count": 1,
+      "fm_writes": 47594,
+      "psg_writes": 42256,
+      "underruns": 0,
+      "mixed_irq_max_cycles": 46150
+    },
+    "2048": {
+      "exact_bytes": 19369,
+      "mix_cycles_256_max_by_voice_count": [
+        15594,
+        26112,
+        38620
+      ],
+      "isolated_release_correlation": 0.9973561945065257,
+      "mixed_waveform_correlation": 0.9869571529543906,
+      "mixed_voice_gains": [
+        39.43633708095518,
+        39.430344756724715,
+        39.86390782282411
+      ],
+      "flipper_onset_latency_ms": 23.335618348997055,
+      "tight_cues": 128,
+      "first_prime_period_ms": 23.14245924469567,
+      "tight_steady_period_range_ms": [
+        16.711722782010323,
+        16.814123044154993
+      ],
+      "wormhole_lead_correlation": 0.984669341494996,
+      "music_only_rms": 2272.3176690343134,
+      "music_window_rms": 2588.558599660949,
+      "effects_window_rms": 1359.3094675346817,
+      "music_over_effects_db": 5.5947931842685215,
+      "music_and_effects_peak": 11679,
+      "music_off_rms": 14.267614777469307,
+      "music_loop_count": 1,
+      "fm_writes": 47594,
+      "psg_writes": 42256,
+      "underruns": 0,
+      "mixed_irq_max_cycles": 46150
+    }
+  }
+}

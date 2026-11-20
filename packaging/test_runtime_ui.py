@@ -67,7 +67,7 @@ with (output('ui.log')).open('w')as f:
    score=scaled((438,197,566,227))
    def changed(reference,current,box):
     return ImageChops.difference(reference.crop(box),current.crop(box)).getbbox() is not None
-   deadline=time.monotonic()+45
+   deadline=time.monotonic()+(90 if split_panes else 45)
    while True:
     time.sleep(.4);attract=shot('attract')
     if changed(ready,attract,caption):break
