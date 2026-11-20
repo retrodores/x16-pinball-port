@@ -32,7 +32,7 @@ __attribute__((naked,used)) void keyboard(void){__asm__ volatile(
  "phx\npha\nand #127\ntax\npla\nbmi 1f\nlda #1\nbra 2f\n1: lda #0\n2: sta keys,x\nplx\nlda #0\nrts");}
 static volatile uint8_t *const v=(volatile uint8_t*)0x9f20;
 static uint8_t priority,previous_state=255,phase_cache[2]={255,255},plunger_cache=255;
-static uint8_t score_cache[9],ball_cache=255,status_cache[40];
+static uint8_t score_cache[9],ball_cache=255;
 static bool wide_score;
 static uint8_t music_cache=255;
 static void addr(uint32_t a){v[5]=0;v[0]=a;v[1]=a>>8;v[2]=0x10|(a>>16);}
@@ -68,10 +68,10 @@ void audio_effect(uint8_t id){
  effect((uint8_t)e,(uint8_t)(e>>8),voice);
 }
 
-static __attribute__((section(".physics"),noinline)) void status_banked(const char*s,uint8_t digit){
- for(uint8_t i=0;i<40;++i){uint8_t c=*s?*s++:32;if(digit&&i==34)c=digit;if(status_cache[i]==c)continue;status_cache[i]=c;
-  tile(33+i,FONT_BASE/32+c-32,405+(i%20)*8,248+(i/20)*12,FONT_STATUS_BANK);
- }
+#include "message_display.h"
+static uint8_t status_cache[MESSAGE_COLUMNS * MESSAGE_ROWS];
+static __attribute__((section(".physics"),noinline)) void status_banked(const char *message,uint8_t digit){
+ draw_message(message,digit,status_cache);
 }
 static void status(const char *s,uint8_t digit){
  uint8_t saved=*(volatile uint8_t*)0;
@@ -141,18 +141,28 @@ static void display(bool update_panel){
 #ifndef GAME_TEST
  if(attract_caption)panel_state=5+attract_caption;
 #endif
+ if(wide_score)panel_state=254;
  if(update_panel&&previous_state!=panel_state){
-  static const char*const labels[]={"F2: NEW GAME","HOLD SPACE          " "RELEASE TO LAUNCH","BALL IN PLAY","CAPTURE / RETURN","NEXT BALL","GAME OVER           F2: NEW GAME"};
+  static const char*const labels[]={
+   "READY\nF2 NEW GAME",
+   "HOLD SPACE\nRELEASE TO\nLAUNCH",
+   "IN PLAY",
+   "BALL HELD\nRETURN SOON",
+   "NEXT BALL",
+   "GAME OVER\nF2 NEW GAME",
+  };
+  if(wide_score)status("LONG SCORE\nVIEW EXACT\nSCORE LOG",0);
 #ifndef GAME_TEST
-  if(attract_caption){
+  else if(attract_caption){
    if(attract_caption<DemoRamps)
-    status("DEMO - F2 TO PLAY   BUMPERS LEFT: 0",'0'+attract_caption);
+    status("DEMO\nHITS LEFT #\nF2 TO PLAY",'0'+attract_caption);
    else if(attract_caption<DemoTourComplete)
-    status("DEMO - F2 TO PLAY   RAMPS LEFT:   0",'0'+attract_caption-DemoRamps+1);
-   else status(attract_caption==DemoFinalScore?"DEMO - F2 TO PLAY   FINAL SCORE":"DEMO - F2 TO PLAY   TOUR COMPLETE",0);
-  }else
+    status("DEMO\n# RAMPS\nF2 TO PLAY",'0'+attract_caption-DemoRamps+1);
+   else status(attract_caption==DemoFinalScore?
+    "DEMO\nFINAL SCORE\nF2 TO PLAY":"DEMO\nTOUR DONE\nF2 TO PLAY",0);
+  }
 #endif
-   status(labels[game.state],0);
+  else status(labels[game.state],0);
   previous_state=panel_state;
  }
  if(update_panel&&music_cache!=music_enabled){
@@ -161,8 +171,6 @@ static void display(bool update_panel){
   music_cache=music_enabled;
  }
  dynamic_update(update_panel?128:0);
- /* 128-bit score remains exact. Flag a panel overflow instead of silently truncating. */
- if(update_panel&&wide_score)status("SCORE EXCEEDS PANEL  SEE EXACT SCORE LOG",0);
 }
 static __attribute__((section(".physics"),noinline)) void compact_footer(void){
  /* Row 25 contains the bottom of the backbox frame and the first line of
@@ -223,6 +231,7 @@ int main(void){
  for(uint8_t i=0;i<DYNAMIC_BANK_COUNT;++i){char n[]="DYN0.BIN";n[3]+=i;*(volatile uint8_t*)0=dynamic_load_banks[i];if(!load(n,0,0xa000))goto fail;}
  *(volatile uint8_t*)0=11;if(!load("UI.BIN",0,0xa000))goto fail;
  for(uint8_t i=0;i<128;++i)hide(i);
+ upload_message_font();
  for(uint8_t i=0;i<9;++i)score_cache[i]=254;
  *(volatile uint8_t*)0=62;
  __asm__ volatile("":::"memory");

@@ -59,7 +59,7 @@ depths=[]
 for gid in range(108,115):
  p=next(e['values'][1:]for e in inv['groups'][gid]['entries']if e['type']==11 and e['values'][0]==501)
  depths.append(round(math.sqrt(p[0]**2+(-.913545*p[1]+.406737*p[2]+3.791398)**2+(24.675402-.406737*p[1]-.913545*p[2])**2)*256))
-(o/'ui.h').write_text(f'#define FONT_BASE {base}UL\n#define FONT_BANK {bank}\n#define FONT_STATUS_BANK {status_bank}\nstatic const int16_t ball_depths[]={{'+','.join(map(str,depths))+'};\n')
+(o/'ui.h').write_text(f'#define FONT_BASE {base}UL\n#define FONT_BANK {bank}\n#define FONT_PEN {pen}\n#define FONT_STATUS_BANK {status_bank}\nstatic const int16_t ball_depths[]={{'+','.join(map(str,depths))+'};\n')
 print('PCM resident',sum(x[2]for x in effects),'font end',hex(base+len(data)),'ball depths',depths)
 
 (o/'projection.h').write_text('#define projection_scale ((const uint16_t*)0xa800)\n')
