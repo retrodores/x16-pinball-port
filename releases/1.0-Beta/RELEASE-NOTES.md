@@ -8,25 +8,24 @@
 
 Each archive includes all 30 game files: PRG, matched overlays, table graphics, palettes, sprites, geometry, depth data, dynamic patches, music and PCM effects. Both include human-readable and machine-readable engine specifications under `specs/`, plus license notices. No nested archives or standalone game/build source are included. The machine reference documentation includes geometry and policy excerpts. Emulator and ROM are not bundled.
 
-This refresh raises the music level by about **6 dB** in both editions. The PCM sound effects are unchanged. Re-download the ZIP and extract it into a fresh folder.
+This refresh puts the **music about 5.6 dB above sound effects** in the measured test scene. Live status messages and the music indicator now render in purple in both editions. Re-download the ZIP and extract it into a fresh folder.
 
 ## Provenance
 
-Engine source: `9534fb8ed127092b0e9580ab75bfaf5d010e9b94`.
-Music converter: `7f6edd77f3665c0f167fb983b784c242f82cce47`.
-Specification: `898276b21c124afddbb242fb4dba0ff933feb049`.
-The PRG and overlays match the accepted beta. The specs describe the reference snapshot. PACKAGE-MANIFEST.json records the current runtime hashes.
+Engine and music converter: `116ee4cc6d7b85c55313c54f404c4ce3f676c3fe`.
+Specification snapshot: `898276b21c124afddbb242fb4dba0ff933feb049`.
+PACKAGE-MANIFEST.json records the current runtime hashes, including the matched PRG and overlays.
 
 ## SHA-256
 
 ```text
-6068e17ad559b92e6ffa41e603575834a8149ab2fd5124b3ed2882869ac7251e  SpaceCadet-X16-1.0-Beta-Runtime.zip
-9c8c4e80d917ab8a447482cf3cc949001f2dab8ae8922aa89a18d2aabd1b5934  SpaceCmdr2D-1.0-Beta-Runtime.zip
+12318ec032bb95ba2f3bc0cd068596114ecb63e7aa19e4cc3e1742e3bc118cf6  SpaceCadet-X16-1.0-Beta-Runtime.zip
+be3395340ff9f6ea9ddeee9a7c7cfb29d7df4ead3785f6127448608f34c6ec9a  SpaceCmdr2D-1.0-Beta-Runtime.zip
 ```
 
 ## Validation
 
-Both editions passed Linux emulator smoke tests at 512 KB and 2048 KB from fresh extractions. Checks covered playfield rendering, plunger and flipper animation, music toggle and restart, audio output, new game, and normal exit. The separate audio fixture completed a full soundtrack loop with concurrent effects at both RAM sizes. See VALIDATION.json for results.
+Both editions passed Linux emulator smoke tests at 512 KB and 2048 KB from fresh extractions. Checks covered purple live text, all four new-ball gate lamp regions, playfield rendering, controls, music toggle and restart, new game, and normal exit. The audio fixture completed a full soundtrack loop with concurrent effects at both RAM sizes. The deliberate 12000-frame test had 70 frames over budget at each RAM size. See VALIDATION.json for results.
 
 Emulator: r49 Pyrite `af102408`, stock 65C02 at 8 MHz. Exact ROM SHA-256 is in VALIDATION.json; separate ROM version not independently identified. Windows interactive launcher testing remains unverified. The engine still exceeds the 133333-cycle budget on some frames and has incomplete rules; this is not a sustained-60-FPS certification.
 

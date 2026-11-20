@@ -13,11 +13,13 @@ runtime += [f'DEPTH{i:02}.BIN' for i in range(9)]
 assert len(runtime)==30
 specnames=['ENGINE-SPEC.md','engine-contract.json','engine-contract.schema.json','reference-data.json']
 sha=lambda b:hashlib.sha256(b).hexdigest()
-source='9534fb8ed127092b0e9580ab75bfaf5d010e9b94'
-music_source='7f6edd77f3665c0f167fb983b784c242f82cce47'
-music_pinned={
- 'MUSIC0.BIN':'d73e67d4a41a3946c697171b6c77ef77e842c01ab55a9afa8fcece772b9e00b5',
- 'MUSIC1.BIN':'771273719e81d71c90271664b10f5effb5938b94ec0f719fa0c98d9be2cf224d',
+source='116ee4cc6d7b85c55313c54f404c4ce3f676c3fe'
+runtime_pinned={
+ 'CADET.PRG':'78d8896c00ad765e21a32f26defc2a0ab30603668954a313e12c327d7bee2126',
+ 'CADET.PHY':'a01cd22e5ba27deb5c94a1bfc1eed510d21ed89baffa5effa985f2ebe775ee36',
+ 'CADET.RUL':'57a362ff3722fbbbaa5898210e8d37adc77fa94fb4140ea2b6badfbfd2da3fe5',
+ 'MUSIC0.BIN':'235d0956bff4a8fbb6bc979e2663eb55f5b50b27fa8b9593faa1338f70b831ec',
+ 'MUSIC1.BIN':'dcb3b3501b76b87f2790ae79945a6641d2fc2496b81cd4e806ce38924ee3b5b4',
 }
 spec_commit='898276b21c124afddbb242fb4dba0ff933feb049'
 contract=json.loads((spec/'engine-contract.json').read_text())
@@ -42,15 +44,14 @@ pause
 exit /b 1
 '''
 manifest={'label':'1.0 Beta','packaging':'complete runtime with all 30 game files; no asset import',
-'engine_source_commit':source,'music_source_commit':music_source,'specification_commit':spec_commit,
+'engine_source_commit':source,'music_source_commit':source,'specification_commit':spec_commit,
 'reference_sha256':'7f2984ab9939b5ec8ffa828cdd2423c16c4faa3e3bf2afb3881fb47acf87b72b',
 'windows_interactive_tested':False,'archives':[]}
 for title,folder,stem in [('Space Cadet - original presentation on X16',original,'SpaceCadet-X16'),
                          ('2D Pinball - Space CmdrX16',cmdr,'SpaceCmdr2D')]:
  files={n:(folder/n).read_bytes() for n in runtime}
- for n in ['CADET.PRG','CADET.PHY','CADET.RUL','FONT.BIN']:
-  assert sha(files[n])==pinned[n],n
- for n,digest in music_pinned.items():assert sha(files[n])==digest,n
+ assert sha(files['FONT.BIN'])==pinned['FONT.BIN'],'FONT.BIN'
+ for n,digest in runtime_pinned.items():assert sha(files[n])==digest,n
  for n in ['LICENSE','ENGINE-THIRD-PARTY-LICENSE']:files[n]=(folder/n).read_bytes()
  files['RUN-WINDOWS.bat']=launcher.replace('FILES',' '.join(runtime)).replace('\n','\r\n').encode()
  files['README.txt']=f'''{title} -- 1.0 Beta
@@ -63,10 +64,10 @@ The emulator and ROM are the only external prerequisites.
 
 Use separate folders for the two editions.
 Flippers: Z and /. Plunger: hold/release Space. New game: F2.
-Music: M. Exit: Escape. This refresh raises the music level by about 6 dB.
+Music: M. Exit: Escape. This refresh puts the music ahead of sound effects
+and uses purple for live status text.
 
 Engine source commit: {source}
-Music source commit: {music_source}
 Specification commit: {spec_commit}
 Human and machine-readable engine specifications are in specs/. They document
 the reference snapshot. See the release's PACKAGE-MANIFEST.json for current

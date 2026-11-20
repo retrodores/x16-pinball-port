@@ -40,11 +40,14 @@ with (output('ui.log')).open('w')as f:
   for box in blink_boxes:
    ImageDraw.Draw(actual).rectangle(box,fill=0);ImageDraw.Draw(expected).rectangle(box,fill=0)
   assert ImageChops.difference(actual,expected).getbbox()is None,'static background differs from packed pixels'
-  flashed=False
-  for i in range(6):
+  flashed=set()
+  for i in range(12):
    time.sleep(.06);lamp=shot('lamp-'+str(i))
-   flashed|=any(ImageChops.difference(ready.crop(box),lamp.crop(box)).getbbox()is not None for box in blink_boxes)
-  assert flashed,'original new-ball gate lamps do not animate'
+   for index,box in enumerate(blink_boxes):
+    if ImageChops.difference(ready.crop(box),lamp.crop(box)).getbbox()is not None:
+     flashed.add(index)
+   if len(flashed)==len(blink_boxes):break
+  assert len(flashed)==len(blink_boxes),('new-ball gate lamps did not all animate',sorted(flashed))
   action('keydown','space');time.sleep(2);pulled=shot('pulled')
   assert ImageChops.difference(ready.crop(scaled((320,375,370,437))),pulled.crop(scaled((320,375,370,437)))).getbbox(),'plunger not animated'
   action('keyup','space');time.sleep(.8);launched=shot('launched')

@@ -1,7 +1,36 @@
 # 1.0 Beta follow-up
 
-This development work starts from `c13fbaa`. The released ZIPs and their draft
-release records still describe the shipped bytes.
+## Music-forward and purple panel refresh
+
+The music converter adds 9 dB to the previous melodic settings and retains
+the previous percussion setting. The PCM volume register is lower. PCM
+sample bytes, note timing, and audio rate are unchanged. The matched
+music-only and effects-only scenes measured a 5.60 dB music lead at 512 KB
+and a 5.63 dB lead at 2 MB.
+
+Play-state messages and the music indicator now choose a purple sprite
+palette. The score and ball counter already use purple numerals. The
+controls remain a static guide. Both editions passed extracted-runtime
+smoke tests for purple text and visible transitions in each of the four
+new-ball gate lamp regions.
+
+### Lamp and timing work still open
+
+- Audit lamp coverage and event hooks for the missing rules, including
+  mission objectives and bonus or special-mode effects.
+- Distinguish rule timing from rendering latency. The current rules share
+  a six-update blink phase. Test activation, on/off cadence and expiry per
+  lamp, then test the rendered states with simultaneous lamps and high
+  frame load. The VERA updater limits patch bytes per frame.
+- Finish the status presentation. Message size, independently timed
+  announcements, and the mission/objective panel remain open.
+- Split the worst native frame into physics, interrupt and rendering
+  contributions. The earlier narrow probe found about 184000 cycles
+  elapsed before display on frame 9424, including interrupt work.
+
+## Initial 1.0 Beta follow-up
+
+This earlier development work starts from `c13fbaa`.
 
 ## Audio and outlane validation
 
