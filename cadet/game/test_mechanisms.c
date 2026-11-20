@@ -95,7 +95,7 @@ static void captures(void){
 static void mission_rings(void){
  game_start();
  CHECK(game_ring_lamp(0)&&!game_ring_lamp(2));
- for(uint8_t i=0;i<72;++i)ring_tick();
+ for(uint8_t i=0;i<72;++i)rules_tick();
  CHECK(game_ring_lamp(18)==1&&game_ring_lamp(19)==0);
  Edge ramp={0};
  for(uint16_t i=0;i<edge_count;++i){ramp=*edge(i);if(ramp.kind==Ramp&&original_groups[ramp.group]==101&&metadata[ramp.param].action==1)break;}
@@ -104,13 +104,13 @@ static void mission_rings(void){
   hit(448);CHECK(game.mission==SelectLaunch);
   event(&ramp);CHECK(game.mission==LaunchTraining&&game.mission_left==3);
   CHECK(game_ring_lamp(0)&&game_ring_lamp(1));
-  for(uint8_t t=0;t<5;++t)ring_tick();
+  for(uint8_t t=0;t<5;++t)rules_tick();
   CHECK(game_ring_lamp(17)&&game_ring_lamp(0)&&!game_ring_lamp(1));
   for(uint8_t i=0;i<3;++i)event(&ramp);
   CHECK(game.mission==NoMission);
  }
  CHECK(game.rank==2&&game.rank_progress==0&&game.ring_flash==300);
- for(uint16_t t=0;t<300;++t)ring_tick();
+ for(uint16_t t=0;t<300;++t)rules_tick();
  CHECK(!game_ring_lamp(0)&&game_ring_lamp(19));
  game_start();hit(452);event(&ramp);
  CHECK(game.mission==Practice&&game.mission_left==8);

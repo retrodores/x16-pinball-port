@@ -278,7 +278,7 @@ int main(void){
   game_frame(buttons&DemoLeft,buttons&DemoRight,buttons&DemoLaunch,buttons&DemoNudge);
 #endif
 
-#ifdef PROFILE_DISPLAY
+#if defined(PROFILE_DISPLAY) || defined(PROFILE_ATTRACT)
   uint32_t physics_end=cycles();
 #endif
   display(cycles()-before<80000UL);++count;
@@ -294,7 +294,11 @@ int main(void){
 #ifdef PROFILE_DISPLAY
   if(elapsed>120000){echo("# COST ");hex(count);echo(" ");hex(physics_end-before);echo(" ");hex(cycles()-physics_end);echo(" ");hex(game.x);echo(" ");hex(game.y);echo(" ");hex(mask_cycles);echo(" ");hex(copy_cycles);echo(" ");hex(prefetch_cycles);echo("\n");}
 #endif
-  if(elapsed>maximum){maximum=elapsed;echo("# WORST ");hex(count);echo(" ");hex(elapsed);echo("\n");}
+  if(elapsed>maximum){maximum=elapsed;echo("# WORST ");hex(count);echo(" ");hex(elapsed);
+#ifdef PROFILE_ATTRACT
+   echo(" ");hex(physics_end-before);
+#endif
+   echo("\n");}
   if(elapsed>133333)++over;
 #ifdef GAME_TEST
 #ifndef TEST_FRAMES

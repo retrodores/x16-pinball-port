@@ -57,6 +57,8 @@ if __name__=='__main__':
         targets.append(('COVTEST' if cover else 'TEST', True))
     for name, fixture in targets:
         defs=['-DPIN_AUDIO']
+        if os.environ.get('CADET_PROFILE_ATTRACT') == '1':
+            defs += ['-DPROFILE_ATTRACT']
         if cover:
             defs+=['-DCOVER_AUDIO','-Wa,-defsym,COVER_AUDIO=1']
         if fixture:
