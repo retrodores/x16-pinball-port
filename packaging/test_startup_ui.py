@@ -6,9 +6,10 @@ import subprocess as sp
 import sys
 import time
 
-from PIL import Image, ImageChops
+from PIL import ImageChops, ImageGrab
 
-ram, stem = sys.argv[1:]
+ram, stem, *flags = sys.argv[1:]
+audio = "--audio" in flags
 player = (430, 260, 610, 306)
 message = (430, 333, 610, 430)
 table = (85, 75, 295, 360)
@@ -26,7 +27,7 @@ def lit(img, roi):
 with log.open('w') as output:
     p = sp.Popen(['/opt/x16emu-r49/x16emu', '-rom', '/opt/x16emu-r49/rom.bin',
                   '-c02', '-mhz', '8', '-ram', ram, '-echo', 'raw', '-fsroot',
-                  '.', '-prg', stem+'.PRG', '-run'],
+                  '.', '-prg', stem+'.PRG', '-run']+(['-wav','startup.wav'] if audio else []),
                  stdout=output, stderr=output, env=dict(os.environ, SDL_AUDIODRIVER='dummy'))
     try:
         deadline = time.monotonic()+30
@@ -36,10 +37,14 @@ with log.open('w') as output:
         win = sp.check_output(['xdotool','search','--onlyvisible','--name',
                                'Commander X16'],text=True).splitlines()[0]
         sp.run(['xdotool','windowfocus',win],check=True)
+        geometry=sp.check_output(['xdotool','getwindowgeometry','--shell',win],text=True)
+        bounds={k:int(v) for k,v in (line.split('=',1) for line in geometry.splitlines())
+                if k in ('X','Y','WIDTH','HEIGHT')}
+        x,y=bounds['X'],bounds['Y']
+        rectangle=(x,y,x+bounds['WIDTH'],y+bounds['HEIGHT'])
+
         def snap():
-            data = sp.check_output(['import','-window',win,'ppm:-'])
-            from io import BytesIO
-            return Image.open(BytesIO(data)).convert('RGB')
+            return ImageGrab.grab(bbox=rectangle).convert('RGB')
 
         def key(value):
             sp.run(['xdotool','key','--window',win,value],check=True)
@@ -64,9 +69,14 @@ with log.open('w') as output:
             sp.run(['xdotool',action,'--window',win,'space'],check=True)
             time.sleep(.5)
         until(lambda f: lit(f,message) and changed(f,ready,message),5)
+        if audio:
+            key('m')
+            time.sleep(.5)
         key('F2')
         until(lambda f: not lit(f,player) and not lit(f,message),5)
-        # F2 during the show advances directly to the ready prompt.
+        # Allow a few reset cues in the audio capture before testing skip.
+        if audio:
+            time.sleep(1.4)
         key('F2')
         until(lambda f: lit(f,player) and not changed(f,ready,message),5)
         key('F2')

@@ -1,0 +1,393 @@
+{
+  "engine_source_commit": "91d075fa098d1037920f27471857b20462c6724b",
+  "platform": "Linux r49 emulator, stock 65C02 at 8 MHz",
+  "windows_launcher_tested": false,
+  "fresh_zip_checks": {
+    "SpaceCadet-X16-Startup-Audio-512KB-Preview.zip": {
+      "ram_kb": 512,
+      "cold_start": true,
+      "changing_lamps": true,
+      "player_before_prompt": true,
+      "plunger_after_serve": true,
+      "f2_restart_and_skip": true,
+      "f3_enters_demo_during_show": true,
+      "exit": true,
+      "scope": "First group is cold start. Second is F2 with music muted, followed by F2 skip.",
+      "detected_cues": {
+        "cold_start": [
+          [
+            0.958,
+            "high",
+            0.974
+          ],
+          [
+            1.345,
+            "low",
+            0.986
+          ],
+          [
+            1.748,
+            "high",
+            0.973
+          ],
+          [
+            2.151,
+            "low",
+            0.987
+          ],
+          [
+            2.554,
+            "high",
+            0.976
+          ],
+          [
+            2.958,
+            "low",
+            0.986
+          ],
+          [
+            3.361,
+            "high",
+            0.975
+          ]
+        ],
+        "f2_restart_music_muted": [
+          [
+            8.384,
+            "high",
+            0.841
+          ],
+          [
+            8.77,
+            "low",
+            0.98
+          ],
+          [
+            9.174,
+            "high",
+            0.975
+          ],
+          [
+            9.61,
+            "high",
+            0.976
+          ]
+        ]
+      },
+      "timing_smoke": {
+        "frames": 537,
+        "peak_cycles": 130861,
+        "mean_cycles": 40711,
+        "over_133333": 0,
+        "missed_intervals": 0,
+        "irq_peak_cycles": 26534,
+        "music_error": 0
+      }
+    },
+    "SpaceCmdr2D-Startup-Audio-512KB-Preview.zip": {
+      "ram_kb": 512,
+      "cold_start": true,
+      "changing_lamps": true,
+      "player_before_prompt": true,
+      "plunger_after_serve": true,
+      "f2_restart_and_skip": true,
+      "f3_enters_demo_during_show": true,
+      "exit": true,
+      "scope": "First group is cold start. Second is F2 with music muted, followed by F2 skip.",
+      "detected_cues": {
+        "cold_start": [
+          [
+            0.958,
+            "high",
+            0.974
+          ],
+          [
+            1.345,
+            "low",
+            0.986
+          ],
+          [
+            1.748,
+            "high",
+            0.973
+          ],
+          [
+            2.151,
+            "low",
+            0.987
+          ],
+          [
+            2.554,
+            "high",
+            0.976
+          ],
+          [
+            2.958,
+            "low",
+            0.986
+          ],
+          [
+            3.361,
+            "high",
+            0.975
+          ]
+        ],
+        "f2_restart_music_muted": [
+          [
+            8.77,
+            "low",
+            0.931
+          ],
+          [
+            9.258,
+            "high",
+            0.975
+          ]
+        ]
+      },
+      "timing_smoke": {
+        "frames": 503,
+        "peak_cycles": 161523,
+        "mean_cycles": 40982,
+        "over_133333": 1,
+        "missed_intervals": 0,
+        "irq_peak_cycles": 26534,
+        "music_error": 0
+      }
+    },
+    "SpaceCadet-X16-Startup-Audio-2048KB-Preview.zip": {
+      "ram_kb": 2048,
+      "cold_start": true,
+      "changing_lamps": true,
+      "player_before_prompt": true,
+      "plunger_after_serve": true,
+      "f2_restart_and_skip": true,
+      "f3_enters_demo_during_show": true,
+      "exit": true,
+      "scope": "First group is cold start. Second is F2 with music muted, followed by F2 skip.",
+      "detected_cues": {
+        "cold_start": [
+          [
+            1.32,
+            "high",
+            0.736
+          ],
+          [
+            1.706,
+            "low",
+            0.682
+          ],
+          [
+            2.111,
+            "high",
+            0.833
+          ],
+          [
+            2.511,
+            "low",
+            0.813
+          ],
+          [
+            2.915,
+            "high",
+            0.849
+          ],
+          [
+            3.32,
+            "low",
+            0.699
+          ],
+          [
+            3.72,
+            "high",
+            0.768
+          ],
+          [
+            4.124,
+            "low",
+            0.818
+          ],
+          [
+            4.529,
+            "high",
+            0.854
+          ],
+          [
+            4.929,
+            "low",
+            0.862
+          ],
+          [
+            5.333,
+            "high",
+            0.623
+          ],
+          [
+            6.142,
+            "high",
+            0.797
+          ]
+        ],
+        "f2_restart_music_muted": [
+          [
+            13.446,
+            "high",
+            0.969
+          ],
+          [
+            13.832,
+            "low",
+            0.983
+          ],
+          [
+            14.237,
+            "high",
+            0.97
+          ],
+          [
+            14.636,
+            "low",
+            0.981
+          ],
+          [
+            15.041,
+            "high",
+            0.968
+          ],
+          [
+            15.445,
+            "low",
+            0.981
+          ],
+          [
+            15.85,
+            "high",
+            0.97
+          ],
+          [
+            16.25,
+            "low",
+            0.982
+          ]
+        ]
+      },
+      "timing_smoke": {
+        "frames": 1533,
+        "peak_cycles": 266103,
+        "mean_cycles": 88503,
+        "over_133333": 65,
+        "missed_intervals": 1,
+        "irq_peak_cycles": 97941,
+        "music_error": 0
+      }
+    },
+    "SpaceCmdr2D-Startup-Audio-2048KB-Preview.zip": {
+      "ram_kb": 2048,
+      "cold_start": true,
+      "changing_lamps": true,
+      "player_before_prompt": true,
+      "plunger_after_serve": true,
+      "f2_restart_and_skip": true,
+      "f3_enters_demo_during_show": true,
+      "exit": true,
+      "scope": "First group is cold start. Second is F2 with music muted, followed by F2 skip.",
+      "detected_cues": {
+        "cold_start": [
+          [
+            1.438,
+            "high",
+            0.735
+          ],
+          [
+            1.824,
+            "low",
+            0.684
+          ],
+          [
+            2.229,
+            "high",
+            0.836
+          ],
+          [
+            2.628,
+            "low",
+            0.809
+          ],
+          [
+            3.033,
+            "high",
+            0.849
+          ],
+          [
+            3.437,
+            "low",
+            0.698
+          ],
+          [
+            3.837,
+            "high",
+            0.772
+          ],
+          [
+            4.242,
+            "low",
+            0.815
+          ],
+          [
+            4.642,
+            "high",
+            0.839
+          ],
+          [
+            5.046,
+            "low",
+            0.866
+          ],
+          [
+            5.451,
+            "high",
+            0.622
+          ],
+          [
+            6.26,
+            "high",
+            0.801
+          ]
+        ],
+        "f2_restart_music_muted": [
+          [
+            8.641,
+            "high",
+            0.968
+          ],
+          [
+            9.027,
+            "low",
+            0.983
+          ],
+          [
+            9.431,
+            "high",
+            0.969
+          ],
+          [
+            9.785,
+            "high",
+            0.969
+          ]
+        ]
+      },
+      "timing_smoke": {
+        "frames": 516,
+        "peak_cycles": 238147,
+        "mean_cycles": 91662,
+        "over_133333": 24,
+        "missed_intervals": 0,
+        "irq_peak_cycles": 98031,
+        "music_error": 0
+      }
+    }
+  },
+  "cue_capture": "Matched recordings to the generated pulses. Background music can mask some cold-start pulses.",
+  "limits": "No extended timing or physical hardware validation."
+}
