@@ -1,0 +1,111 @@
+{
+  "source_commit": "77c574bffd497887cfea239167109fb3a54ebc65",
+  "emulator": "Linux r49, stock 65C02, 8 MHz",
+  "emulator_sha256": "59bc86b8d24632f602339dd722eaf77317fc4fb6b76393a479216d3efd37228e",
+  "rom_sha256": "b81654cc8c87ed96e3ffc7c8e7c312c9f3b7b870c7bb34de61e61eac931b819a",
+  "windows_launcher_tested": false,
+  "native_gameplay": {
+    "standard_512": {
+      "frames": 12000,
+      "peak_cycles": 215141,
+      "mean_cycles": 70048,
+      "over_133333": 96,
+      "missed_intervals": 0,
+      "irq_peak_cycles": 41021,
+      "music_error": 0,
+      "pcm_underruns": 0
+    },
+    "standard_2048": {
+      "frames": 12000,
+      "peak_cycles": 215217,
+      "mean_cycles": 70050,
+      "over_133333": 96,
+      "missed_intervals": 0,
+      "irq_peak_cycles": 41021,
+      "music_error": 0,
+      "pcm_underruns": 0
+    },
+    "cover_2048": {
+      "frames": 7200,
+      "peak_cycles": 373747,
+      "mean_cycles": 120737,
+      "over_133333": 1040,
+      "missed_intervals": 19,
+      "irq_peak_cycles": 103540,
+      "music_error": 0,
+      "pcm_underruns": 0,
+      "music_loops": 2,
+      "stereo_sample_triggers": 51
+    }
+  },
+  "extracted_runtime": {
+    "SpaceCadet-X16-Center-Demo-2048KB-Preview.zip": {
+      "seconds": 10.344515441959532,
+      "muted_windows": [
+        45,
+        56
+      ],
+      "peak_stereo_difference_rms": 6124.165532568421,
+      "exit_ok": true,
+      "ram_kb": 2048,
+      "test": "startup, stereo output, mute and restart, plunger and flipper inputs, exit"
+    },
+    "SpaceCadet-X16-Center-Demo-512KB-Preview.zip": {
+      "ram_kb": 512,
+      "music_restart_seconds": null,
+      "audio_rms": 2984.778874184109,
+      "peak": 11977.0,
+      "samples": 2910214,
+      "inputs_sha256": {
+        "CADET.PRG": "0ae590f65292c4206ce0e4149f0d0213e16a0d8087c7b856125e2d4590972e7c",
+        "CADET.RUL": "35da034dd455e6a92cc8600626c9e0473f4da290efd711c1213e73f092bde1f0",
+        "CADET.PHY": "c2ae016c194271d0b447995606c73122e6309d7252d5faa44dbbfcfe91f52d8a"
+      },
+      "reported_frame": 1749,
+      "worst_cycles": 163282,
+      "mean_cycles": 51207,
+      "test": "pane and number sprites, demo idle and F3, takeover, plunger, flippers, stereo recording and exit"
+    },
+    "SpaceCmdr2D-Center-Demo-2048KB-Preview.zip": {
+      "seconds": 10.801159170967477,
+      "muted_windows": [
+        45,
+        60
+      ],
+      "peak_stereo_difference_rms": 6412.97493559581,
+      "exit_ok": true,
+      "ram_kb": 2048,
+      "test": "startup, stereo output, mute and restart, plunger and flipper inputs, exit"
+    },
+    "SpaceCmdr2D-Center-Demo-512KB-Preview.zip": {
+      "ram_kb": 512,
+      "music_restart_seconds": null,
+      "audio_rms": 3017.3681703683474,
+      "peak": 12507.0,
+      "samples": 2959550,
+      "inputs_sha256": {
+        "CADET.PRG": "0ae590f65292c4206ce0e4149f0d0213e16a0d8087c7b856125e2d4590972e7c",
+        "CADET.RUL": "35da034dd455e6a92cc8600626c9e0473f4da290efd711c1213e73f092bde1f0",
+        "CADET.PHY": "c2ae016c194271d0b447995606c73122e6309d7252d5faa44dbbfcfe91f52d8a"
+      },
+      "reported_frame": 1777,
+      "worst_cycles": 163401,
+      "mean_cycles": 51754,
+      "test": "pane and number sprites, demo idle and F3, takeover, plunger, flippers, stereo recording and exit"
+    }
+  },
+  "host_attract_replay": {
+    "frames": 90000,
+    "completed_demos": 11,
+    "completed_objective_tours": 11
+  },
+  "host_mechanism_checks": 230,
+  "native_dynamic_readback_checks_per_ram_size": 24085,
+  "isolated_flipper_effect": {
+    "old_fit_gain": 35.71897811738017,
+    "new_fit_gain": 71.50920941925558,
+    "gain_change_db": 6.029259019534889,
+    "old_correlation": 0.9903304420177687,
+    "new_correlation": 0.9926320974510381
+  }
+}
