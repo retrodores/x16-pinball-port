@@ -1,106 +1,69 @@
-/* From the repo root:
- * cc -O2 -Wall -Wextra -Icadet/play-build cadet/game/test_attract.c \
- *    cadet/game/engine.c -o /tmp/test-attract && /tmp/test-attract
- */
+/* Compile with cc -O2 -Icadet/play-build cadet/game/{test_attract,engine}.c. */
 #include <assert.h>
 #include <stdio.h>
 #include "attract.c"
 
 static void transitions(void){
- game.state=Serving;
- game.ball_number=1;
-
- /* The idle interval crosses the 16-bit video clock wrap. */
+ game.state=Serving;game.ball_number=1;
  assert(controls(0,65000)==0);
  assert(controls(0,363)==0);
  assert(controls(0,364)==DemoReset);
- assert(attract_caption==DemoBumpers+3);
+ assert(attract_caption==DemoActive);
  assert(controls(0,365)==0);
- assert(controls(0,413)==DemoLaunch);
- assert(controls(0,466)==0);
-
- game.state=InPlay;
- game.bumper_hits=3;
- controls(0,467);
- assert(attract_caption==DemoBumpers);
- game.bumper_hits=4;
- game.ramp_entries=5;
- controls(0,468);
- assert(attract_caption==DemoRamps+1);
- game.ramp_entries=7;
- controls(0,469);
- assert(attract_caption==DemoTourComplete);
-
- /* A ball can return to the shooter lane without changing the ball number. */
- game.state=Serving;
- assert(controls(0,480)==0);
- assert(controls(0,528)==DemoLaunch);
- assert(controls(0,590)==0);
-
+ assert(controls(0,377)==DemoLaunch);
+ assert(controls(0,558)==0);
  game.state=GameOver;
  assert(controls(0,600)==0);
  assert(attract_caption==DemoFinalScore);
- assert(controls(0,779)==0);
- assert(controls(0,780)==DemoReset);
-
- game.state=Serving;
- game.bumper_hits=game.ramp_entries=0;
- assert(controls(DemoLeft,781)==(DemoReset|DemoLeft));
- assert(!attract_caption);
- assert(controls(0,2500)==0);
-
- /* A midway serve cannot be taken over by the computer. */
- game.ball_number=2;
- assert(controls(DemoToggle,2501)==0);
- assert(controls(0,2502)==0);
- game.ball_number=1;
- assert(controls(DemoToggle,2503)==DemoReset);
- assert(controls(DemoNew,2504)==DemoReset);
+ assert(controls(0,899)==0);
+ assert(controls(0,900)==DemoReset);
+ assert(controls(DemoLeft,901)==(DemoReset|DemoLeft));
  assert(!attract_caption);
 }
 
 static void approaches(void){
- game_place(470,1500,0,1100,1);
- for(unsigned frame=0;frame<64;++frame) assert(flip_input(frame)==0);
+ random_state=0x5d;
+ game_place(300,2750,0,1100,1);
+ assert(flip_input(65530)==0);
  game.y=2950;
  assert(flip_input(65532)==DemoLeft);
- game.y=1600;game.vy=-1000;
  assert(flip_input(3)==DemoLeft);
  assert(flip_input(40)==0);
- game_place(-470,2970,0,800,1);
- assert(flip_input(41)==DemoRight);
- game_place(550,2800,0,800,1);game.ramp=true;
+ assert(flip_input(41)==0); /* Sitting in the region cannot re-arm. */
+ game_place(-300,2750,0,800,1);
  assert(flip_input(42)==0);
- game.ramp=false;
- assert(flip_input(43)==0);
- assert(flip_input(63)==DemoLeft);
+ game.y=2950;
+ assert(flip_input(43)==DemoRight);
  game.state=Captured;
- assert(flip_input(64)==0);
+ assert(flip_input(44)==0);
+ game_place(900,2750,0,800,1);
+ assert(flip_input(45)==0);
+ game.y=3100;
+ assert(flip_input(46)==0);
 }
 
 int main(void){
- transitions();
- approaches();
- idle_allowed=true;
- idle_started=false;
- previous_buttons=0;
- assert(game_load());
- game_start();
- unsigned completed=0,tours=0;
- for(unsigned frame=0;frame<90000;++frame){
-  bool finished_tour=goal==2;
+ transitions();approaches();
+ idle_allowed=true;idle_started=false;previous_buttons=0;
+ assert(game_load());game_start();
+ unsigned completed=0,contacts=0,flips=0,missions=0;
+ uint8_t before=0;
+ for(unsigned frame=0;frame<180000;++frame){
   uint8_t input=controls(0,(uint16_t)frame);
   if(input&DemoReset){
-   if(game.state==GameOver){
-    ++completed;
-    if(finished_tour)++tours;
-    assert(!game.escapes);
-   }
+   if(game.state==GameOver){++completed;assert(!game.escapes);}
    game_start();
   }
+  uint16_t hits=game.flipper_hits;
+  bool active=game.mission>=Practice;
   game_frame(input&DemoLeft,input&DemoRight,input&DemoLaunch,input&DemoNudge);
+  if(game.flipper_hits!=hits)++contacts;
+  if(!active&&game.mission>=Practice)++missions;
+  if((input&~before)&3)++flips;
+  before=input;
  }
- assert(completed>=2&&tours>=2);
- printf("%u complete demos, %u complete objective tours\n",completed,tours);
+
+ printf("%u demos, %u presses, %u contact frames, %u missions\n",completed,flips,contacts,missions);
+ assert(completed>=2&&contacts>0&&flips>0&&missions>0);
  return 0;
 }

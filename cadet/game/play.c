@@ -176,12 +176,8 @@ static void display(bool update_panel){
   }
 #ifndef GAME_TEST
   else if(attract_caption){
-   if(attract_caption<DemoRamps)
-    status("Demo\n# bumper hits\nF2 to play",'0'+attract_caption);
-   else if(attract_caption<DemoTourComplete)
-    status("Demo\n# ramps\nF2 to play",'0'+attract_caption-DemoRamps+1);
-   else status(attract_caption==DemoFinalScore?
-    "Demo\nFinal score\nF2 to play":"Demo\nTour complete\nF2 to play",0);
+   status(attract_caption==DemoFinalScore?
+    "Demo\nFinal score\nF2 to play":"Demo\nHit mission\ntargets",0);
   }
 #endif
   else status(labels[game.state],0);
