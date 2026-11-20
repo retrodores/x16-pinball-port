@@ -60,8 +60,8 @@ static __attribute__((section(".physics"),noinline)) void upload_message_font(vo
     addr(MESSAGE_FONT_BASE);
     for(uint8_t glyph=0;glyph<MESSAGE_GLYPH_COUNT;++glyph){
         for(uint8_t y=0;y<16;++y){
-            uint8_t dots=(y<14 && !(y&1)) ? message_glyphs[glyph][y/2] : 0;
-            /* Five columns over eight pixels, with dark rows between dots. */
+            uint8_t dots=y<14 ? message_glyphs[glyph][y/2] : 0;
+            /* Five columns over eight pixels. Tall dots hold up at cabinet scale. */
             v[3]=(dots&16)?FONT_PEN<<4:0;
             v[3]=((dots&8)?FONT_PEN<<4:0)|((dots&4)?FONT_PEN:0);
             v[3]=(dots&2)?FONT_PEN:0;
