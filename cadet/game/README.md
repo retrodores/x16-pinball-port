@@ -25,3 +25,14 @@ at BA00 in bank 11, beyond the UI and projection data. Both ranges fit the
 
 Flag boost, Time Warp, skill-shot rules, the drain blocker and two independent
 status queues remain open. See the preview validation for the frame budget.
+
+
+### Table controls
+
+Up Arrow nudges the table. Three distinct presses within three seconds
+trigger tilt, with a half-second pause between accepted nudges. The upper
+X flashes, scoring is suspended, and the flippers are inactive until the
+next ball. The first three drop targets award a four-second spinner boost
+that triples the normal spin award. The upper window reports these events
+and wormhole captures. The lower window continues to show an active mission
+even while the ball is held.

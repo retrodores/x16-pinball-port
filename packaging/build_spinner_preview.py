@@ -28,6 +28,12 @@ def build(previous, runtime, output, source, revision=1):
         updated = [f'{program}.{ext}' for ext in ('PRG', 'PHY', 'RUL', 'MEC')]
         updated += [f'{stem}{i}.BIN' for stem, count in (('DYN', 4), ('GEOM', 3)) for i in range(count)]
         updated += ['RINGS.BIN', 'RINGS2.BIN']
+        if revision == 3:
+            replacement = (runtime / 'UI.BIN').read_bytes()
+            assert len(files['UI.BIN']) == len(replacement)
+            assert files['UI.BIN'][:0x500] == replacement[:0x500]
+            assert files['UI.BIN'][0x800:] == replacement[0x800:]
+            updated.append('UI.BIN')
         for name in updated:
             data = (runtime / name).read_bytes()
             if name in ('DYN0.BIN', 'DYN1.BIN'):
@@ -51,6 +57,9 @@ def build(previous, runtime, output, source, revision=1):
         readme = readme.replace(baseline['engine_source_commit'], source).rstrip()
         readme += ('\n\nBoth flag spinners react to a passing ball. The red X flashes during the opening.\n'
                    'The larger Time Warp mission is still pending.\n')
+        if revision == 3:
+            readme += ('\nUse Up Arrow to nudge. Three close nudges trigger tilt. Clear the first three drop targets for a four-second spinner boost.\n'
+                       'The upper status panel reports tilt, boost, and wormhole visits.\n')
         files['README.txt'] = readme.encode('ascii')
         path = output / original.replace('Quick-Reset', name_part)
         with zipfile.ZipFile(path, 'w') as archive:
@@ -75,6 +84,6 @@ if __name__ == '__main__':
     for name in ('previous', 'runtime', 'output'):
         parser.add_argument(name, type=Path)
     parser.add_argument('source')
-    parser.add_argument('--revision', type=int, choices=(1, 2), default=1)
+    parser.add_argument('--revision', type=int, choices=(1, 2, 3), default=1)
     args = parser.parse_args()
     build(args.previous, args.runtime, args.output, args.source, args.revision)

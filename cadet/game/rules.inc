@@ -29,7 +29,7 @@ static RULE_FN void rule_rebounder(uint8_t group){rules.rebounder_fire[group-GRO
 static MECHANIC_FN void rule_spin_step(FlagSpinner*s){
  s->pose=(s->pose+(s->reverse?7:1))&7;
  ++game.spinner_epoch;
- if(!s->pose)rules_destination(false);
+ if(!s->pose&&!game.tilted)rules_destination(false);
 }
 static MECHANIC_FN void spinner_sound(uint8_t side){
  game.last_group=side?GROUP_489:GROUP_481;
@@ -42,7 +42,7 @@ static MECHANIC_FN void rule_spin_start(uint8_t side,uint8_t reverse){
  FlagSpinner*s=&rules.spinner[side];
  s->reverse=reverse;
  rule_spin_step(s);
- add_score(500);
+ add_score(game.spinner_boost?1500:500);
  spinner_sound(side);
  /* 60*256/(20*0.65) is about 1182. Speed is in table units/second. */
  s->interval=s->remaining=speed?1182u/speed:0;
@@ -56,7 +56,7 @@ static MECHANIC_FN void rule_spin_tick(void){
   while(s->remaining<=time){
    time-=s->remaining;
    rule_spin_step(s);
-   award+=500;
+   award+=game.spinner_boost?1500:500;
    /* Slow by 0.65 per step. Stop below five steps per second. */
    s->interval=(s->interval*20u+6)/13u;
    if(s->interval>3072){s->interval=0;break;}
@@ -71,6 +71,8 @@ static MECHANIC_FN void rule_spin_tick(void){
  }
 }
 static RULE_FN void rule_tick(void){
+ if(game.spinner_boost&&!--game.spinner_boost&&game.upper_notice==BoostNotice)
+  game.upper_notice=NoNotice;
  if(++rules.blink_clock==6){rules.blink_clock=0;rules.blink^=1;if(rules.lane_flash[0]||rules.lane_flash[1]||rules.hazard_clear[0]||rules.hazard_clear[1]||rules.wormhole_timer||rules.destination_flash||rules.gravity||rules.gate_flash[0]||rules.gate_flash[1]||rules.gate_alert[0]||rules.gate_alert[1])++game.visual_epoch;for(uint8_t i=0;i<6;++i)if(rules.hazard_flash[i]){++game.visual_epoch;break;}}
  for(uint8_t i=0;i<4;++i)if(rules.rebounder_fire[i]){rules.rebounder_fire[i]-=2;if(!rules.rebounder_fire[i])++game.visual_epoch;}
  for(uint8_t i=0;i<7;++i)if(rules.bumper_fire[i]){rules.bumper_fire[i]-=2;if(!rules.bumper_fire[i])++game.visual_epoch;}
@@ -108,7 +110,7 @@ static RULE_FN void rule_destination(bool force){
  if(force||rules.wormhole_dest){rules.wormhole_dest=rules.wormhole_dest==3?1:rules.wormhole_dest+1;rules.destination_flash=force?360:rules.destination_flash;}
 }
 static RULE_FN void rule_award_large(uint32_t n){
- if(game.overflow)return;
+ if(game.overflow||game.tilted)return;
  /* Preflight the entire award before committing any 50000-point chunks.
   * Overflow must preserve both the binary score and its decimal digits. */
  uint32_t carry=n;
@@ -127,7 +129,7 @@ static RULE_FN void rule_capture(const Edge*e){
    else add_score(2500);
    static const uint8_t group[3] RULE_DATA={GROUP_338,GROUP_340,GROUP_342};
    static const uint8_t param[3] RULE_DATA={META_338,META_340,META_342};
-   rules.exit_group=group[exit];game.param=param[exit];rules.wormhole_exit=exit;rules.wormhole_timer=game.wait;
+   rules.exit_group=group[exit];game.param=param[exit];rules.wormhole_exit=exit;rules.wormhole_timer=game.wait;game.upper_notice=WormholeNotice;
   }
  }else if(e->kind==Kickout){
   const Meta*m=&metadata[e->param];game.x=m->x;game.y=m->y;game.z=m->az;
@@ -143,7 +145,7 @@ static RULE_FN void rule_capture(const Edge*e){
  rule_sound(SoundCapture,e->group,e->kind);
 }
 static RULE_FN void rule_release(void){
- const Meta*m=&metadata[game.param];game.state=InPlay;game.ramp=false;game.remx=game.remy=game.accx=game.accy=0;
+ const Meta*m=&metadata[game.param];game.state=InPlay;game.upper_notice=game.spinner_boost?BoostNotice:NoNotice;game.ramp=false;game.remx=game.remy=game.accx=game.accy=0;
  if(game.captured==Hole){game.mask=m->mask;game.z=m->az;game.vx=0;game.vy=256;}
  else{game.x=m->x;game.y=m->y;game.vx=m->vx;game.vy=m->vy;game.mask=game.captured==Kickout?rules.original_mask:1;game.z=game.captured==Kickout?rules.original_z:77;}
  /* The unadjusted upper exit bounces straight back into the same sink.

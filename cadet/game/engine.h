@@ -6,6 +6,7 @@ enum Kind {Wall,Bumper,Plunger,Drain,Ramp,Target,Drop,Sensor,Spinner,Gate,Kickba
 enum SoundEvent {SoundCapture=7,SoundRelease,SoundKickback,SoundGateOpen,SoundGateClose,SoundLane,SoundUpgrade,SoundHazard,SoundWormholeAdvance,SoundFeed,SoundStartup};
 enum Mission {NoMission, SelectPractice, SelectLaunch, Practice, LaunchTraining};
 enum { StartupFrames=360, StartupReadyFrames=60, OpeningCrossLamp=179 };
+enum UpperNotice {NoNotice, WormholeNotice, BoostNotice};
 enum State {Ready,Serving,InPlay,Captured,Between,GameOver};
 typedef struct {int16_t x,y;} Vec;
 typedef struct {int16_t x,y,ex,ey,nx,ny,r,xlo,ylo,xhi,yhi;uint8_t group,smooth,kind,mask,elastic,boost,param,flags;int16_t threshold;} Edge;
@@ -15,6 +16,8 @@ typedef struct {
  uint8_t mask,phase[2],charge,balls,state,last_sound,flash[160],score[16],digits[40];
  uint16_t disabled[160];uint8_t lamps[160];uint8_t captured,param,flags,multiplier,nudges;bool ramp,overflow,score_dirty;
  uint8_t mission,mission_left,rank,rank_progress,ring_phase,ring_clock;
+ uint8_t tilted,nudge_down,spinner_boost,upper_notice;
+ uint16_t nudge_start;
  uint16_t ring_flash;
  uint16_t bumper_hits,flipper_hits,target_hits,returns,drains,guard_hits,escapes;
  uint8_t last_group,last_kind,charge_clock,ball_number,sound_value,visual_epoch,spinner_epoch,flipper_keys;uint16_t last_edge,events,ramp_entries,layer_changes;

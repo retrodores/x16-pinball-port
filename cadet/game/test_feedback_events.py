@@ -13,23 +13,25 @@ assert '# FEEDBACK PASS' in result,result
 print(result.strip(),flush=True)
 sources=['wireframe/widemul.s','wireframe/sqrt.s','wireframe/narrowmul_shared.s','cadet/game/signedmul.s',
          'cadet/game/fraction.s','cadet/game/ratio.s','cadet/game/bounds.s','cadet/game/test_feedback_events.c']
-build_native('FEEDBACK-EVENTS',sources)
-for ram in ('512','2048'):
-    log=OUT/f'feedback-{ram}.log'
-    with log.open('w') as output:
-        process=sp.Popen(['/opt/x16emu-r49/x16emu','-c02','-rom','/opt/x16emu-r49/rom.bin',
-          '-ram',ram,'-mhz','8','-warp','-echo','raw','-fsroot',str(OUT),
-          '-prg',str(OUT/'FEEDBACK-EVENTS.PRG'),'-run'],stdout=output,stderr=output,
-          env=dict(os.environ,SDL_VIDEODRIVER='dummy',SDL_AUDIODRIVER='dummy'))
-        try:
-            deadline=time.monotonic()+120
-            while '# DONE' not in log.read_text(errors='replace'):
-                assert process.poll() is None and time.monotonic()<deadline,'native fixture timeout'
-                time.sleep(.1)
-        finally:
-            process.terminate()
-            try: process.wait(timeout=5)
-            except sp.TimeoutExpired: process.kill();process.wait()
-    result=log.read_text(errors='replace')
-    assert '# FEEDBACK PASS' in result,result
-    print('Slingshot and input event contracts PASS',ram,re.search(r'# FEEDBACK .*',result).group(),flush=True)
+for part in ('INPUT','SPIN','TILT'):
+    name=f'FEEDBACK-{part}'
+    build_native(name,sources,[f'-DFEEDBACK_{part}'])
+    for ram in ('512','2048'):
+        log=OUT/f'feedback-{part.lower()}-{ram}.log'
+        with log.open('w') as output:
+            process=sp.Popen(['/opt/x16emu-r49/x16emu','-c02','-rom','/opt/x16emu-r49/rom.bin',
+              '-ram',ram,'-mhz','8','-warp','-echo','raw','-fsroot',str(OUT),
+              '-prg',str(OUT/f'{name}.PRG'),'-run'],stdout=output,stderr=output,
+              env=dict(os.environ,SDL_VIDEODRIVER='dummy',SDL_AUDIODRIVER='dummy'))
+            try:
+                deadline=time.monotonic()+120
+                while '# DONE' not in log.read_text(errors='replace'):
+                    assert process.poll() is None and time.monotonic()<deadline,'native fixture timeout'
+                    time.sleep(.1)
+            finally:
+                process.terminate()
+                try: process.wait(timeout=5)
+                except sp.TimeoutExpired: process.kill();process.wait()
+        result=log.read_text(errors='replace')
+        assert '# FEEDBACK PASS' in result,result
+        print('Feedback contracts PASS',part,ram,re.search(r'# FEEDBACK .*',result).group(),flush=True)

@@ -36,7 +36,17 @@ h=['#include <stdint.h>','typedef struct {uint8_t bank;uint16_t ptr,length;} Eff
  '#define PCM_PARTS '+str(len(segments)),
  'static const uint8_t pcm_load_banks[]={'+','.join(str(x[2])for x in segments)+'};',
  '#define PCM_BYTES '+str(len(data))+'UL']
-for key,values in mappings.items():h.append('static const uint8_t '+key+'_sound[]={'+','.join(map(str,values))+'};')
+# Reserve a page below the projection table for the contact lookups.
+sound_tables=bytearray()
+h.append('#if defined(__CX16__) && defined(PIN_AUDIO)')
+for key,values in mappings.items():
+ address=0xa500+len(sound_tables)
+ h.append(f'#define {key}_sound (*(const uint8_t (*)[{len(values)}]){address:#x}u)')
+ sound_tables.extend(values)
+h.append('#else')
+for key,values in mappings.items():
+ h.append('static const uint8_t '+key+'_sound[]={'+','.join(map(str,values))+'};')
+h.append('#endif')
 for name,idx in indices.items():
  h.append('#define '+name.replace('.WAV','')+' '+str(idx))
  h.append('#define '+name.replace('.WAV','')+'_TICKS '+str(durations[name]))
@@ -75,7 +85,11 @@ with (o/'ui.h').open('a') as f:
 print('PCM resident',sum(x[2]for x in effects),'font end',hex(base+len(data)),'ball depths',depths)
 
 (o/'projection.h').write_text('#define projection_scale ((const uint16_t*)0xa800)\n')
-ui=bytearray((o/'UI-SPR.BIN').read_bytes());ui.extend(bytes(2048-len(ui)));ui.extend(struct.pack('<1024H',*[round(400*4096/(2048+i*8))for i in range(1024)]));(o/'UI.BIN').write_bytes(ui)
+ui=bytearray((o/'UI-SPR.BIN').read_bytes())
+assert len(ui)<=0x500 and len(sound_tables)<=0x300
+ui.extend(bytes(0x500-len(ui)))
+ui.extend(sound_tables)
+ui.extend(bytes(2048-len(ui)));ui.extend(struct.pack('<1024H',*[round(400*4096/(2048+i*8))for i in range(1024)]));(o/'UI.BIN').write_bytes(ui)
 
 # Initial-state awards, extracted by tag from the recovered original rule table.
 s=(r/'direct/vendor/SpaceCadetPinball/control.cpp').read_text()

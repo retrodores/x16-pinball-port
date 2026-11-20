@@ -103,7 +103,10 @@ void audio_effect(uint8_t id){
   pcm_select_bank=19;pcm_select_ptr=0xa000;
   pcm_start(55539);return;
  }
+ uint8_t saved=*(volatile uint8_t*)0;
+ *(volatile uint8_t*)0=11;__asm__ volatile("":::"memory");
  uint16_t e=audio_event_sample(id,game.last_group,game.last_kind,game.sound_value);
+ __asm__ volatile("":::"memory");*(volatile uint8_t*)0=saved;
  uint8_t voice=id<=1?1:(id==3||id==4||id==16)?2:0;
  effect((uint8_t)e,(uint8_t)(e>>8),voice);
 }
@@ -142,13 +145,14 @@ static void ball(uint8_t f,int16_t x,int16_t y,uint32_t distance_squared){
 }
 static __attribute__((section(".rules"),noinline)) void update_status_banked(void){
  uint8_t panel_state=game.state;
+ uint8_t upper=game.tilted?4:1+game.upper_notice;
 #if !defined(GAME_TEST)||defined(ATTRACT_TEST)
  if(attract_caption)panel_state=5+attract_caption;
 #endif
- if(game.state==Ready&&game.wait>StartupReadyFrames)panel_state=126;
- if(game.state==InPlay&&game.mission)panel_state=128+9*game.mission+game.mission_left;
+ if(game.state==Ready&&game.wait>StartupReadyFrames){panel_state=126;upper=0;}
+ if((game.state==InPlay||game.state==Captured)&&game.mission)panel_state=128+9*game.mission+game.mission_left;
  if(wide_score)panel_state=254;
- if(previous_state!=panel_state){
+ if(previous_state!=panel_state||upper_status!=upper){
   static const char*const labels[]={
    "",
    "Ready to\nlaunch",
@@ -157,22 +161,22 @@ static __attribute__((section(".rules"),noinline)) void update_status_banked(voi
    "Next ball",
    "Game over\nF2 for\nnew game",
   };
-  if(wide_score)status("Long score\nView exact\nscore log",0);
+  if(wide_score)status("Long score\nView exact\nscore log",0,upper);
   else if(panel_state>=128){
    switch(game.mission){
-    case SelectPractice:status("Launch ramp\nTo accept\nTarget practice",0);break;
-    case SelectLaunch:status("Launch ramp\nTo accept\nLaunch training",0);break;
-    case Practice:status("Attack\nbumpers\nHits left: #",'0'+game.mission_left);break;
-    case LaunchTraining:status("Launches left:\n#",'0'+game.mission_left);break;
+    case SelectPractice:status("Launch ramp\nTo accept\nTarget practice",0,upper);break;
+    case SelectLaunch:status("Launch ramp\nTo accept\nLaunch training",0,upper);break;
+    case Practice:status("Attack\nbumpers\nLeft: #",'0'+game.mission_left,upper);break;
+    case LaunchTraining:status("Launch ramp\nLeft: #",'0'+game.mission_left,upper);break;
    }
   }
 #if !defined(GAME_TEST)||defined(ATTRACT_TEST)
   else if(attract_caption){
    status(attract_caption==DemoFinalScore?
-    "Demo\nFinal score\nF2 to play":"Demo\nHit mission\ntargets",0);
+    "Demo\nFinal score\nF2 to play":"Demo\nHit mission\ntargets",0,upper);
   }
 #endif
-  else status(labels[game.state],0);
+  else status(labels[game.state],0,upper);
   previous_state=panel_state;
  }
 }
@@ -211,7 +215,7 @@ static void display(bool update_panel){
  dynamic_update(update_panel?(game.state==Ready?240:128):0);
  if(update_panel)message_step();
 }
-static __attribute__((section(".physics"),noinline)) void compact_footer(void){
+static __attribute__((section(".mechanics"),noinline)) void compact_footer(void){
  /* The supported maps use private tiles in this part of row 25. The
   * shared blank tiles already have zero in the rows we erase. */
  for(uint8_t col=24;col<37;++col){
@@ -258,9 +262,8 @@ int main(void){
  *(volatile uint8_t*)0=11;if(!load("UI.BIN",0,0xa000))goto fail;
  for(uint8_t i=0;i<128;++i)hide(i);
  for(uint8_t i=0;i<9;++i)score_cache[i]=254;
- *(volatile uint8_t*)0=62;
+ *(volatile uint8_t*)0=10;
  __asm__ volatile("":::"memory");
- init_messages();
  compact_footer();
  __asm__ volatile("":::"memory");
  *(volatile uint8_t*)0=11;

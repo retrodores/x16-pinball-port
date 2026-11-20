@@ -21,7 +21,9 @@ static uint8_t font_cache[96] __attribute__((section(".physics.fontcache")));
 static const uint8_t font_colors[16] = MSG_COLOR_TABLE;
 static uint8_t font_head,font_tail,player_head,player_tail,font_slot,font_digit;
 static uint16_t font_x,font_y;
-static const char *font_pending;
+static const char *font_pending,*lower_pending;
+static uint8_t lower_digit, upper_status=255;
+static bool font_upper;
 
 static void font_bank(uint8_t b){
  __asm__ volatile("":::"memory");
@@ -79,11 +81,16 @@ static FONT_CODE void message_banked(void){
  uint8_t pixels[110];
  for(uint8_t i=0;i<4;++i){
   uint8_t c=*font_pending++;
-  if(!c||font_slot>=MESSAGE_LAST_SPRITE||font_y>MESSAGE_TOP+2u*MSG_HEIGHT){
+  if(!c||font_slot>=(font_upper?MESSAGE_FIRST_SPRITE:MESSAGE_LAST_SPRITE)||font_y>MESSAGE_TOP+2u*MSG_HEIGHT){
    font_pending=0;break;
   }
   if(c=='\n'){font_x=MESSAGE_LEFT;font_y+=MSG_HEIGHT;continue;}
-  if(c=='#')c=font_digit;
+  if(c=='#'&&font_digit>='0'&&font_digit<='9'){
+   if(font_x+16<=MESSAGE_RIGHT)
+    tile(font_slot++,SCORE_DIGIT_BASE+(font_digit-'0')*8u,font_x,font_y,SCORE_DIGIT_ATTR);
+   font_x+=16+MSG_GAP;
+   continue;
+  }
   if(c<32||c>=128)c=' ';
   uint8_t code=c-32;
   uint8_t slot=font_cache[code];
@@ -100,43 +107,45 @@ static FONT_CODE void message_banked(void){
  }
 }
 
-static void message_step(void){
- if(!font_pending)return;
- uint8_t saved=*(volatile uint8_t*)0;
- font_bank(62);
- message_banked();
- font_bank(saved);
-}
-
-static FONT_CODE void init_messages(void){
- for(uint8_t i=0;i<96;++i)font_cache[i]=255;
- font_slot=PLAYER_FIRST_SPRITE;
- font_head=0;font_tail=FONT_HEAD_CELLS;
- font_x=MESSAGE_LEFT;font_y=244;
- font_pending="Player 1";
- while(font_pending)message_banked();
- player_head=font_head;player_tail=font_tail;
- font_slot=MESSAGE_FIRST_SPRITE;
-}
-
-static FONT_CODE void status_banked(const char *s,uint8_t digit){
- uint8_t visible=game.state==Ready&&game.wait>StartupReadyFrames?0:12;
- for(uint8_t i=PLAYER_FIRST_SPRITE;i<PLAYER_FIRST_SPRITE+7;++i){
-  addr(0x1fc06UL+(uint16_t)i*8);v[3]=visible;
- }
+static __attribute__((noinline)) void begin_lower(void){
  while(font_slot>MESSAGE_FIRST_SPRITE)hide(--font_slot);
  for(uint8_t i=0;i<96;++i){
   uint8_t slot=font_cache[i];
   if((slot>=player_head&&slot<FONT_HEAD_CELLS)||slot>=player_tail)font_cache[i]=255;
  }
  font_head=player_head;font_tail=player_tail;
- font_x=MESSAGE_LEFT;font_y=MESSAGE_TOP;font_digit=digit;font_pending=s;
+ font_slot=MESSAGE_FIRST_SPRITE;
+ font_x=MESSAGE_LEFT;font_y=MESSAGE_TOP;font_digit=lower_digit;font_pending=lower_pending;
 }
 
-static __attribute__((noinline)) void status(const char *s,uint8_t digit){
+static void message_step(void){
+ if(!font_pending)return;
  uint8_t saved=*(volatile uint8_t*)0;
  font_bank(62);
- status_banked(s,digit);
+ message_banked();
+ if(!font_pending&&font_upper){
+  font_upper=false;
+  player_head=font_head;player_tail=font_tail;
+  begin_lower();
+ }
+ font_bank(saved);
+}
+
+static __attribute__((noinline)) void status(const char *s,uint8_t digit,uint8_t upper){
+ uint8_t saved=*(volatile uint8_t*)0;
+ font_bank(62);
+ lower_pending=s;lower_digit=digit;
+ if(upper!=upper_status){
+  static const char*const labels[]={"","Player 1","Wormhole","Boost","Tilt"};
+  upper_status=upper;
+  while(font_slot>MESSAGE_FIRST_SPRITE)hide(--font_slot);
+  for(uint8_t i=PLAYER_FIRST_SPRITE;i<MESSAGE_FIRST_SPRITE;++i)hide(i);
+  for(uint8_t i=0;i<96;++i)font_cache[i]=255;
+  font_head=0;font_tail=FONT_HEAD_CELLS;
+  font_slot=PLAYER_FIRST_SPRITE;
+  font_x=MESSAGE_LEFT;font_y=244; font_pending=labels[upper];
+  font_upper=true;
+ }else if(!font_upper)begin_lower();
  font_bank(saved);
 }
 

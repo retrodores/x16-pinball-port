@@ -12,6 +12,7 @@ ram, stem, *flags = sys.argv[1:]
 audio = "--audio" in flags
 show_frames = "--show-frames" in flags
 red_cross = "--red-cross" in flags
+tilt = "--tilt" in flags
 player = (430, 260, 610, 306)
 message = (430, 333, 610, 430)
 table = (85, 75, 295, 360)
@@ -103,6 +104,15 @@ with log.open('w') as output:
             sp.run(['xdotool',action,'--window',win,'space'],check=True)
             time.sleep(.5)
         until(lambda f: lit(f,message) and changed(f,ready,message),5)
+        if tilt:
+            for step in range(3):
+                if step:
+                    time.sleep(1.18)
+                sp.run(['xdotool','keydown','--window',win,'Up'],check=True)
+                time.sleep(.13)
+                sp.run(['xdotool','keyup','--window',win,'Up'],check=True)
+            tilted = until(lambda f: cross_visible(f) and changed(f,ready,player), 3)
+            tilted.save('tilt.png')
         if audio:
             key('m')
             time.sleep(.5)
@@ -144,4 +154,4 @@ print(json.dumps({'ram_kb':int(ram),'cold_start':True,'changing_lamps':True,'f2_
                   'f2_audio_file_size_at_keydown':f2_audio_bytes,
                   'red_cross_on_start_and_f2':red_cross, 'red_cross_over_upper_insert':red_cross,
                   'player_before_prompt':True,'plunger_after_serve':True,'f2_restart_and_skip':True,
-                  'f3_enters_demo_during_show':True,'exit':True}))
+                  'f3_enters_demo_during_show':True,'tilt_input_and_flash':tilt,'exit':True}))

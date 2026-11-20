@@ -10,7 +10,7 @@
 #endif
 static uint16_t tip_remaining;
 static TIP_FN bool paddle_static_tip_core(uint8_t side,uint8_t old,int16_t sx,int16_t sy){
- if(game.state!=InPlay||game.mask!=1||game.phase[side]!=old)return false;
+ if(game.state!=InPlay||game.mask!=1||game.tilted||game.phase[side]!=old)return false;
  const Vec*t=&tips[side][old];const uint16_t radius=126,r2=15876;
  int16_t ex=game.x,ey=game.y;
  if((sx<t->x-(int16_t)radius&&ex<t->x-(int16_t)radius)||(sx>t->x+(int16_t)radius&&ex>t->x+(int16_t)radius)||

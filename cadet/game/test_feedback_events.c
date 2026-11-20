@@ -136,4 +136,72 @@ static void opening_cross(void){
  CHECK(transitions>=4);
  CHECK(game.state==Serving&&!game_lamp(OpeningCrossLamp));
 }
-int main(void){if(!game_load()){puts("# LOAD FAIL\n# DONE");return 1;}slingshots();input_events();spinners();opening_cross();printf("# FEEDBACK %s %u %u\n",failures?"FAIL":"PASS",checks,failures);puts("# DONE");return failures!=0;}
+static void tilt_and_notices(void){
+ game_start();
+ game_place(0,300,0,0,1);
+ game_frame(false,false,false,true);
+ CHECK(game.nudges==1&&!game.tilted);
+ game.ignore=0;
+ game_frame(false,false,false,true);
+ CHECK(game.nudges==1&&!game.tilted);
+ game_frame(false,false,false,false);
+ game_frame(false,false,false,true);
+ CHECK(game.nudges==2&&!game.tilted);
+ game.ignore=0;
+ game_frame(false,false,false,false);
+ game_frame(true,true,false,true);
+ CHECK(game.tilted&&!game.phase[0]&&!game.phase[1]);
+ add_score(500);
+ CHECK(score()==0);
+ bool lit=false,dark=false;
+ for(uint8_t i=0;i<16;++i){
+  rules_tick();
+  if(game_lamp(OpeningCrossLamp))lit=true;else dark=true;
+ }
+ CHECK(lit&&dark);
+ rules.replay=1;
+ drain();
+ CHECK(game.state==Between&&game.balls==2);
+ serve();
+ CHECK(!game.tilted&&!game_lamp(OpeningCrossLamp));
+
+ game_place(0,300,0,0,1);
+ game_frame(false,false,false,true);
+ game_frame(false,false,false,false);
+ game.ignore=0;
+ game.tick+=362;
+ game_frame(false,false,false,true);
+ CHECK(game.nudges==1&&!game.tilted);
+
+ game_start();
+ game_place(0,300,0,256,1);
+ for(uint8_t i=GROUP_432;i<=GROUP_434;++i){
+  Edge target={0};target.group=i;target.kind=Drop;
+  event(&target);
+ }
+ CHECK(game.upper_notice==BoostNotice&&game.spinner_boost==240);
+ Edge spinner={0};spinner.group=GROUP_489;spinner.kind=Spinner;
+ uint32_t before=score();
+ event(&spinner);
+ for(uint8_t i=0;i<48;++i)rules_tick();
+ CHECK(score()==before+6000);
+ game.mission=Practice;game.mission_left=3;
+ Edge sink={0};sink.group=GROUP_338;sink.kind=Sink;sink.param=META_338;
+ event(&sink);
+ CHECK(game.upper_notice==WormholeNotice&&game.state==Captured&&game.mission_left==3);
+ rules_release();
+ CHECK(game.upper_notice==BoostNotice&&game.mission_left==3);
+ for(uint8_t i=0;i<192;++i)rules_tick();
+ CHECK(!game.spinner_boost&&game.upper_notice==NoNotice);
+}
+int main(void){if(!game_load()){puts("# LOAD FAIL\n# DONE");return 1;}
+#if !defined(__CX16__) || defined(FEEDBACK_INPUT)
+ slingshots();input_events();
+#endif
+#if !defined(__CX16__) || defined(FEEDBACK_SPIN)
+ spinners();opening_cross();
+#endif
+#if !defined(__CX16__) || defined(FEEDBACK_TILT)
+ tilt_and_notices();
+#endif
+ printf("# FEEDBACK %s %u %u\n",failures?"FAIL":"PASS",checks,failures);puts("# DONE");return failures!=0;}

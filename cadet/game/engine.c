@@ -137,7 +137,7 @@ void sound(uint8_t id){game.last_sound=id;
  if(id==255)audio_stop();else audio_effect(id);
 #endif
 }
-void add_score(uint16_t n){if(game.overflow)return;game.score_dirty=true;uint16_t carry=n;for(uint8_t i=0;i<16&&carry;++i){uint16_t sum=game.score[i]+(carry&255);carry=(carry>>8)+(sum>>8);}if(carry){game.overflow=true;return;}carry=n;for(uint8_t i=0;i<16&&carry;++i){uint16_t sum=game.score[i]+(carry&255);game.score[i]=sum;carry=(carry>>8)+(sum>>8);}if(carry){game.overflow=true;return;}carry=n;uint8_t digit=0;
+void add_score(uint16_t n){if(game.overflow||game.tilted)return;game.score_dirty=true;uint16_t carry=n;for(uint8_t i=0;i<16&&carry;++i){uint16_t sum=game.score[i]+(carry&255);carry=(carry>>8)+(sum>>8);}if(carry){game.overflow=true;return;}carry=n;for(uint8_t i=0;i<16&&carry;++i){uint16_t sum=game.score[i]+(carry&255);game.score[i]=sum;carry=(carry>>8)+(sum>>8);}if(carry){game.overflow=true;return;}carry=n;uint8_t digit=0;
  /* Known table awards have trailing zeros. Skip them without division; the
     generic path still accepts every uint16_t value and all 128 score bits. */
  switch(n){case 500:carry=5;digit=2;break;case 750:carry=75;digit=1;break;
@@ -186,13 +186,13 @@ static RULE_FN uint8_t startup_lamp(uint8_t group){
  if(game.wait<=StartupReadyFrames)return 0;
  return ((group^(group>>3)^game.ring_phase)&3u)<2;
 }
-BANK_TRAMPOLINE uint8_t game_lamp(uint16_t n){RULE_ENTER;uint8_t r=n==OpeningCrossLamp?(game.state==Ready&&rules.cross_hold!=0):
+BANK_TRAMPOLINE uint8_t game_lamp(uint16_t n){RULE_ENTER;uint8_t r=n==OpeningCrossLamp?(game.state==Ready?rules.cross_hold!=0:game.tilted&&rules.blink):
   game.state==Ready?startup_lamp((uint8_t)n):rule_lamp(n);RULE_LEAVE;return r;}
 BANK_TRAMPOLINE uint8_t game_pose(uint16_t n){RULE_ENTER;uint8_t r=rule_pose(n);RULE_LEAVE;return r;}
 /* Rank steps persist across balls. The first-rank practice and launch
  * missions use the original target selection, counts and rank award. */
 static BANK_TRAMPOLINE void mission_advance(void){
- if(--game.mission_left)return;
+ if(game.tilted||--game.mission_left)return;
  game.mission=NoMission;
  game.rank_progress+=6;
  if(game.rank_progress>=18){
@@ -218,6 +218,7 @@ __attribute__((noinline)) uint8_t game_ring_lamp(uint8_t index){
  return index<game.rank_progress;
 }
 static void mission_ramp(void){
+ if(game.tilted)return;
  if(game.mission==LaunchTraining){mission_advance();return;}
  if(game.mission==SelectPractice||game.mission==SelectLaunch){
   bool practice=game.mission==SelectPractice;
@@ -253,7 +254,7 @@ static MECHANIC_FN void ring_tick(void){
   ++game.visual_epoch;
  }
 }
-static void serve(){sound(255);rules.gate[0]=rules.gate[1]=1;rules.gate_flash[0]=rules.gate_flash[1]=600;++game.visual_epoch;game.ball_number=4-game.balls;game.state=Serving;game.x=serve_x;game.y=plunger_y-2;game.z=77;game.vx=game.vy=game.remx=game.remy=game.accx=game.accy=0;game.mask=1;game.ramp=false;game.charge=0;game.charge_clock=0;game.flags=0;game.nudges=0;game.last_group=GROUP_473;game.last_kind=Plunger;sound(SoundFeed);}
+static void serve(){sound(255);rules.gate[0]=rules.gate[1]=1;rules.gate_flash[0]=rules.gate_flash[1]=600;++game.visual_epoch;game.ball_number=4-game.balls;game.state=Serving;game.x=serve_x;game.y=plunger_y-2;game.z=77;game.vx=game.vy=game.remx=game.remy=game.accx=game.accy=0;game.mask=1;game.ramp=false;game.charge=0;game.charge_clock=0;game.flags=0;game.nudges=0;game.tilted=0;game.nudge_down=0;game.upper_notice=NoNotice;game.spinner_boost=0;game.last_group=GROUP_473;game.last_kind=Plunger;sound(SoundFeed);}
 static RULE_FN void reset_game(void){
  uint8_t epoch=game.visual_epoch, spinner_epoch=game.spinner_epoch;
  active_count=0;memset(active_flags,0,sizeof active_flags);
@@ -266,7 +267,7 @@ BANK_TRAMPOLINE void game_begin(bool show){
  RULE_ENTER;reset_game();rules.opening_random=seed?seed:1;RULE_LEAVE;
  if(show){game.wait=StartupFrames;sound(255);++game.visual_epoch;}else serve();
 }
-static void drain(){if(game.state!=InPlay)return;game.state=Between;game.mission=NoMission;game.mission_left=0;game.wait=120;game.vx=game.vy=0;game.mask=0;game.ramp=false;++game.drains;if(rules.replay)rules.replay=0;else if(game.balls)--game.balls;rules_reset();memset(game.lamps,0,sizeof game.lamps);memset(game.disabled,0,sizeof game.disabled);sound(5);}
+static void drain(){if(game.state!=InPlay)return;game.state=Between;game.mission=NoMission;game.mission_left=0;game.wait=120;game.vx=game.vy=0;game.mask=0;game.ramp=false;++game.drains;if(rules.replay&&!game.tilted)rules.replay=0;else if(game.balls)--game.balls;rules_reset();memset(game.lamps,0,sizeof game.lamps);memset(game.disabled,0,sizeof game.disabled);sound(5);}
 #ifdef __CX16__
 __attribute__((section(".physics"),noinline))
 #endif
@@ -468,12 +469,18 @@ static bool event_core(const Edge*e){
  }
  if(e->kind==Drain){drain();return false;}
  if(e->kind==Sink||e->kind==Kickout||e->kind==Hole){rules_capture(e);return false;}
- if(e->kind==Drop){game.disabled[c]=1200;if(fresh){++game.target_hits;add_score(initial_award[c]);sound(2);game.lamps[c]=1;}}
+ if(e->kind==Drop){game.disabled[c]=1200;if(fresh){++game.target_hits;add_score(initial_award[c]);sound(2);game.lamps[c]=1;
+  if(original>=432&&original<=434&&!game.tilted&&game.lamps[GROUP_432]&&game.lamps[GROUP_433]&&game.lamps[GROUP_434]){
+   game.lamps[GROUP_432]=game.lamps[GROUP_433]=game.lamps[GROUP_434]=0;
+   game.spinner_boost=240;
+   game.upper_notice=BoostNotice;
+  }
+ }}
  else if(e->kind==Target&&fresh){++game.target_hits;add_score(initial_award[c]);
   if(original>=454&&original<=464)rules_hazard(original);
   else{
    sound(2);if(original==466)rules_destination(true);
-   if(game.rank==1&&game.mission<Practice){
+   if(!game.tilted&&game.rank==1&&game.mission<Practice){
     if(original==452)game.mission=SelectPractice;
     if(original==448)game.mission=SelectLaunch;
     if(original==450)game.mission=NoMission;
@@ -481,7 +488,7 @@ static bool event_core(const Edge*e){
   }
  }
  else if(e->kind==Kickback){uint8_t s=c==GROUP_507;if(!rules.kick_phase[s]){rules.kick_phase[s]=1;rules.kick_timer[s]=84;}}
- else if(e->kind==Plunger){game.state=Serving;game.vx=game.vy=0;if(!(game.flags&1)){game.charge=0;game.charge_clock=0;}return true;}
+ else if(e->kind==Plunger){if(game.tilted){drain();return false;}game.state=Serving;game.vx=game.vy=0;if(!(game.flags&1)){game.charge=0;game.charge_clock=0;}return true;}
  else if(e->kind!=Bumper&&fresh&&!(c>=GROUP_469&&c<=GROUP_472)){sound(6);}
  return true;
 }
@@ -524,7 +531,7 @@ static void move_time(int16_t dx,int16_t dy,uint8_t steps,uint16_t remaining){ra
 }
 static void move(int16_t dx,int16_t dy,uint8_t steps){move_time(dx,dy,steps,256);}
 static RULE_FN void paddle_core(uint8_t side,uint8_t old){
- if(game.mask!=1||game.state!=InPlay)return;const Vec*p=&pivots[side];const Vec*t=&tips[side][game.phase[side]];
+ if(game.mask!=1||game.state!=InPlay||game.tilted)return;const Vec*p=&pivots[side];const Vec*t=&tips[side][game.phase[side]];
 #ifndef PIN_REFERENCE
  // Reject outside the actual capsule before the closest-point division.
  // 158 is conservative: the maximum physical collision radius is 156 Q8.
@@ -600,6 +607,15 @@ static bool plunger_input(bool pull){
 __attribute__((noinline)) static void tick(bool left,bool right,bool pull,bool nudge){
  rules_tick();if(game.state==Ready){if(!game.wait)serve();return;}
  game.tick+=2;for(uint8_t k=0;k<active_count;){uint8_t i=active[k];if(game.flash[i])game.flash[i]=game.flash[i]>2?game.flash[i]-2:0;if(game.disabled[i])game.disabled[i]=game.disabled[i]>2?game.disabled[i]-2:0;if(!game.flash[i]&&!game.disabled[i]){active_flags[i]=0;active[k]=active[--active_count];}else ++k;}if(game.ignore)game.ignore=game.ignore>2?game.ignore-2:0;
+ bool push=nudge&&!game.nudge_down;
+ game.nudge_down=nudge;
+ if(push&&game.state==InPlay&&!game.ignore&&!game.tilted){
+  if((uint16_t)(game.tick-game.nudge_start)>360)game.nudges=0;
+  if(!game.nudges)game.nudge_start=game.tick;
+  if(++game.nudges>=3){game.tilted=1;game.spinner_boost=0;}
+  else{game.vx+=(game.nudges&1)?-768:768;game.vy-=1536;game.ignore=60;}
+ }
+ if(game.tilted)left=right=false;
  bool keys[2]={left,right};uint8_t old[2],pressed=(left?1:0)|(right?2:0);
  for(uint8_t i=0;i<2;++i){old[i]=game.phase[i];uint8_t key=1u<<i;
   if((pressed^game.flipper_keys)&key){if(pressed&key){rules_shift(i);sound(0);}else sound(1);}
@@ -612,7 +628,6 @@ __attribute__((noinline)) static void tick(bool left,bool right,bool pull,bool n
  if(game.state==Captured){if(game.wait){game.wait=game.wait>2?game.wait-2:0;}if(!game.wait)rules_release();return;}
 
  if(game.state!=InPlay)return;
- if(nudge&&!game.ignore){game.vx+=(game.nudges&1)?768:-768;game.vy-=1536;game.ignore=60;++game.nudges;}
  bool well=well_force();if(game.state!=InPlay)return;
  int16_t fx=well?game.fx:game.ramp?metadata[game.param].fx:0,fy=well?game.fy:game.ramp?metadata[game.param].fy:3068;
  game.accx+=fx;game.accy+=fy;int16_t dvx=div60(game.accx),dvy=div60(game.accy);game.vx+=dvx-div300(game.vx);game.vy+=dvy-div300(game.vy);game.accx-=dvx*60;game.accy-=dvy*60;limit();

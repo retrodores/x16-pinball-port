@@ -40,7 +40,7 @@ static void cross_update(void){
  dv[3]=on?12:0;
 }
 bool dynamic_update(uint8_t budget){
- if(game.state==Ready||cross_shown)cross_update();
+ if(game.state==Ready||game.tilted||cross_shown)cross_update();
  uint8_t saved=*(volatile uint8_t*)0;
  if(fast_epoch!=game.visual_epoch){bool changed=fast_update();bank(saved);if(changed)return true;}
  if(!budget)return false;
