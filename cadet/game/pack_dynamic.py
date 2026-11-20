@@ -185,22 +185,21 @@ for gid,lamp in [(469,180),(470,181)]:
  fast_descs.append((gid,63,0xa000+offset%8192,2));blob.extend(raw)
  fast_records.append({'group':gid,'lamp_group':lamp,'offset':offset,'length':len(raw),'maps':meta,'rest':list(rest_data),'fire':list(fire_data)})
  report.append({'group':gid,'kind':2,'source_groups':[lamp,gid],'pixels':len(px),'bytes':len(rest_data),'tiles':len(meta),'poses':2})
-# The insert shares two tiles with the fast slingshot graphics. Use a
-# transparent sprite so neither writer can erase the other. The installation
-# supplied to the converter has a blue insert; the enhanced reference uses
-# red. Preserve the mask and model its red luminance ramp in the local palette.
-cross, cross_meta = bitmap(254)
+# The insert shares two slingshot tiles. Draw an independent red X at
+# the catalog placement. The local bitmap is a blue arrow, so recoloring
+# it would leave an arrow where the enhanced recording shows an X.
+_, cross_meta = bitmap(254)
 cross_dist = ((colors - np.array((187,0,0)))**2).sum(axis=2)
 cross_pen = int(cross_dist.argmin())
-cross_palette = cross_pen // 16
-assert cross_pen % 16
+cross_palette, cross_core = divmod(cross_pen,16)
+assert cross_core
 ramp = colors[cross_palette]
-target = np.zeros((256,3),dtype=np.int32)
-target[:,0] = np.clip((source_brightness+2)//5,51,255)
-distance = ((ramp[None,:,:]-target[:,None,:])**2).sum(axis=2)
-distance[:,0] = 10**9
+cross_edge = 1 + int(((ramp[1:] - np.array((119,17,17)))**2).sum(axis=1).argmin())
 cross_pixels = np.zeros((16,16),dtype=np.uint8)
-cross_pixels[:cross.shape[0],:cross.shape[1]] = np.where(cross!=0,distance.argmin(axis=1)[cross],0)
+y,x = np.mgrid[0:9,0:9]
+distance = np.minimum(np.abs(x-y), np.abs(x+y-8))
+cross_pixels[2:11,3:12] = np.where(distance<=1,cross_core,
+                                          np.where(distance==2,cross_edge,0))
 cross_data = ((cross_pixels[:,::2]<<4)|cross_pixels[:,1::2]).tobytes()
 cross_ptr = 0xa000+len(blob)%8192
 assert len(blob)//8192==3
