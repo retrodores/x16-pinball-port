@@ -146,19 +146,19 @@ static void display(bool update_panel){
  if(wide_score)panel_state=254;
  if(update_panel&&previous_state!=panel_state){
   static const char*const labels[]={
-   "Ready\nF2 for new game",
+   "Ready\nF2 for\nnew game",
    "Hold Space\nRelease to\nlaunch",
    "In play",
    "Ball held\nReturn soon",
    "Next ball",
-   "Game over\nF2 for new game",
+   "Game over\nF2 for\nnew game",
   };
   if(wide_score)status("Long score\nView exact\nscore log",0);
   else if(panel_state>=128){
    switch(game.mission){
     case SelectPractice:status("Launch ramp\nTo accept\nTarget practice",0);break;
     case SelectLaunch:status("Launch ramp\nTo accept\nLaunch training",0);break;
-    case Practice:status("Attack bumpers\nHits left: #",'0'+game.mission_left);break;
+    case Practice:status("Attack\nbumpers\nHits left: #",'0'+game.mission_left);break;
     case LaunchTraining:status("Launches left:\n#",'0'+game.mission_left);break;
    }
   }
