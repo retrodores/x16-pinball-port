@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Package complete runtimes. No first-run import or patching.
-Usage: python3 packaging/build_runtime.py ORIGINAL_DIR CMDR_2D_DIR SPEC_DIR OUT_DIR [--attract-preview]
+Usage: python3 packaging/build_runtime.py ORIGINAL_DIR CMDR_2D_DIR SPEC_DIR OUT_DIR [--attract-preview | --message-preview]
 Inputs must be prepared, tested runtime directories; only allowlisted files ship.
 """
 from pathlib import Path
@@ -8,7 +8,9 @@ import argparse,json,hashlib,zipfile
 parser=argparse.ArgumentParser(description=__doc__)
 for name in ('original','cmdr','spec','out'):
  parser.add_argument(name,type=Path)
-parser.add_argument('--attract-preview',action='store_true')
+mode=parser.add_mutually_exclusive_group()
+mode.add_argument('--attract-preview',action='store_true')
+mode.add_argument('--message-preview',action='store_true')
 args=parser.parse_args()
 original,cmdr,spec,out=args.original,args.cmdr,args.spec,args.out
 out.mkdir(parents=True,exist_ok=True)
@@ -46,6 +48,21 @@ if args.attract_preview:
   'MUSIC0.BIN':'d73e67d4a41a3946c697171b6c77ef77e842c01ab55a9afa8fcece772b9e00b5',
   'MUSIC1.BIN':'771273719e81d71c90271664b10f5effb5938b94ec0f719fa0c98d9be2cf224d',
  }
+if args.message_preview:
+ label='Attract Preview 2'
+ archive_label='Attract-Preview-2'
+ source='25fb5f99aaaf50d459555cec07555d59cfd232a7'
+ notes=('Music: M. Exit: Escape. Press F3 or idle for about 15 seconds for the demo.\n'
+        'F2 starts a fresh game. A play control also takes over from the demo.\n'
+        'This build restores the music-forward mix and adds large purple messages.\n'
+        'See the release validation report for timing measurements.')
+ runtime_pinned={
+  'CADET.PRG':'02ce0d607f43a682420843f77d6607f22a6f993c551a1fe5268d5e5cae4ca00f',
+  'CADET.PHY':'c973ecafcef07e4c9547259d69135d7b8f83d15f4c63fa210620063637af9586',
+  'CADET.RUL':'8c5dc5e09647cf9b22f03e5562f0a4f03ef315c6dfc635e189769f25719c30ae',
+  'MUSIC0.BIN':'235d0956bff4a8fbb6bc979e2663eb55f5b50b27fa8b9593faa1338f70b831ec',
+  'MUSIC1.BIN':'dcb3b3501b76b87f2790ae79945a6641d2fc2496b81cd4e806ce38924ee3b5b4',
+ }
 spec_commit='898276b21c124afddbb242fb4dba0ff933feb049'
 contract=json.loads((spec/'engine-contract.json').read_text())
 pinned={Path(x['path']).name:x['sha256'] for x in contract['runtime_files']}
@@ -69,7 +86,7 @@ pause
 exit /b 1
 '''
 manifest={'label':label,'packaging':'complete runtime with all 30 game files; no asset import',
-'engine_source_commit':source,'music_source_commit':source,'specification_commit':spec_commit,
+'engine_source_commit':source,'music_source_commit':('317af0be667eadd846b5cd9adc213f3e49714bb9' if args.message_preview else source),'specification_commit':spec_commit,
 'reference_sha256':'7f2984ab9939b5ec8ffa828cdd2423c16c4faa3e3bf2afb3881fb47acf87b72b',
 'windows_interactive_tested':False,'archives':[]}
 for title,folder,stem in [('Space Cadet - original presentation on X16',original,'SpaceCadet-X16'),

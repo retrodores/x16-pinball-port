@@ -1,0 +1,189 @@
+{
+  "engine_source_commit": "25fb5f99aaaf50d459555cec07555d59cfd232a7",
+  "music_source_commit": "317af0be667eadd846b5cd9adc213f3e49714bb9",
+  "message_source_commit": "c94bd6a6001a8fe48bad113d73c375284e782663",
+  "specification_commit": "898276b21c124afddbb242fb4dba0ff933feb049",
+  "emulator": "r49 Pyrite af102408",
+  "rom_sha256": "b81654cc8c87ed96e3ffc7c8e7c312c9f3b7b870c7bb34de61e61eac931b819a",
+  "platform": "Linux Xvfb; stock 65C02 8 MHz",
+  "windows_launcher_executed": false,
+  "frame_cycle_budget": 133333,
+  "checks": [
+    "30 runtime files, Windows launcher, licenses, specifications, ZIP CRC and per-file hashes",
+    "Large purple three-line launch text, cleared lines in play, visible controls guide",
+    "F3 and idle attract entry, score and objective progression, F2 and flipper takeover",
+    "Gate lamp changes, plunger and flipper animation, and in-game music toggle and restart",
+    "Matched music and effects scenes with music leading by at least 3 dB",
+    "Native PRG and distinct overlay bytes checked against the ELF sections",
+    "Full soundtrack loop with concurrent sound effects at both RAM sizes"
+  ],
+  "archive_ui_tests": {
+    "SpaceCadet-X16": {
+      "retry_note": "An initial concurrent UI run reached the idle-demo wall-clock timeout. The same archive was freshly extracted and rerun.",
+      "512": {
+        "ram_kb": 512,
+        "music_restart_seconds": 1.7253327672369778,
+        "audio_rms": 2980.5625525255227,
+        "peak": 13654.0,
+        "samples": 2700300,
+        "inputs_sha256": {
+          "CADET.PRG": "02ce0d607f43a682420843f77d6607f22a6f993c551a1fe5268d5e5cae4ca00f",
+          "CADET.RUL": "8c5dc5e09647cf9b22f03e5562f0a4f03ef315c6dfc635e189769f25719c30ae",
+          "CADET.PHY": "c973ecafcef07e4c9547259d69135d7b8f83d15f4c63fa210620063637af9586"
+        },
+        "reported_frame": 1629,
+        "worst_cycles": 172420,
+        "mean_cycles": 51668
+      },
+      "2048": {
+        "ram_kb": 2048,
+        "music_restart_seconds": 2.527697955723852,
+        "audio_rms": 2960.7440164510176,
+        "peak": 12544.0,
+        "samples": 2752582,
+        "inputs_sha256": {
+          "CADET.PRG": "02ce0d607f43a682420843f77d6607f22a6f993c551a1fe5268d5e5cae4ca00f",
+          "CADET.RUL": "8c5dc5e09647cf9b22f03e5562f0a4f03ef315c6dfc635e189769f25719c30ae",
+          "CADET.PHY": "c973ecafcef07e4c9547259d69135d7b8f83d15f4c63fa210620063637af9586"
+        },
+        "reported_frame": 1659,
+        "worst_cycles": 172372,
+        "mean_cycles": 51816
+      }
+    },
+    "SpaceCmdr2D": {
+      "512": {
+        "ram_kb": 512,
+        "music_restart_seconds": 2.0082822497934103,
+        "audio_rms": 2980.9214769917476,
+        "peak": 12528.0,
+        "samples": 2727936,
+        "inputs_sha256": {
+          "CADET.PRG": "02ce0d607f43a682420843f77d6607f22a6f993c551a1fe5268d5e5cae4ca00f",
+          "CADET.RUL": "8c5dc5e09647cf9b22f03e5562f0a4f03ef315c6dfc635e189769f25719c30ae",
+          "CADET.PHY": "c973ecafcef07e4c9547259d69135d7b8f83d15f4c63fa210620063637af9586"
+        },
+        "reported_frame": 1644,
+        "worst_cycles": 175785,
+        "mean_cycles": 51926
+      },
+      "2048": {
+        "ram_kb": 2048,
+        "music_restart_seconds": 1.7809556247666478,
+        "audio_rms": 2973.2583639580407,
+        "peak": 12788.0,
+        "samples": 2728264,
+        "inputs_sha256": {
+          "CADET.PRG": "02ce0d607f43a682420843f77d6607f22a6f993c551a1fe5268d5e5cae4ca00f",
+          "CADET.RUL": "8c5dc5e09647cf9b22f03e5562f0a4f03ef315c6dfc635e189769f25719c30ae",
+          "CADET.PHY": "c973ecafcef07e4c9547259d69135d7b8f83d15f4c63fa210620063637af9586"
+        },
+        "reported_frame": 1645,
+        "worst_cycles": 175771,
+        "mean_cycles": 51816
+      }
+    }
+  },
+  "audio_fixture": {
+    "512": {
+      "exact_bytes": 19369,
+      "mix_cycles_256_max_by_voice_count": [
+        15594,
+        26112,
+        38638
+      ],
+      "isolated_release_correlation": 0.9973560119252993,
+      "mixed_waveform_correlation": 0.9869571529543906,
+      "mixed_voice_gains": [
+        39.43633708095518,
+        39.430344756724715,
+        39.86390782282411
+      ],
+      "flipper_onset_latency_ms": 23.315138296568115,
+      "tight_cues": 128,
+      "first_prime_period_ms": 23.14245924469567,
+      "tight_steady_period_range_ms": [
+        16.711722782010323,
+        16.814123044154993
+      ],
+      "wormhole_lead_correlation": 0.984669341494996,
+      "music_only_rms": 2267.965941852404,
+      "music_window_rms": 2583.601237856471,
+      "effects_window_rms": 1359.3191448695898,
+      "music_over_effects_db": 5.578081006705615,
+      "music_and_effects_peak": 11597,
+      "music_off_rms": 14.371430804254752,
+      "music_loop_count": 1,
+      "fm_writes": 47594,
+      "psg_writes": 42256,
+      "underruns": 0,
+      "mixed_irq_max_cycles": 46150
+    },
+    "2048": {
+      "exact_bytes": 19369,
+      "mix_cycles_256_max_by_voice_count": [
+        15594,
+        26112,
+        38620
+      ],
+      "isolated_release_correlation": 0.9973561945065257,
+      "mixed_waveform_correlation": 0.9869571529543906,
+      "mixed_voice_gains": [
+        39.43633708095518,
+        39.430344756724715,
+        39.86390782282411
+      ],
+      "flipper_onset_latency_ms": 23.335618348997055,
+      "tight_cues": 128,
+      "first_prime_period_ms": 23.14245924469567,
+      "tight_steady_period_range_ms": [
+        16.711722782010323,
+        16.814123044154993
+      ],
+      "wormhole_lead_correlation": 0.984669341494996,
+      "music_only_rms": 2272.3176690343134,
+      "music_window_rms": 2588.558599660949,
+      "effects_window_rms": 1359.3094675346817,
+      "music_over_effects_db": 5.5947931842685215,
+      "music_and_effects_peak": 11679,
+      "music_off_rms": 14.267614777469307,
+      "music_loop_count": 1,
+      "fm_writes": 47594,
+      "psg_writes": 42256,
+      "underruns": 0,
+      "mixed_irq_max_cycles": 46150
+    }
+  },
+  "native_timing": {
+    "512": {
+      "frames": 12000,
+      "max_cycles": 212978,
+      "mean_cycles": 68889,
+      "over_budget": 71,
+      "missed_frame_starts": 0,
+      "irq_max": 41590,
+      "music_errors": 0,
+      "ram": 512,
+      "mhz": 8,
+      "expected_frames": 12000,
+      "program": "TEST.PRG",
+      "pcm_underruns": 0,
+      "budget_pass": false
+    },
+    "2048": {
+      "frames": 12000,
+      "max_cycles": 213072,
+      "mean_cycles": 68890,
+      "over_budget": 70,
+      "missed_frame_starts": 0,
+      "irq_max": 41590,
+      "music_errors": 0,
+      "ram": 2048,
+      "mhz": 8,
+      "expected_frames": 12000,
+      "program": "TEST.PRG",
+      "pcm_underruns": 0,
+      "budget_pass": false
+    }
+  }
+}
