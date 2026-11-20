@@ -59,8 +59,28 @@ static void transitions(void){
  assert(!attract_caption);
 }
 
+static void approaches(void){
+ game_place(470,1500,0,1100,1);
+ for(unsigned frame=0;frame<64;++frame) assert(flip_input(frame)==0);
+ game.y=2950;
+ assert(flip_input(65532)==DemoLeft);
+ game.y=1600;game.vy=-1000;
+ assert(flip_input(3)==DemoLeft);
+ assert(flip_input(40)==0);
+ game_place(-470,2970,0,800,1);
+ assert(flip_input(41)==DemoRight);
+ game_place(550,2800,0,800,1);game.ramp=true;
+ assert(flip_input(42)==0);
+ game.ramp=false;
+ assert(flip_input(43)==0);
+ assert(flip_input(63)==DemoLeft);
+ game.state=Captured;
+ assert(flip_input(64)==0);
+}
+
 int main(void){
  transitions();
+ approaches();
  idle_allowed=true;
  idle_started=false;
  previous_buttons=0;

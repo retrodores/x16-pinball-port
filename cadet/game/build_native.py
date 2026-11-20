@@ -25,7 +25,7 @@ def build_native(name,sources,defines=()):
     linker = '-L' + str(ROOT/'cadet/game/linker')
     sdk = '@' + str(Path(CC).parent/'mos-cx16.cfg')
     config.write_text(shlex.join((linker, sdk)) + '\n', encoding='utf-8')
-    args=[CC,'--no-default-config','--config='+str(config),'-Os','-Icadet/play-build',
+    args=[CC,'--no-default-config','--config='+str(config),'-Oz','-Icadet/play-build',
           '-DRULES_FILE="'+name+'.RUL"','-DPHYSICS_FILE="'+name+'.PHY"',*defines,*sources,
           # Both banked code sections intentionally share A000 VMA. Region sizes
           # and main-stack assertions remain enforced by the linker.

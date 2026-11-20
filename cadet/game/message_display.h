@@ -31,16 +31,7 @@ static const uint8_t message_glyphs[][7] __attribute__((section(".physics.rodata
     {17,17,10,4,10,17,17},
     {17,17,10,4,4,4,4},
     {31,1,2,4,8,16,31}, /* Z */
-    {14,17,19,21,25,17,14}, /* 0 */
-    {4,12,4,4,4,4,14},
-    {14,17,1,6,8,16,31},
-    {30,1,1,14,1,1,30},
-    {2,6,10,18,31,2,2},
-    {31,16,30,1,1,17,14},
-    {6,8,16,30,17,17,14},
-    {31,1,2,4,8,8,8},
-    {14,17,17,14,17,17,14},
-    {14,17,17,15,1,2,12},
+
 };
 
 /* Lowercase glyphs reuse the former legend font's VRAM. */
@@ -74,7 +65,7 @@ static const uint8_t message_lowercase[][7] __attribute__((section(".physics.rod
 };
 
 #define MESSAGE_COLUMNS 15u
-#define MESSAGE_ROWS 4u
+#define MESSAGE_ROWS 3u
 #define PLAYER_COLUMNS 8u
 #define PLAYER_FIRST_SPRITE 33u
 #define MESSAGE_FIRST_SPRITE (PLAYER_FIRST_SPRITE + PLAYER_COLUMNS)
@@ -99,7 +90,7 @@ static __attribute__((section(".physics"),noinline)) void upload_glyphs(uint32_t
             uint8_t shadow=(stroke>>1)|previous;
             previous=stroke;
             uint8_t pair=0;
-            uint8_t highlights=y&1 ? 0x55 : 0xaa;
+            uint8_t highlights=(y&3)==1 ? 0x22 : (y&3)==3 ? 0x88 : 0;
             for(uint8_t bit=0x80;bit;bit>>=1){
                 uint8_t color=0;
                 if(stroke&bit)color=highlights&bit ? FONT_STATUS_HIGHLIGHT : FONT_STATUS_PEN;
@@ -114,8 +105,18 @@ static __attribute__((section(".physics"),noinline)) void upload_glyphs(uint32_t
 static __attribute__((section(".physics"),noinline)) uint16_t message_pattern(uint8_t c){
     if(c>='a'&&c<='z')return FONT_BASE/32+2u*(c-'a');
     if(c>='A'&&c<='Z')return MESSAGE_FONT_BASE/32+2u*(c-'A');
-    if(c>='0'&&c<='9')return MESSAGE_FONT_BASE/32+2u*(26+c-'0');
     return 0;
+}
+
+/* Digits in both panes share the score/BALL sprite bytes, size and palette. */
+static __attribute__((section(".physics"),noinline)) void message_tile(uint8_t slot,uint8_t c,uint16_t x,uint16_t y){
+    if(c>='0'&&c<='9'){
+        tile(slot,SCORE_DIGIT_BASE+8u*(c-'0'),x,y,SCORE_DIGIT_ATTR);
+        return;
+    }
+    uint16_t pattern=message_pattern(c);
+    if(pattern)tile(slot,pattern,x,y+3,0x40|FONT_STATUS_BANK);
+    else hide(slot);
 }
 
 static __attribute__((section(".physics"),noinline)) void init_messages(void){
@@ -123,8 +124,7 @@ static __attribute__((section(".physics"),noinline)) void init_messages(void){
     upload_glyphs(MESSAGE_FONT_BASE,message_glyphs,sizeof(message_glyphs)/7);
     const char player[]="Player 1";
     for(uint8_t i=0;i<PLAYER_COLUMNS;++i){
-        uint16_t pattern=message_pattern(player[i]);
-        if(pattern)tile(PLAYER_FIRST_SPRITE+i,pattern,405u+11u*i,244,0x40|FONT_STATUS_BANK);
+        message_tile(PLAYER_FIRST_SPRITE+i,player[i],405u+11u*i,244);
     }
 }
 
@@ -132,16 +132,19 @@ static __attribute__((section(".physics"),noinline)) void init_messages(void){
 static void draw_message(const char *message,uint8_t digit,uint8_t *cache){
     uint8_t slot=0;
     uint16_t y=306;
-    for(uint8_t row=0;row<MESSAGE_ROWS;++row,y+=18){
-        uint16_t x=405;
-        for(uint8_t column=0;column<MESSAGE_COLUMNS;++column,++slot,x+=11){
+    for(uint8_t row=0;row<MESSAGE_ROWS;++row,y+=23){
+        uint16_t x=405;bool reflow=false;
+        for(uint8_t column=0;column<MESSAGE_COLUMNS;++column,++slot){
             uint8_t c=*message&&*message!='\n' ? *message++ : ' ';
             if(c=='#')c=digit;
-            if(cache[slot]==c)continue;
-            cache[slot]=c;
-            uint16_t pattern=message_pattern(c);
-            if(pattern)tile(MESSAGE_FIRST_SPRITE+slot,pattern,x,y,0x40|FONT_STATUS_BANK);
-            else hide(MESSAGE_FIRST_SPRITE+slot);
+            uint8_t width=c>='0'&&c<='9'?15:11;
+            if(reflow||cache[slot]!=c){
+                reflow|=width!=(cache[slot]>='0'&&cache[slot]<='9'?15:11);
+                cache[slot]=c;
+                if(x+(width==15?15:8)<=570)message_tile(MESSAGE_FIRST_SPRITE+slot,c,x,y);
+                else hide(MESSAGE_FIRST_SPRITE+slot);
+            }
+            x+=width;
         }
         while(*message&&*message!='\n')++message;
         if(*message)++message;

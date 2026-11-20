@@ -154,6 +154,7 @@ static void display(bool update_panel){
 #ifndef GAME_TEST
  if(attract_caption)panel_state=5+attract_caption;
 #endif
+ if(game.state==InPlay&&game.mission)panel_state=128+9*game.mission+game.mission_left;
  if(wide_score)panel_state=254;
  if(update_panel&&previous_state!=panel_state){
   static const char*const labels[]={
@@ -165,6 +166,14 @@ static void display(bool update_panel){
    "Game over\nF2 for new game",
   };
   if(wide_score)status("Long score\nView exact\nscore log",0);
+  else if(panel_state>=128){
+   switch(game.mission){
+    case SelectPractice:status("Launch ramp\nTo accept\nTarget practice",0);break;
+    case SelectLaunch:status("Launch ramp\nTo accept\nLaunch training",0);break;
+    case Practice:status("Attack bumpers\nHits left: #",'0'+game.mission_left);break;
+    case LaunchTraining:status("Launches left:\n#",'0'+game.mission_left);break;
+   }
+  }
 #ifndef GAME_TEST
   else if(attract_caption){
    if(attract_caption<DemoRamps)
@@ -220,6 +229,7 @@ int main(void){
 #endif
  for(uint8_t i=0;i<PCM_PARTS;++i){char n[]="PCM0.BIN";n[3]+=i;*(volatile uint8_t*)0=pcm_load_banks[i];if(!load(n,0,0xa000))goto fail;}
  for(uint8_t i=0;i<9;++i){char n[]="DEPTH00.BIN";n[6]+=i;*(volatile uint8_t*)0=i==0?10:i<3?16+i:i+42;if(!load(n,0,0xa000))goto fail;}
+ *(volatile uint8_t*)0=31;if(!load("RINGS.BIN",0,0xb000))goto fail;
  for(uint8_t i=0;i<DYNAMIC_BANK_COUNT;++i){char n[]="DYN0.BIN";n[3]+=i;*(volatile uint8_t*)0=dynamic_load_banks[i];if(!load(n,0,0xa000))goto fail;}
  *(volatile uint8_t*)0=11;if(!load("UI.BIN",0,0xa000))goto fail;
  for(uint8_t i=0;i<128;++i)hide(i);

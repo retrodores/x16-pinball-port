@@ -7,8 +7,12 @@ Game game;
 static uint8_t poses[DYNAMIC_COUNT],before[512];
 static volatile uint8_t *const v=(volatile uint8_t*)0x9f20;
 static uint16_t checks,errors;static uint32_t fast_max;
-uint8_t game_pose(uint16_t group){for(uint8_t i=0;i<DYNAMIC_COUNT;++i)if(dynamic_desc[i].group==group)return poses[i];return 0;}
+uint8_t game_pose(uint16_t group){for(uint8_t i=0;i<DYNAMIC_COUNT;++i)if(dynamic_desc[i].lamp!=3&&dynamic_desc[i].group==group)return poses[i];return 0;}
 uint8_t game_lamp(uint16_t group){return game_pose(group);}
+uint8_t game_ring_lamp(uint8_t index){
+ for(uint8_t i=0;i<DYNAMIC_COUNT;++i)if(dynamic_desc[i].lamp==3&&dynamic_desc[i].group==index)return poses[i];
+ return 0;
+}
 static void text(const char*s){while(*s)*(volatile uint8_t*)0x9fbb=*s++;}
 static void hex(uint16_t n){for(uint8_t i=0;i<4;++i){*(volatile uint8_t*)0x9fbb="0123456789abcdef"[n>>12];n<<=4;}}
 static uint16_t word(const uint8_t*p){return(uint16_t)p[0]|((uint16_t)p[1]<<8);}
@@ -26,6 +30,7 @@ static void fast_maps(uint8_t pose){
 static void fast_tick(void){uint32_t start=cycles();dynamic_update(0);uint32_t elapsed=cycles()-start;if(elapsed>fast_max)fast_max=elapsed;if(*(volatile uint8_t*)0!=11)++errors;}
 int main(void){
  if(!load("TILES.BIN",2,4096)){text("# LOAD FAILED\n# DONE\n");return 1;}
+ *(volatile uint8_t*)0=31;if(!load("RINGS.BIN",0,0xb000)){text("# LOAD FAILED\n# DONE\n");return 1;}
  for(uint8_t i=0;i<DYNAMIC_BANK_COUNT;++i){char n[]="DYN0.BIN";n[3]+=i;*(volatile uint8_t*)0=dynamic_load_banks[i];if(!load(n,0,0xa000)){text("# LOAD FAILED\n# DONE\n");return 1;}}
  *(volatile uint8_t*)0=11;dynamic_init();
  /* Alternate pixels and original-rest patterns must be preloaded exactly. */

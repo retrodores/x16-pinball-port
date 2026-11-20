@@ -4,11 +4,14 @@ import numpy as np
 from PIL import Image,ImageChops,ImageDraw
 r=Path(__file__).resolve().parents[1];o=Path(os.environ['CADET_RELEASE_DIR'])
 ram=os.environ.get('CADET_RAM','512');tag=''if ram=='512'else'-'+ram
-inputs={n:hashlib.sha256((o/n).read_bytes()).hexdigest()for n in('CADET.PRG','CADET.RUL','CADET.PHY')}
+prg=os.environ.get('CADET_TEST_PRG','CADET')
+score_digits=os.environ.get('CADET_TEST_SCORE_DIGITS')=='1'
+inputs={prg+suffix:hashlib.sha256((o/(prg+suffix)).read_bytes()).hexdigest()
+        for suffix in ('.PRG','.RUL','.PHY')}
 def output(name):
  p=Path(name);return o/(p.stem+tag+p.suffix)
 with (output('ui.log')).open('w')as f:
- p=sp.Popen(['/opt/x16emu-r49/x16emu','-c02','-rom','/opt/x16emu-r49/rom.bin','-ram',ram,'-mhz','8','-scale','1','-echo','raw','-fsroot',str(o),'-prg',str(o/'CADET.PRG'),'-run','-wav',str(output('ui.wav'))+',auto'],stdout=f,stderr=f,env=dict(os.environ,SDL_AUDIODRIVER='dummy'))
+ p=sp.Popen(['/opt/x16emu-r49/x16emu','-c02','-rom','/opt/x16emu-r49/rom.bin','-ram',ram,'-mhz','8','-scale','1','-echo','raw','-fsroot',str(o),'-prg',str(o/(prg+'.PRG')),'-run','-wav',str(output('ui.wav'))+',auto'],stdout=f,stderr=f,env=dict(os.environ,SDL_AUDIODRIVER='dummy'))
  try:
   w=sp.check_output(['xdotool','search','--sync','--onlyvisible','--name','Commander X16'],timeout=10).decode().splitlines()[0]
   sp.run(['xdotool','windowfocus',w],check=True)
@@ -33,9 +36,19 @@ with (output('ui.log')).open('w')as f:
   if split_panes:
    assert purple_glyphs(ready,player)>60,'Player 1 is missing from upper pane'
    assert purple_glyphs(ready,(405,261,570,288))==0,'upper pane has extra message rows'
-   for top in (306,324,342):
+   for top in ((309,332,355) if score_digits else (306,324,342)):
     assert purple_glyphs(ready,(405,top,570,top+15))>25,('launch message row missing',top)
-   assert ready.crop(scaled((405,361,570,387))).getbbox() is None,'controls legend remains'
+   blank_top=374 if score_digits else 361
+   assert ready.crop(scaled((405,blank_top,570,387))).getbbox() is None,'controls legend remains'
+   if score_digits:
+    # The upper box digit and BALL count use the same 16x32 tile.
+    def violet(box):
+     r,g,b=np.asarray(ready.crop(scaled(box)),dtype=np.int16).transpose(2,0,1)
+     return (b>r+40)&(r>g+15)
+    player_one=violet((482,244,498,268))
+    ball_one=violet((553,152,569,176))
+    assert min(player_one.sum(),ball_one.sum())>=40
+    assert abs(int(player_one.sum())-int(ball_one.sum()))<=12,'numeric glyph differs from BALL counter'
   elif large_messages:
    for top in (244,259,274):
     assert purple_glyphs(ready,(405,top,555,top+14))>25,('launch message row missing',top)
@@ -73,7 +86,7 @@ with (output('ui.log')).open('w')as f:
     if changed(ready,attract,caption):break
     assert time.monotonic()<deadline,'idle demo did not appear'
    assert purple_glyphs(attract,message)>40,'demo caption is missing purple text'
-   goal=scaled((405,324,570,340) if split_panes else (405,259,555,274) if large_messages else (405,260,565,270))
+   goal=scaled((405,329,570,350) if score_digits else (405,324,570,340) if split_panes else (405,259,555,274) if large_messages else (405,260,565,270))
    deadline=time.monotonic()+35
    while True:
     time.sleep(.4);playing_demo=shot('attract-playing')

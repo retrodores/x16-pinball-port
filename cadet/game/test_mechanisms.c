@@ -92,8 +92,31 @@ static void captures(void){
  CHECK(rules.gravity==1&&rules.hyper_count==0);game_place(0,1536,0,0,1);CHECK(well_force());CHECK(game.state==Captured&&game.z==77&&rules.gravity==0);
  game_start();rules_destination(true);hit(338);rules_release();drain();CHECK(game.balls==3);game.state=InPlay;drain();CHECK(game.balls==2);
 }
+static void mission_rings(void){
+ game_start();CHECK(game_ring_lamp(18)==1&&game_ring_lamp(19)==0);
+ Edge ramp={0};
+ for(uint16_t i=0;i<edge_count;++i){ramp=*edge(i);if(ramp.kind==Ramp&&original_groups[ramp.group]==101&&metadata[ramp.param].action==1)break;}
+ CHECK(ramp.kind==Ramp&&original_groups[ramp.group]==101);
+ for(uint8_t tour=0;tour<3;++tour){
+  hit(448);CHECK(game.mission==SelectLaunch);
+  event(&ramp);CHECK(game.mission==LaunchTraining&&game.mission_left==3);
+  CHECK(game_ring_lamp(0)&&game_ring_lamp(1));
+  for(uint8_t t=0;t<5;++t)ring_tick();
+  CHECK(game_ring_lamp(17)&&game_ring_lamp(0)&&!game_ring_lamp(1));
+  for(uint8_t i=0;i<3;++i)event(&ramp);
+  CHECK(game.mission==NoMission);
+ }
+ CHECK(game.rank==2&&game.rank_progress==0&&game.ring_flash==300);
+ for(uint16_t t=0;t<300;++t)ring_tick();
+ CHECK(!game_ring_lamp(0)&&game_ring_lamp(19));
+ game_start();hit(452);event(&ramp);
+ CHECK(game.mission==Practice&&game.mission_left==8);
+ for(uint8_t i=0;i<8;++i)mission_advance();
+ CHECK(game.mission==NoMission&&game.rank_progress==6&&game_ring_lamp(5)&&!game_ring_lamp(6));
+}
+
 int main(void){
- if(!game_load()){puts("# LOAD FAIL\n# DONE");return 1;}
+ if(!game_load()){puts("# LOAD FAIL\n# DONE");mission_rings();return 1;}
 #ifndef TEST_PART
 #define TEST_PART 0
 #endif

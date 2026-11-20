@@ -40,7 +40,7 @@ bool dynamic_update(uint8_t budget){
   do{
    uint8_t i=next_component;if(++next_component==DYNAMIC_COUNT)next_component=DYNAMIC_FAST_COUNT;
    const DynamicDesc*d=&dynamic_desc[i];
-   uint8_t pose=d->lamp?game_lamp(d->group):game_pose(d->group);
+   uint8_t pose=d->lamp==3?game_ring_lamp(d->group):d->lamp?game_lamp(d->group):game_pose(d->group);
    if(shown[i]!=pose){active=i;target=pose;break;}
   }while(++checked<DYNAMIC_COUNT-DYNAMIC_FAST_COUNT);
   if(active==255){shown_epoch=game.visual_epoch;return false;}

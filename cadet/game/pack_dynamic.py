@@ -28,6 +28,9 @@ defs += [(501,0,[501,None]),(502,0,[502,None]),(505,0,[505,506]),(507,0,[507,508
 # TWall starts hidden; a qualifying rebound exposes bitmap 0 for 0.1 seconds.
 # The rest pose restores the original table rather than keeping the firing art.
 defs += [(g,0,[None,g]) for g in [471,472]]
+ring_groups = [196,160,197,159,198,158,199,157,200,156,201,155,202,154,203,153,204,152]
+ring_groups += list(range(205,214))
+defs += [(g,1,[None,g]) for g in ring_groups]
 report=[];used=defaultdict(list)
 for i in range(40*30):
  off=(i//40*64+i%40)*2;t=mapping[off]|((mapping[off+1]&3)<<8);used[t].append(i)
@@ -75,7 +78,7 @@ for gid,kind,poses in defs:
  report.append({'group':gid,'kind':kind,'pixels':len(px),'bytes':len(addresses),'runs':len(runs),'poses':len(poses),'fixed':fixed,'variable':variable})
  records.append((gid,kind,positions,runs,data))
 assert not any(len(used[t])>1 for t in alltiles),'Dynamic tile patterns must not alias other screen cells'
-blob=bytearray();descs=[];packed_records=[]
+blob=bytearray();ring_tail=bytearray();descs=[];packed_records=[]
 for gid,kind,positions,runs,data in records:
  addresses=[addr for run in runs for addr in run];n=len(addresses)
  raw=bytearray(struct.pack('<BBH',len(runs),len(data),n))
@@ -83,10 +86,20 @@ for gid,kind,positions,runs,data in records:
  raw.extend(positions[addr]for addr in addresses)
  for writes in data:raw.extend(writes[addr]for addr in addresses)
  assert len(raw)<=8192
- if len(blob)%8192+len(raw)>8192:blob.extend(bytes(8192-len(blob)%8192))
- offset=len(blob);descs.append((gid,58+offset//8192,0xa000+offset%8192,kind));blob.extend(raw)
+ if len(blob)%8192+len(raw)>8192 and len(blob)<2*8192:
+  blob.extend(bytes(8192-len(blob)%8192))
+ if len(blob)+len(raw)<=3*8192 and not ring_tail:
+  offset=len(blob); bank=58+offset//8192; ptr=0xa000+offset%8192
+  blob.extend(raw)
+ else:
+  assert gid in ring_groups
+  offset=3*8192+len(ring_tail);bank=31;ptr=0xb000+len(ring_tail)
+  ring_tail.extend(raw)
+ kind=3 if gid in ring_groups else kind
+ descs.append((ring_groups.index(gid) if kind==3 else gid,bank,ptr,kind))
  packed_records.append({'group':gid,'offset':offset,'length':len(raw),'positions':addresses,'masks':[positions[a]for a in addresses],'poses':[[values[a]for a in addresses]for values in data]})
-assert len(blob)<=3*8192,('dynamic bank budget exceeded',len(blob))
+assert ring_tail and len(ring_tail)<=4096,('ring bank budget exceeded',len(ring_tail))
+(o/'RINGS.BIN').write_bytes(ring_tail)
 regular_used=len(blob);blob.extend(bytes(3*8192-len(blob)))
 # Lower rebounder rubber and its TLight glow overlap. The original control fires
 # both for the same 0.1 seconds; compose their DAT z-maps, then switch private
@@ -157,18 +170,20 @@ h=['#ifndef CADET_DYNAMIC_H','#define CADET_DYNAMIC_H','#include <stdint.h>','#i
  'static const DynamicDesc dynamic_desc[]={'+','.join('{%d,%d,%d,%d}'%v for v in descs)+'};',
  'void dynamic_init(void);bool dynamic_update(uint8_t);','#endif']
 (o/'dynamic.h').write_text('\n'.join(h)+'\n')
-manifest={'bytes':used_bytes,'regular_bytes':regular_used,'banks':[58,59,60,63],'affected_tiles':len(alltiles|fast_tiles),'fast_vram_base':fast_base,'fast_vram_end':fast_end,'components':report,'records':packed_records,'fast_records':fast_records}
+manifest={'ring_start':next(x['offset'] for x in packed_records if x['group']==ring_groups[0]),'ring_tail_bytes':len(ring_tail),'bytes':used_bytes,'regular_bytes':regular_used,'banks':[58,59,60,63],'affected_tiles':len(alltiles|fast_tiles),'fast_vram_base':fast_base,'fast_vram_end':fast_end,'components':report,'records':packed_records,'fast_records':fast_records}
 (o/'dynamic.json').write_text(json.dumps(manifest,indent=2)+'\n')
 # Validate every pose and every transparent nibble against the packed source.
 for record in packed_records:
- at=record['offset'];nr,nposes,n=struct.unpack_from('<BBH',blob,at);at+=4
+ at=record['offset'];payload=blob
+ if at>=3*8192:payload=ring_tail;at-=3*8192
+ nr,nposes,n=struct.unpack_from('<BBH',payload,at);at+=4
  runs=[]
  for _ in range(nr):
-  lo,hi,count=struct.unpack_from('<HBB',blob,at);at+=4;runs.extend(range(lo+(hi<<16),lo+(hi<<16)+count))
- masks=blob[at:at+n];at+=n
+  lo,hi,count=struct.unpack_from('<HBB',payload,at);at+=4;runs.extend(range(lo+(hi<<16),lo+(hi<<16)+count))
+ masks=payload[at:at+n];at+=n
  assert runs==record['positions'] and list(masks)==record['masks']
  for pose in range(nposes):
-  values=blob[at+pose*n:at+(pose+1)*n];assert list(values)==record['poses'][pose]
+  values=payload[at+pose*n:at+(pose+1)*n];assert list(values)==record['poses'][pose]
   for address,mask,value in zip(runs,masks,values):
    for old in (0,85,170,255):assert (((old&(~mask&255))|(value&mask))&(~mask&255))==(old&(~mask&255))
 print(json.dumps({k:v for k,v in manifest.items()if k not in ('records','fast_records')},indent=2))
@@ -189,7 +204,7 @@ def preview(active):
    t=off&1023;pixels[t*128:(t+1)*128]=bytes(values[i*128:(i+1)*128])
  for record in packed_records:
   pose=(3 if record['group']in (372,380,388,396,405,413,421)else 1)if active else 0
-  if not active and record['group']in (501,502,147,148,227,228):pose=1
+  if not active and record['group']in (501,502,147,148,227,228,205):pose=1
   for address,mask,value in zip(record['positions'],record['masks'],record['poses'][pose]):
    pixels[address-4096]=(pixels[address-4096]&~mask)|(value&mask)
  image=np.zeros((480,640,3),np.uint8)

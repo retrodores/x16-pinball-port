@@ -4,7 +4,7 @@ import subprocess as sp,os,time,re,json,hashlib
 r=Path(__file__).resolve().parents[2];o=r/'cadet/play-build'
 cc='/opt/llvm-mos-sdk-23.4.0/llvm-mos/bin/mos-cx16-clang'
 sp.run([cc,'-Os','-Icadet/play-build','cadet/game/dynamic.c','cadet/game/test_dynamic.c','-o',str(o/'DYNAMIC-TEST.PRG')],cwd=r,check=True)
-report={'assets_sha256':{n:hashlib.sha256((o/n).read_bytes()).hexdigest()for n in ['TILES.BIN']+[f'DYN{i}.BIN'for i in range(4)]},'runs':[]}
+report={'assets_sha256':{n:hashlib.sha256((o/n).read_bytes()).hexdigest()for n in ['TILES.BIN','RINGS.BIN']+[f'DYN{i}.BIN'for i in range(4)]},'runs':[]}
 for ram in ('512','2048'):
  log=o/f'dynamic-{ram}.log'
  with log.open('w')as f:
