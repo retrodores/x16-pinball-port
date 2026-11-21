@@ -72,7 +72,7 @@ def audit(build=BUILD):
     missing=[n for n in RUNTIME if not (build/n).is_file()]
     assert not missing, f'Missing runtime assets: {missing}'
     data={n:(build/n).read_bytes() for n in RUNTIME}
-    assert len(data['CADET.PRG'])==2+0x96ff, 'main PRG region must end before I/O'
+    assert 2<len(data['CADET.PRG'])<=2+0x96ff, 'main PRG region must end before I/O'
     assert data['CADET.PRG'][:2]==b'\x01\x08', 'wrong PRG load address'
     assert len(data['CADET.RUL'])==8192, 'incomplete rules overlay'
     assert len(data['CADET.PHY'])==8192, 'incomplete physics overlay'

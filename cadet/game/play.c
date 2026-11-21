@@ -28,9 +28,13 @@ extern volatile uint8_t pcm_select_bank,music_enabled,music_error,music_loops;
 extern volatile uint16_t pcm_select_ptr,pcm_remaining,pcm_underruns;
 extern volatile uint32_t irq_max,irq_start;
 __attribute__((used)) volatile uint8_t keys[128];
-__attribute__((used)) volatile uint8_t new_game_request;
+__attribute__((used)) volatile uint8_t new_game_request,quit_request;
 __attribute__((naked,used)) void keyboard(void){__asm__ volatile(
- "phx\npha\nand #127\ntax\npla\nbmi 1f\ncpx #113\nbne 3f\nlda keys,x\nbne 3f\ninc new_game_request\n3: lda #1\nbra 2f\n1: lda #0\n2: sta keys,x\nplx\nlda #0\nrts");}
+ "phx\npha\nand #127\ntax\npla\nbmi 1f\n"
+ "cpx #17\nbeq 4f\ncpx #110\nbne 5f\n"
+ "4: lda #1\nsta quit_request\nbra 3f\n"
+ "5: cpx #113\nbne 3f\nlda keys,x\nbne 3f\ninc new_game_request\n"
+ "3: lda #1\nbra 2f\n1: lda #0\n2: sta keys,x\nplx\nlda #0\nrts");}
 static volatile uint8_t *const v=(volatile uint8_t*)0x9f20;
 static uint8_t priority,mechanical_sample,previous_state=255,phase_cache[2]={255,255},plunger_cache=255;
 static uint8_t score_cache[9],ball_cache=255;
@@ -49,17 +53,13 @@ static uint8_t load(const char*n,uint8_t mode,uint16_t a){cbm_k_setnam(n);cbm_k_
 #ifdef COVER_AUDIO
 #include "music_cover_data.h"
 extern volatile uint16_t cover_triggers;
-static bool cover_high_ram(void){
- volatile uint8_t *const bank=(volatile uint8_t*)0;
- volatile uint8_t *const probe=(volatile uint8_t*)0xa000;
- uint8_t saved=*bank;*bank=0;uint8_t low=*probe;
- *bank=COVER_LAST_BANK;uint8_t high=*probe;
- *probe=low^255u;bool writable=*probe==(uint8_t)(low^255u);
- *bank=0;bool independent=*probe==low;
- *bank=COVER_LAST_BANK;*probe=high;*bank=0;*probe=low;*bank=saved;
- return writable&&independent;
-}
 #endif
+/* KERNAL MEMTOP returns the usable 8 KB bank count in A. Zero means 256. */
+static uint8_t ram_banks(void){
+ uint8_t banks;
+ __asm__ volatile("sec\njsr $ff99":"=a"(banks)::"x","y","p","memory");
+ return banks;
+}
 static void print(const char*s){while(*s)cbm_k_bsout(*s++);}
 static void echo(const char*s){while(*s)*(volatile uint8_t*)0x9fbb=*s++;}
 static void hex(uint32_t a){for(uint8_t i=0;i<8;++i){*(volatile uint8_t*)0x9fbb="0123456789abcdef"[a>>28];a<<=4;}}
@@ -232,11 +232,32 @@ static __attribute__((section(".mechanics"),noinline)) void compact_footer(void)
   for(uint8_t col=0;col<13;++col){v[3]=lo;v[3]=hi;}
  }
 }
+static void restore_keyboard(uint16_t vector){
+ __asm__ volatile("php\nsei":::"memory");
+ *(volatile uint16_t*)0x032e=vector;
+ __asm__ volatile("plp":::"memory");
+}
+
+static void restore_console(uint8_t bank){
+ *(volatile uint8_t*)0=bank;
+ cbm_k_clrch();
+ /* Reload the BASIC palette, charset and screen mode and clear game input. */
+ __asm__ volatile("jsr $ff81":::"a","x","y","p","memory");
+ *(volatile uint8_t*)0=bank;
+}
+
 int main(void){
  uint8_t oldbank=*(volatile uint8_t*)0;uint16_t oldkey=*(volatile uint16_t*)0x032e;
+ uint8_t banks=ram_banks();
 #ifdef COVER_AUDIO
- if(!cover_high_ram()){print("COVER REQUIRES 2 MB RAM\r");echo("# COVER NEEDS 2 MB\n");return 1;}
+ if(banks){
+  print("\rPINBALL NEEDS 2 MB OF BANKED RAM.\rTRY THE 512 KB EDITION INSTEAD.\r");
+#else
+ if(banks&&banks<64){
+  print("\rPINBALL NEEDS 512 KB OF BANKED RAM.\r");
 #endif
+  return 1;
+ }
  print("\x93" "CMDRX CADET - ORIGINAL TABLE\rLOADING...\r");v[5]=0;v[9]=1;
  if(!game_load()||!load("MAP.BIN",2,0)||!load("TILES.BIN",2,0x1000)||!load("PAL.BIN",3,0xfa00)||
  !load("SPRITES.BIN",3,SPRITE_BASE&65535)||!load("FONT.BIN",3,FONT_BASE&65535))goto fail;
@@ -274,7 +295,7 @@ int main(void){
 #ifndef GAME_TEST
  if(!startup_pcm(true))goto fail;
 #endif
- __asm__ volatile("sei");*(volatile uint16_t*)0x032e=(uint16_t)(uintptr_t)keyboard;__asm__ volatile("cli");
+ restore_keyboard((uint16_t)(uintptr_t)keyboard);
  lab_install();
 #ifdef GAME_TEST
  game_start();
@@ -318,7 +339,7 @@ int main(void){
   game_frame(count%43<12,count%67<14,game.state==Serving&&game.charge<80,false);
   if(game.state==GameOver)game_start();
 #else
-  if(keys[110])break;
+  if(quit_request)break;
   if(keys[52]&&!old_m){if(music_enabled)music_stop();else music_start();}
   old_m=keys[52];
   __asm__ volatile("php\nsei":::"memory");
@@ -391,16 +412,16 @@ int main(void){
 #ifdef COVER_AUDIO
  echo("# COVER LOOPS ");hex(music_loops);echo(" TRIGGERS ");hex(cover_triggers);echo("\n");
 #endif
- echo("# RESULT ");hex(count);echo(" ");hex(maximum);echo(" ");hex(total/count);echo(" ");hex(over);echo(" ");hex(gaps);echo(" ");hex(irq_max);echo(" ");hex(music_error);echo("\n# PCM UNDERRUNS ");hex(pcm_underruns);echo("\n# DONE\n");
- lab_uninstall();__asm__ volatile("sei");*(volatile uint16_t*)0x032e=oldkey;__asm__ volatile("cli");
+ echo("# RESULT ");hex(count);echo(" ");hex(maximum);echo(" ");hex(count?total/count:0);echo(" ");hex(over);echo(" ");hex(gaps);echo(" ");hex(irq_max);echo(" ");hex(music_error);echo("\n# PCM UNDERRUNS ");hex(pcm_underruns);echo("\n# DONE\n");
+ lab_uninstall();restore_keyboard(oldkey);
  *(volatile uint8_t*)0=oldbank;
 #ifdef GAME_TEST
  *(volatile uint8_t*)0x9fb4=0;__asm__ volatile("jmp $ffff");
 #endif
- __asm__ volatile("jsr $ff81");return 0;
+ restore_console(oldbank);return 0;
 #ifndef GAME_TEST
 audio_load_failed:
- lab_uninstall();__asm__ volatile("sei");*(volatile uint16_t*)0x032e=oldkey;__asm__ volatile("cli");
+ lab_uninstall();restore_keyboard(oldkey);
 #endif
-fail:*(volatile uint8_t*)0=oldbank;__asm__ volatile("jsr $ff81");print("ASSET LOAD FAILED\r");echo("# LOAD FAILED\n");return 1;
+fail:restore_console(oldbank);print("ASSET LOAD FAILED\r");echo("# LOAD FAILED\n");return 1;
 }

@@ -5,7 +5,7 @@ TIP is the default fixture. All named overlays must be live and distinct.
 """
 from pathlib import Path
 import subprocess as sp,tempfile,re,sys,json
-from build_native import OUT,CC,MAIN_BYTES,OVERLAYS
+from build_native import OUT,CC,MAIN_MAX_BYTES,OVERLAYS
 toolbin=Path(CC).parent
 reports=[]
 for name in sys.argv[1:] or ['TIP']:
@@ -24,7 +24,10 @@ for name in sys.argv[1:] or ['TIP']:
   for n in wanted:args+=['--dump-section',n+'='+str(tmp/n[1:])]
   sp.run([*args,str(elf),str(tmp/'copy.elf')],check=True)
   prg=(OUT/(name+'.PRG')).read_bytes()
-  assert len(prg)==MAIN_BYTES and prg[:2]==b'\x01\x08'
+  load_end=max(addr+size for n,(addr,size) in sections.items()
+               if n in wanted and n not in overlay_files)
+  assert len(prg)==2+load_end-0x801 and len(prg)<MAIN_MAX_BYTES
+  assert prg[:2]==b'\x01\x08'
   overlays=[]
   for n in wanted:
    body=(tmp/n[1:]).read_bytes();addr,size=sections[n];assert len(body)==size

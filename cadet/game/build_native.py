@@ -4,7 +4,7 @@ import os, shlex, struct, subprocess as sp
 ROOT=Path(__file__).resolve().parents[2]
 OUT=ROOT/'cadet/play-build'
 CC=os.environ.get('MOS_CC','/opt/llvm-mos-sdk-23.4.0/llvm-mos/bin/mos-cx16-clang')
-MAIN_BYTES=2+0x96ff
+MAIN_MAX_BYTES=2+0x96ff
 OVERLAYS=(('.rules','.RUL',8192),('.physics','.PHY',8192),('.mechanics','.MEC',0x9f8))
 def elf_section(path,name):
     # The linker raw writer selects by VMA; overlays share A000, so FULL cannot
@@ -34,9 +34,9 @@ def build_native(name,sources,defines=()):
           '-Wl,-Map,'+str(OUT/(name+'.map')),'-o',str(raw)]
     sp.run(args,cwd=ROOT,check=True)
     data=raw.read_bytes()
-    assert len(data)==MAIN_BYTES+sum(size for _,_,size in OVERLAYS),(name,len(data))
+    assert 2 < len(data) < MAIN_MAX_BYTES, (name, len(data))
     assert data[:2]==b'\x01\x08'
-    (OUT/(name+'.PRG')).write_bytes(data[:MAIN_BYTES])
+    (OUT/(name+'.PRG')).write_bytes(data)
     for section,ext,size in OVERLAYS:
         overlay=elf_section(Path(str(raw)+'.elf'),section)
         assert len(overlay)<=size,(name,section,len(overlay))

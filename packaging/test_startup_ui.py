@@ -13,6 +13,8 @@ audio = "--audio" in flags
 show_frames = "--show-frames" in flags
 red_cross = "--red-cross" in flags
 tilt = "--tilt" in flags
+cpu = "-c816" if "--c816" in flags else "-c02"
+quit_key = "q" if "--quit-q" in flags else "Escape"
 player = (430, 260, 610, 306)
 message = (430, 333, 610, 430)
 table = (85, 75, 295, 360)
@@ -36,7 +38,7 @@ def lit(img, roi):
 
 with log.open('w') as output:
     p = sp.Popen(['/opt/x16emu-r49/x16emu', '-rom', '/opt/x16emu-r49/rom.bin',
-                  '-c02', '-mhz', '8', '-ram', ram, '-echo', 'raw', '-fsroot',
+                  cpu, '-mhz', '8', '-ram', ram, '-echo', 'raw', '-fsroot',
                   '.', '-prg', stem+'.PRG', '-run']+(['-wav','startup.wav'] if audio else []),
                  stdout=output, stderr=output, env=dict(os.environ, SDL_AUDIODRIVER='dummy'))
     try:
@@ -150,7 +152,7 @@ with log.open('w') as output:
         until(lambda f: not lit(f,player) and not lit(f,message),5)
         key('F3')
         until(lambda f: lit(f,player) and changed(f,ready,message),5)
-        key('Escape')
+        key(quit_key)
         deadline=time.monotonic()+5
         while '# DONE' not in log.read_text(errors='replace'):
             assert time.monotonic()<deadline

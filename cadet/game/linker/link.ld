@@ -1,8 +1,8 @@
 /* Stock 65C02 program with rules/physics in RAM banks 61/62 and
  * additional mechanics code after the depth index in RAM bank 10.
- * Build emits main PRG plus ELF. build_native.py extracts named ELF overlays.
- * The raw FULL overlay ranges share VMA and must not be used as sidecar bytes.
- * The fixed-size main region preserves the BASIC/KERNAL memory boundary.
+ * Build emits the initialized main PRG plus an ELF with the named overlays.
+ * Do not pad the PRG through the BASIC memory ceiling. BASIC needs working
+ * space to interpret the next LOAD after this program returns.
  */
 __basic_zp_start = 0x0002;
 __basic_zp_end = 0x0080;
@@ -22,8 +22,5 @@ __stack = 0x9f00;
 ASSERT(__bss_end <= 0x9b00, "Need at least 1 KB for the software stack")
 OUTPUT_FORMAT {
  SHORT(ORIGIN(ram))
- FULL(ram)
- FULL(rules)
- FULL(physics)
- FULL(mechanics)
+ TRIM(ram)
 }

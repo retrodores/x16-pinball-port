@@ -36,3 +36,8 @@ next ball. The first three drop targets award a four-second spinner boost
 that triples the normal spin award. The upper window reports these events
 and wormhole captures. The lower window continues to show an active mission
 even while the ball is held.
+
+Press Q or Escape to quit to BASIC. The compact soundtrack needs at least
+512 KB of banked RAM. The full cover soundtrack needs 2 MB. The game
+checks before loading any assets. The r49 emulator can run the same PRG
+with either -c02 or -c816 at 8 MHz.
