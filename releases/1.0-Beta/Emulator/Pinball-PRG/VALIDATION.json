@@ -1,0 +1,112 @@
+{
+  "source": "../VALIDATION.json",
+  "source_packaging_commit": "e25cc91",
+  "entry_point": "PINBALL.PRG",
+  "archive_checks": "Source and output SHA-256, complete manifests, ZIP CRCs, fresh extraction hashes, and byte-identical rerun. Executable, asset, overlay, notice and specification bytes match the source ZIPs.",
+  "emulator": {
+    "version": "Linux x16emu r49, stock 65C02 at 8 MHz",
+    "emulator_sha256": "59bc86b8d24632f602339dd722eaf77317fc4fb6b76393a479216d3efd37228e",
+    "rom_sha256": "b81654cc8c87ed96e3ffc7c8e7c312c9f3b7b870c7bb34de61e61eac931b819a"
+  },
+  "fresh_zip_checks": {
+    "SpaceCadet-X16-1.0-Beta-2MB.zip": {
+      "ram_kb": 2048,
+      "cold_start": true,
+      "changing_lamps": true,
+      "f2_visible_ms": 117.9,
+      "f2_audio_file_size_at_keydown": 2015232,
+      "red_cross_on_start_and_f2": true,
+      "red_cross_over_upper_insert": true,
+      "player_before_prompt": true,
+      "plunger_after_serve": true,
+      "f2_restart_and_skip": true,
+      "f3_enters_demo_during_show": true,
+      "tilt_input_and_flash": true,
+      "exit": true,
+      "audio_capture_frames": 582402
+    },
+    "SpaceCadet-X16-1.0-Beta-512KB.zip": {
+      "ram_kb": 512,
+      "cold_start": true,
+      "changing_lamps": true,
+      "f2_visible_ms": 153.9,
+      "f2_audio_file_size_at_keydown": 1867776,
+      "red_cross_on_start_and_f2": true,
+      "red_cross_over_upper_insert": true,
+      "player_before_prompt": true,
+      "plunger_after_serve": true,
+      "f2_restart_and_skip": true,
+      "f3_enters_demo_during_show": true,
+      "tilt_input_and_flash": true,
+      "exit": true,
+      "audio_capture_frames": 537202
+    },
+    "SpaceCmdrX16-1.0-Beta-2MB.zip": {
+      "ram_kb": 2048,
+      "cold_start": true,
+      "changing_lamps": true,
+      "f2_visible_ms": 183.1,
+      "f2_audio_file_size_at_keydown": 1998848,
+      "red_cross_on_start_and_f2": true,
+      "red_cross_over_upper_insert": true,
+      "player_before_prompt": true,
+      "plunger_after_serve": true,
+      "f2_restart_and_skip": true,
+      "f3_enters_demo_during_show": true,
+      "tilt_input_and_flash": true,
+      "exit": true,
+      "audio_capture_frames": 572447
+    },
+    "SpaceCmdrX16-1.0-Beta-512KB.zip": {
+      "ram_kb": 512,
+      "cold_start": true,
+      "changing_lamps": true,
+      "f2_visible_ms": 278.9,
+      "f2_audio_file_size_at_keydown": 1925120,
+      "red_cross_on_start_and_f2": true,
+      "red_cross_over_upper_insert": true,
+      "player_before_prompt": true,
+      "plunger_after_serve": true,
+      "f2_restart_and_skip": true,
+      "f3_enters_demo_during_show": true,
+      "tilt_input_and_flash": true,
+      "exit": true,
+      "audio_capture_frames": 551201
+    }
+  },
+  "windows_launcher_checked": "Launcher file checks and emulator command reference PINBALL.PRG and preserve the source RAM settings.",
+  "windows_launcher_tested": false,
+  "physical_hardware_tested": false,
+  "extended_gameplay_source_results": {
+    "512": {
+      "frames": 12000,
+      "max_cycles": 213957,
+      "mean_cycles": 73228,
+      "over_budget": 349,
+      "missed_frame_starts": 0,
+      "irq_max": 39950,
+      "music_errors": 0,
+      "ram": 512,
+      "mhz": 8,
+      "expected_frames": 12000,
+      "program": "TEST.PRG",
+      "pcm_underruns": 0,
+      "budget_pass": false
+    },
+    "2048": {
+      "frames": 12000,
+      "max_cycles": 451573,
+      "mean_cycles": 149657,
+      "over_budget": 4358,
+      "missed_frame_starts": 166,
+      "irq_max": 124338,
+      "music_errors": 0,
+      "ram": 2048,
+      "mhz": 8,
+      "expected_frames": 12000,
+      "program": "COVTEST.PRG",
+      "pcm_underruns": 0,
+      "budget_pass": false
+    }
+  }
+}

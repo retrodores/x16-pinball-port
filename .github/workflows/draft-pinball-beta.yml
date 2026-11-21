@@ -1,0 +1,66 @@
+name: Prepare 1.0 Beta PINBALL.PRG drafts
+on:
+  push:
+    branches: [beta-pinball-prg]
+    paths:
+      - 'releases/1.0-Beta/Emulator/Pinball-PRG/**'
+      - '.github/workflows/draft-pinball-beta.yml'
+permissions:
+  contents: write
+concurrency:
+  group: draft-pinball-beta
+  cancel-in-progress: false
+jobs:
+  draft:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify ZIPs and upload each to its own draft
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          TARGET_COMMIT: ${{ github.sha }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          directory=releases/1.0-Beta/Emulator/Pinball-PRG
+          (cd "$directory" && sha256sum -c SHA256SUMS)
+          python3 - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+          from subprocess import PIPE, run
+
+          directory = Path('releases/1.0-Beta/Emulator/Pinball-PRG')
+          manifest = json.loads((directory / 'PACKAGE-MANIFEST.json').read_text())
+          target = os.environ['TARGET_COMMIT']
+          results = {}
+          for name, archive in manifest['archives'].items():
+              title, tag = (archive['release'][key] for key in ('title', 'tag'))
+              asset = str(directory / name)
+              fields = 'url,isDraft,isPrerelease,tagName,targetCommitish,assets'
+              query = ['gh', 'release', 'view', tag, '--json', fields]
+              existing = run(query, text=True, stdout=PIPE, stderr=PIPE)
+              if existing.returncode:
+                  run(['gh', 'release', 'create', tag, asset, '--draft', '--prerelease',
+                       '--target', target, '--title', title,
+                       '--notes-file', str(directory / 'RELEASE-NOTES.md')], check=True)
+              draft = json.loads(run(query, text=True, stdout=PIPE, check=True).stdout)
+              assert draft['isDraft'] and draft['isPrerelease'], tag
+              assert draft['targetCommitish'] == target, tag
+              assert len(draft['assets']) == 1, tag
+              uploaded = draft['assets'][0]
+              assert uploaded['name'] == name and uploaded['digest'] == 'sha256:' + archive['sha256'], tag
+              results[name] = draft
+          assert len(results) == 4
+          Path('docs/release-status/pinball-beta.json').write_text(json.dumps(results, indent=2) + '\n')
+          PY
+      - name: Record verified draft URLs
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs/release-status/pinball-beta.json
+          if ! git diff --cached --quiet; then
+            git commit -m "Record four verified PINBALL.PRG beta drafts"
+            git push origin HEAD:beta-pinball-prg
+          fi
