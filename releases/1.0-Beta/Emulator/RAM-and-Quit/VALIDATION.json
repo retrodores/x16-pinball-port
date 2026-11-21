@@ -203,5 +203,54 @@
       "pcm_underruns": 0,
       "budget_pass": false
     }
-  }
+  },
+  "supplemental_basic_check": "The 512 KB Space CmdrX16 package also ran on a 2 MB 65C816 configuration. Escape returned to BASIC, which loaded and ran NEXT.PRG.",
+  "current_gameplay_fixture_timing": {
+    "c02-2048": {
+      "completed": false,
+      "timeout_seconds": 140,
+      "highest_observed_cycles": 398586,
+      "frame_of_highest_observed_cycles": 5165,
+      "ram_kb": 2048,
+      "mhz": 8,
+      "budget_cycles": 133333,
+      "budget_pass": false
+    },
+    "c02-512": {
+      "frames": 12000,
+      "max_cycles": 214003,
+      "mean_cycles": 73246,
+      "over_budget": 350,
+      "missed_frame_starts": 0,
+      "irq_max": 40102,
+      "music_errors": 0,
+      "pcm_underruns": 0,
+      "ram_kb": 512,
+      "mhz": 8,
+      "budget_cycles": 133333,
+      "budget_pass": false
+    },
+    "c816-2048": {
+      "completed": false,
+      "timeout_seconds": 140,
+      "highest_observed_cycles": 398937,
+      "frame_of_highest_observed_cycles": 5165,
+      "ram_kb": 2048,
+      "mhz": 8,
+      "budget_cycles": 133333,
+      "budget_pass": false
+    },
+    "c816-512": {
+      "completed": false,
+      "timeout_seconds": 140,
+      "highest_observed_cycles": 214085,
+      "frame_of_highest_observed_cycles": 9424,
+      "ram_kb": 512,
+      "mhz": 8,
+      "budget_cycles": 133333,
+      "budget_pass": false
+    }
+  },
+  "reproducible_zip_build": true,
+  "draft_upload_hashes_verified": true
 }
