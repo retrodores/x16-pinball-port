@@ -53,3 +53,15 @@ preceding renderer revision (8b1ed62). The final renderer revision changes
 mission-selection lamp priority only. The loop run reached 12,364
 game frames with zero reported music errors and zero PCM underruns.
 The preview has not been validated on Windows or physical hardware.
+
+### Santa cap edition
+
+Artwork source commit: `11f2d7b`.
+ZIP SHA-256: `6614d211c84aef169b471730fa4564be1853ed06d365858b3efd8487cb73035e`.
+The executable and score are byte-identical to the previous package.
+
+A fresh extraction ran at 8 MHz with 2 MB on Linux x16emu r49. The capture
+showed the cap and red/green center lamps in attract mode. The soundtrack
+continued into ball 2 and logged one full loop, zero music errors, and zero
+PCM underruns before Q. The demo logged 1,353 of 12,397 frames over
+133,333 cycles, with a peak of 630,774. Windows and hardware remain untested.
