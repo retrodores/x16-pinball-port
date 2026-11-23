@@ -65,3 +65,16 @@ showed the cap and red/green center lamps in attract mode. The soundtrack
 continued into ball 2 and logged one full loop, zero music errors, and zero
 PCM underruns before Q. The demo logged 1,353 of 12,397 frames over
 133,333 cycles, with a peak of 630,774. Windows and hardware remain untested.
+
+### Audible soundtrack revision
+
+The opening previously used only the quieter FM bell voices. Voice 5
+of VERA PSG now carries the lead from tick zero, with FM retaining its
+bell layer. The score length and lamp events are identical.
+
+ZIP SHA-256: `e13946ef83fa1cdf9730e6aa38148a23dc66748aca1ac6a62c3db1ca8caf5f8d`.
+Fresh-extraction r49 audio capture verified M mute and restart, the
+expected 330/370/392 Hz opening motif, and zero PCM underruns.
+The revised score was checked structurally for the full 204 seconds.
+The revision's emulator playback test covered startup and the mute/restart
+sequence. The preceding Santa-cap build supplied the full-loop playtest.

@@ -23,6 +23,13 @@ def arrange():
         for register, value in enumerate((frequency & 255, frequency >> 8, 192 | level, wave)):
             events[tick].append((0, voice * 4 + register, value))
 
+    def lead(tick, note, level, duration):
+        # VERA carries the melody immediately, including on setups where
+        # the FM bell layer is quiet or unavailable.
+        psg(tick, 5, note, level)
+        events[tick + 8].append((0, 5 * 4 + 2, 192 | (level - 5)))
+        events[tick + duration].append((0, 5 * 4 + 2, 192))
+
     def bell(tick, channel, note, level, duration):
         fm(tick, 8, channel)
         fm(tick, 0x28 + channel, ((note // 12 - 1) << 4) | KEY_CODES[note % 12])
@@ -66,6 +73,7 @@ def arrange():
             melody = zip((0, 61, 92, 122), notes)
         for index, (offset, note) in enumerate(melody):
             bell(tick + offset, index % 2, note, 79 + energy + (3 if index == 0 else 0), 34)
+            lead(tick + offset, note, min(62, 56 + energy + (3 if index == 0 else 0)), 28)
             if energy >= 6 and index in (0, 3):
                 psg(tick + offset, 4, note + 12, energy + 3, 0x80)
                 psg(tick + offset + 19, 4, note + 12, 0, 0x80)
@@ -97,6 +105,7 @@ def arrange():
     tick = 96 * BAR
     for channel, note in enumerate((52, 59, 64, 67)):
         bell(tick, channel, note, 94 - channel, 170)
+    lead(tick, 64, 60, 120)
     for index, intensity in enumerate((10, 8, 6, 4, 2, 1, 0)):
         events[tick + 61 * index].append((2, 0, (7 << 4) | intensity))
     return events
@@ -138,7 +147,7 @@ def build(output):
     commands = encode(events, lamps=True)
     assert len(commands) < 13 * 8192
     (output / 'COVER.CMD').write_bytes(commands)
-    header = b'zm\x01' + (16).to_bytes(3, 'little') + bytes(3) + bytes((0x0f, 0x1f, 0))
+    header = b'zm\x01' + (16).to_bytes(3, 'little') + bytes(3) + bytes((0x0f, 0x3f, 0))
     header += HZ.to_bytes(2, 'little') + bytes(2)
     (output / 'SHCHEDRYK.ZSM').write_bytes(header + encode(events, lamps=False))
 

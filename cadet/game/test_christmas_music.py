@@ -49,6 +49,11 @@ class ChristmasMusicTest(unittest.TestCase):
         game_tick, game_writes, cues = decode(game, True)
         self.assertEqual(game_tick, tick)
         self.assertEqual(game_writes, writes)
+        self.assertEqual(zsm[10] & 0x20, 0x20)
+        for start in (0, 48 * BAR, 64 * BAR, 96 * BAR):
+            lead_on = [(tick, value) for tick, chip, register, value in writes
+                       if tick == start and chip == 'PSG' and register == 22]
+            self.assertTrue(any(value >= 249 for _, value in lead_on), start)
         energy = dict(cues)
         self.assertLess(energy[0], energy[32 * BAR])
         self.assertLess(energy[48 * BAR], energy[32 * BAR])
