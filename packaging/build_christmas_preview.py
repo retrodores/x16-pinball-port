@@ -38,6 +38,45 @@ def lamp_patterns(inventory):
         for name, (kind, values) in data.items()))
 
 
+def santa_cap(target):
+    # Pixel spans sit between the title and the robot's eyes, following
+    # the slope of the robot's brow. End coordinates are exclusive.
+    shades = {
+        'r': (238, 51, 51), 's': (153, 17, 34), 'h': (255, 102, 85),
+        'w': (255, 238, 238), 'd': (187, 187, 204),
+    }
+    rows = (
+        ((124, 134, 's'),),
+        ((120, 139, 'r'),),
+        ((117, 142, 'r'), (122, 134, 'h')),
+        ((115, 145, 'r'), (119, 134, 'h')),
+        ((114, 148, 'r'), (117, 130, 'h')),
+        ((112, 150, 'r'), (137, 146, 's')),
+        ((111, 152, 'r'), (136, 144, 's')),
+        ((111, 153, 'r'), (135, 143, 's')),
+        ((110, 154, 'r'), (134, 142, 's')),
+        ((110, 155, 'r'), (133, 142, 's')),
+        ((109, 140, 'r'), (144, 155, 's')),
+        ((109, 140, 'r'), (146, 156, 'r')),
+        ((108, 140, 'r'), (148, 157, 'r')),
+        ((108, 141, 'r'), (150, 157, 's')),
+        ((108, 142, 'w'), (152, 158, 'd')),
+        ((107, 143, 'w'), (151, 159, 'w')),
+        ((107, 144, 'w'), (150, 159, 'w')),
+        ((108, 144, 'w'), (150, 160, 'w')),
+        ((111, 145, 'w'), (151, 159, 'd')),
+        ((117, 145, 'd'), (152, 158, 'd')),
+        ((129, 144, 'd'),),
+        ((139, 143, 'd'),),
+    )
+    mask = np.zeros(target.shape[:2], dtype=bool)
+    for y, row in enumerate(rows, 73):
+        for left, right, shade in row:
+            target[y, left:right] = shades[shade]
+            mask[y, left:right] = True
+    return mask
+
+
 def winter_backbox(files):
     panel, colors, original_map, original_tiles = unpack(files)
     target = panel.copy()
@@ -48,6 +87,7 @@ def winter_backbox(files):
         if panel[y-1:y+2, x-1:x+2].max() <= 34:
             level = rng.choice((68, 102, 136, 170))
             target[y, x] = (level, level, min(255, level + 17))
+    cap = santa_cap(target)
     mapping, tiles = original_map.copy(), original_tiles.copy()
     changed = [(y, LEFT//16+x) for y in range(10) for x in range(13)
                if np.any(panel[y*16:y*16+16, x*16:x*16+16] != target[y*16:y*16+16, x*16:x*16+16])]
@@ -57,7 +97,8 @@ def winter_backbox(files):
         y, x = row*16, col*16-LEFT
         block = target[y:y+16, x:x+16].astype(int)
         error = ((block[:, :, None, None, :] - colors) ** 2).sum(axis=-1)
-        bank = int(error.min(axis=-1).sum(axis=(0, 1)).argmin())
+        weights = np.where(cap[y:y+16, x:x+16], 5, 1)
+        bank = int((error.min(axis=-1) * weights[:, :, None]).sum(axis=(0, 1)).argmin())
         pens = error[:, :, bank].argmin(axis=-1).astype(np.uint8)
         slot = next(free)
         tiles[slot] = (pens[:, ::2] << 4) | pens[:, 1::2]
@@ -89,7 +130,9 @@ def package(files, output):
         'Windows: put x16emu.exe and rom.bin in the parent folder and run RUN-WINDOWS.bat.',
         'X16 BASIC: LOAD"PINBALL.PRG",8,1 then RUN from the extracted game folder.',
         '', 'Space launches. Z and / flip. F2 starts a new game. F3 starts the demo.',
-        'M toggles music. Q or Esc returns to BASIC.',
+        'Music starts automatically. M toggles it. Q or Esc returns to BASIC.',
+        'COVER.CMD contains the full 3:24 Shchedryk arrangement and lamp cues.',
+        'Keep COVER.CMD in the game folder. The separate ZSM is optional.',
         '', 'The holiday lamps follow the score during normal play and the demo.',
         'Startup, tilt, and gameplay mission/rank lamps take priority.',
         'See MUSIC-CREDITS.txt, LICENSE and ENGINE-THIRD-PARTY-LICENSE.',
