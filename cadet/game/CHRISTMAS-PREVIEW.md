@@ -10,7 +10,9 @@ The YM2151 and PSG play music while the existing VERA PCM mixer plays
 table sounds. No commercial recording or sampled music is in this build.
 
 Holiday sprites draw over inactive center inserts only. Normal startup,
-rank progress, missions, rank flash, and tilt retain priority. The holiday
+rank progress, rank flash, and tilt retain priority. Active missions
+reserve the outer ring for their chase. Unclaimed inner inserts can still
+follow the song during a mission. The holiday
 display updates seven sprites per normal display frame. F2 and re-enabling
 music restart the score. Ball drains and attract transitions keep the
 current musical position.

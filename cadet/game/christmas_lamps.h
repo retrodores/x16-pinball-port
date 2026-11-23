@@ -15,20 +15,20 @@ static __attribute__((noinline,section(".holiday"))) void christmas_init(void){
 static __attribute__((noinline,section(".holiday"))) void christmas_lamps(void){
  uint8_t cue=music_enabled?christmas_cue:0;
  uint8_t energy=cue&15,phase=cue>>4;
- bool exclusive=game.state==Ready||game.tilted||game.ring_flash||game.mission!=NoMission;
+ bool exclusive=game.state==Ready||game.tilted||game.ring_flash;
  for(uint8_t work=0;work<7;++work){
   uint8_t i=holiday_cursor;
   if(++holiday_cursor==27)holiday_cursor=0;
   uint8_t color=0;
   if(energy&&!exclusive&&!game_ring_lamp(i)){
-   if(i<18){
+   if(i<18&&game.mission<Practice){
     uint8_t clockwise=i+18-phase;
     if(clockwise>=18)clockwise-=18;
     uint8_t counter=17-i+phase;
     if(counter>=18)counter-=18;
     if(clockwise<energy)color=1;
     else if(energy>=3&&counter<energy)color=2;
-   }else if(energy>=8&&i-18<(energy-7)*3){
+   }else if(i>=18&&energy>=8&&i-18<(energy-7)*3){
     color=(i&1)+1;
    }
   }
