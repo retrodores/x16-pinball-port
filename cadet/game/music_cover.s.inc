@@ -7,6 +7,9 @@ music_prefetch:
  rts
 
 music_reset:
+.ifdef CHRISTMAS
+ stz christmas_cue
+.endif
  lda #32
  sta music_bank
  stz cover_command+1
@@ -76,6 +79,24 @@ cover_tick:
  rts
 
 cover_extension:
+.ifdef CHRISTMAS
+ jsr music_byte
+ cmp #$81
+ bne 7f
+ jsr music_byte
+ sta christmas_cue
+ jmp music_command
+7:
+ and #$3f
+ sta music_count
+ beq 9f
+8:
+ jsr music_byte
+ dec music_count
+ bne 8b
+9:
+ jmp music_command
+.else
  jsr music_byte
  tax
  and #$3f
@@ -102,6 +123,8 @@ cover_extension:
  bne 2b
 3:
  jmp music_command
+
+.endif
 
 cover_trigger:
  cmp #COVER_INSTRUMENTS
@@ -277,7 +300,15 @@ cover_right:
  sta $00
  rts
 
+.ifdef CHRISTMAS
+COVER_CMD_HIGH = 64
+COVER_LOOP_BANK = 32
+COVER_LOOP_PTR = $a000
+COVER_INSTRUMENTS = 0
+cover_instruments:
+.else
 .include "cadet/play-build/music_cover_data.inc"
+.endif
 
 .section .bss.lab,"aw",@nobits
 cover_phase: .zero 2
@@ -285,6 +316,10 @@ cover_offset: .zero 1
 cover_bank: .zero 1
 cover_position: .zero 1
 cover_remaining: .zero 3
+.ifdef CHRISTMAS
+.globl christmas_cue
+christmas_cue: .zero 1
+.endif
 cover_blocks: .zero 1
 cover_frames: .zero 1
 cover_drum_frames: .zero 1

@@ -8,12 +8,14 @@ __basic_zp_start = 0x0002;
 __basic_zp_end = 0x0080;
 MEMORY {
  ram (rw) : ORIGIN = 0x0801, LENGTH = 0x96ff
+ holiday (rw) : ORIGIN = 0xa000, LENGTH = 0x2000
  rules (rw) : ORIGIN = 0xa000, LENGTH = 0x2000
  physics (rw) : ORIGIN = 0xa000, LENGTH = 0x2000
  mechanics (rw) : ORIGIN = 0xb608, LENGTH = 0x09f8
 }
 INCLUDE commodore.ld
 SECTIONS {
+ .holiday : { *(.holiday .holiday.*) } >holiday
  .rules : { *(.rules .rules.*) } >rules
  .physics : { *(.physics .physics.*) } >physics
  .mechanics : { *(.mechanics .mechanics.*) } >mechanics

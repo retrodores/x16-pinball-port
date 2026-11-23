@@ -43,6 +43,9 @@ static void addr(uint32_t a){v[5]=0;v[0]=a;v[1]=a>>8;v[2]=0x10|(a>>16);}
 static void word(uint16_t a){v[3]=a;v[3]=a>>8;}
 static void hide(uint8_t n){addr(0x1fc06UL+(uint16_t)n*8);v[3]=0;}
 static void tile(uint8_t n,uint16_t a,int16_t x,int16_t y,uint8_t size){addr(0x1fc00UL+(uint16_t)n*8);word(a);word(x);word(y);v[3]=12;v[3]=size;}
+#ifdef CHRISTMAS
+#include "christmas_lamps.h"
+#endif
 static void frame(uint8_t n,uint8_t f,int16_t x,int16_t y,uint8_t reserved){
  const SpriteFrame*s=&sprites[f];
  for(uint8_t i=0;i<reserved;++i){
@@ -214,6 +217,14 @@ static void display(bool update_panel){
  if(update_panel)update_status();
  dynamic_update(update_panel?(game.state==Ready?240:128):0);
  if(update_panel)message_step();
+#ifdef CHRISTMAS
+ if(update_panel){
+  uint8_t saved=*(volatile uint8_t*)0;
+  *(volatile uint8_t*)0=64;
+  christmas_lamps();
+  *(volatile uint8_t*)0=saved;
+ }
+#endif
 }
 static __attribute__((section(".mechanics"),noinline)) void compact_footer(void){
  /* The supported maps use private tiles in this part of row 25. The
@@ -258,7 +269,12 @@ int main(void){
 #endif
   return 1;
  }
- print("\x93" "CMDRX CADET - ORIGINAL TABLE\rLOADING...\r");v[5]=0;v[9]=1;
+#ifdef CHRISTMAS
+ print("\x93" "SPACE CMDRX16 CHRISTMAS EDITION\rLOADING...\r");
+#else
+ print("\x93" "CMDRX CADET - ORIGINAL TABLE\rLOADING...\r");
+#endif
+ v[5]=0;v[9]=1;
  if(!game_load()||!load("MAP.BIN",2,0)||!load("TILES.BIN",2,0x1000)||!load("PAL.BIN",3,0xfa00)||
  !load("SPRITES.BIN",3,SPRITE_BASE&65535)||!load("FONT.BIN",3,FONT_BASE&65535))goto fail;
  /* Clear the spill below the cabinet using the existing blank map tile. */
@@ -269,8 +285,12 @@ int main(void){
  }
 #ifdef COVER_AUDIO
  *(volatile uint8_t*)0=32;if(!load("COVER.CMD",0,0xa000))goto fail;
+#ifdef CHRISTMAS
+ *(volatile uint8_t*)0=64;if(!load("COVER.XMS",0,0xa000))goto fail;
+#else
  *(volatile uint8_t*)0=64;if(!load("COVER.PCM",0,0xa000))goto fail;
  *(volatile uint8_t*)0=COVER_CMD_HIGH;if(!load("COVER.HI",0,0xa000))goto fail;
+#endif
 #else
  for(uint8_t i=0;i<2;++i){char n[]="MUSIC0.BIN";n[5]+=i;*(volatile uint8_t*)0=32+i*8;if(!load(n,0,0xa000))goto fail;}
 #endif
@@ -302,7 +322,11 @@ int main(void){
 #else
  game_begin(true);
 #endif
- dynamic_init();frame(31,32,403,197,1);display(true);v[9]=0x51;
+ dynamic_init();
+#ifdef CHRISTMAS
+ *(volatile uint8_t*)0=64;christmas_init();*(volatile uint8_t*)0=11;
+#endif
+ frame(31,32,403,197,1);display(true);v[9]=0x51;
 #ifndef NO_MUSIC
  music_start();
 #endif
@@ -350,6 +374,9 @@ int main(void){
     (new_game?DemoNew:0);
   buttons=attract_input(buttons,now);
   if(buttons&DemoReset){
+#ifdef CHRISTMAS
+   if(new_game&&music_enabled)music_start();
+#endif
    bool show=game.state!=Ready&&!attract_caption&&!(buttons&15);
    previous_state=255;
    if(show){

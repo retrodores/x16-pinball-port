@@ -37,7 +37,11 @@ def build_native(name,sources,defines=()):
     assert 2 < len(data) < MAIN_MAX_BYTES, (name, len(data))
     assert data[:2]==b'\x01\x08'
     (OUT/(name+'.PRG')).write_bytes(data)
-    for section,ext,size in OVERLAYS:
+    if '-DCHRISTMAS' in defines:
+        overlays = OVERLAYS + (('.holiday', '.XMS', 8192),)
+    else:
+        overlays = OVERLAYS
+    for section,ext,size in overlays:
         overlay=elf_section(Path(str(raw)+'.elf'),section)
         assert len(overlay)<=size,(name,section,len(overlay))
         (OUT/(name+ext)).write_bytes(overlay.ljust(size,b'\x00'))
@@ -49,7 +53,8 @@ if __name__=='__main__':
       'cadet/game/bounds.s','cadet/game/audio.s','cadet/game/engine.c',
       'cadet/game/depth_quant.s','cadet/game/mask_pixels.s','cadet/game/depth_rect.s',
       'cadet/game/depth.c','cadet/game/dynamic.c','cadet/game/attract.c','cadet/game/play.c']
-    cover = os.environ.get('CADET_COVER_AUDIO') == '1'
+    christmas = os.environ.get("CADET_CHRISTMAS") == "1"
+    cover = christmas or os.environ.get('CADET_COVER_AUDIO') == '1'
     attract = os.environ.get('CADET_ATTRACT_TEST') == '1'
     targets = [('COVER' if cover else 'CADET', False)]
     if attract:
@@ -62,6 +67,8 @@ if __name__=='__main__':
             defs += ['-DPROFILE_ATTRACT']
         if cover:
             defs+=['-DCOVER_AUDIO','-Wa,-defsym,COVER_AUDIO=1']
+        if christmas:
+            defs += ["-DCHRISTMAS", "-Wa,-defsym,CHRISTMAS=1"]
         if fixture:
             defs+=['-DGAME_TEST','-DTEST_FRAMES='+os.environ.get('CADET_TEST_FRAMES','12000')]
             if attract:
