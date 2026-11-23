@@ -1,9 +1,9 @@
-/* Holiday sprites share one 8x8 pattern per colour. Slots 80..106
+/* Holiday sprites share one 8x8 pattern per colour. Slots 100..126
  * are separate from the gameplay sprites and behind the ball. */
 #include "christmas_lamp_data.h"
 
-#define CHRISTMAS_PATTERN 0x1f9c0UL
-#define CHRISTMAS_FIRST_SPRITE 80
+#define CHRISTMAS_PATTERN 0x1f980UL
+#define CHRISTMAS_FIRST_SPRITE 100
 extern volatile uint8_t christmas_cue;
 static uint8_t holiday_shown[27], holiday_cursor;
 
@@ -36,6 +36,6 @@ static __attribute__((noinline,section(".holiday"))) void christmas_lamps(void){
   holiday_shown[i]=color;
   uint8_t sprite=CHRISTMAS_FIRST_SPRITE+i;
   if(!color)hide(sprite);
-  else tile(sprite,CHRISTMAS_PATTERN/32u+color-1,holiday_x[i],holiday_y[i],holiday_palette[color-1]);
+  else tile(sprite,0x8000u | (CHRISTMAS_PATTERN/32u+2u*(color-1)),holiday_x[i],holiday_y[i],0);
  }
 }

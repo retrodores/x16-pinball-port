@@ -45,6 +45,9 @@ static void hide(uint8_t n){addr(0x1fc06UL+(uint16_t)n*8);v[3]=0;}
 static void tile(uint8_t n,uint16_t a,int16_t x,int16_t y,uint8_t size){addr(0x1fc00UL+(uint16_t)n*8);word(a);word(x);word(y);v[3]=12;v[3]=size;}
 #ifdef CHRISTMAS
 #include "christmas_lamps.h"
+_Static_assert(CHRISTMAS_PATTERN >= FAST_TILE_END, "Holiday sprites overlap mechanism patterns");
+_Static_assert(CHRISTMAS_PATTERN + sizeof(holiday_patterns) == 0x1fa00UL,
+               "Holiday sprites overlap the palette");
 #endif
 static void frame(uint8_t n,uint8_t f,int16_t x,int16_t y,uint8_t reserved){
  const SpriteFrame*s=&sprites[f];
@@ -115,6 +118,13 @@ void audio_effect(uint8_t id){
 }
 
 #include "message_display.h"
+#ifdef CHRISTMAS
+_Static_assert(CHRISTMAS_FIRST_SPRITE >= MESSAGE_LAST_SPRITE &&
+               CHRISTMAS_FIRST_SPRITE + 27 <= 127, "Holiday sprite attributes overlap");
+_Static_assert(CHRISTMAS_PATTERN >= FAST_TILE_END + FONT_TAIL_CELLS*128UL,
+               "Holiday sprites overlap the message cache");
+#endif
+
 #ifdef PROFILE_DISPLAY
 static uint32_t mask_cycles,copy_cycles,prefetch_cycles;
 #endif

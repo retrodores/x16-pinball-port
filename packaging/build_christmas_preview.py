@@ -14,30 +14,25 @@ ROOT = Path(__file__).resolve().parents[1]
 BUILD = ROOT / 'cadet/play-build'
 SOURCE = ROOT / ('releases/1.0-Beta/Emulator/RAM-and-Quit/'
                  'SpaceCmdrX16-1.0-Beta-2MB-65C02.zip')
+HOLIDAY_COLORS = {0xa0: (17, 102, 34), 0xb0: (51, 255, 85),
+                  0xc0: (119, 17, 17), 0xe0: (255, 51, 34)}
 GROUPS = (196, 160, 197, 159, 198, 158, 199, 157, 200, 156, 201, 155,
           202, 154, 203, 153, 204, 152, *range(205, 214))
 
 
-def lamp_patterns(files, inventory):
-    _, colors, _, _ = unpack(files)
+def lamp_patterns(inventory):
     bitmaps = {item['group']: item for item in json.loads(inventory.read_text())['bitmaps']}
     origin = bitmaps[107]
     x = [bitmaps[i]['x'] - origin['x'] + 8 + (bitmaps[i]['width'] - 8) // 2 for i in GROUPS]
     y = [bitmaps[i]['y'] - origin['y'] + 5 + (bitmaps[i]['height'] - 8) // 2 for i in GROUPS]
-    palettes, patterns = [], []
-    for rgb in ((255, 51, 34), (51, 238, 68)):
-        bright_error = ((colors[:, 1:] - rgb) ** 2).sum(axis=2)
-        dim_error = ((colors[:, 1:] - np.asarray(rgb) * .47) ** 2).sum(axis=2)
-        bank = int((bright_error.min(axis=1) + dim_error.min(axis=1)).argmin())
-        palettes.append(bank)
-        bright, dim = (int(error[bank].argmin()) + 1 for error in (bright_error, dim_error))
-        yy, xx = np.mgrid[:8, :8]
-        distance = (xx - 3.5) ** 2 + (yy - 3.5) ** 2
-        pixels = np.where(distance < 5, bright, np.where(distance < 12, dim, 0))
-        patterns.extend(((pixels[:, ::2] << 4) | pixels[:, 1::2]).flatten())
-    assert len(patterns) == 64 and len(set(zip(x, y))) == 27
+    patterns = []
+    yy, xx = np.mgrid[:8, :8]
+    distance = (xx - 3.5) ** 2 + (yy - 3.5) ** 2
+    for dim, bright in ((0xa0, 0xb0), (0xc0, 0xe0)):
+        patterns.extend(np.where(distance < 5, bright, np.where(distance < 12, dim, 0)).flatten())
+    assert len(patterns) == 128 and len(set(zip(x, y))) == 27
     data = {'holiday_x': ('uint16_t', x), 'holiday_y': ('uint16_t', y),
-            'holiday_palette': ('uint8_t', palettes), 'holiday_patterns': ('uint8_t', patterns)}
+            'holiday_patterns': ('uint8_t', patterns)}
     (BUILD / 'christmas_lamp_data.h').write_text(''.join(
         f'static const {kind} {name}[] __attribute__((section(".holiday.rodata"))) = {{{", ".join(map(str, values))}}};\n'
         for name, (kind, values) in data.items()))
@@ -71,6 +66,12 @@ def winter_backbox(files):
 
 
 def package(files, output):
+    # These palette-bank zero entries are never selected by 4bpp assets.
+    # The 8bpp message font observes a fixed subset that excludes them.
+    palette = bytearray(files['PAL.BIN'])
+    for pen, (r, g, b) in HOLIDAY_COLORS.items():
+        palette[2*pen:2*pen+2] = bytes(((g//17 << 4) | b//17, r//17))
+    files['PAL.BIN'] = bytes(palette)
     for name in ('COVER.HI', 'COVER.PCM'):
         del files[name]
     for ext in ('CMD', 'XMS', 'MEC', 'PHY', 'RUL', 'PRG'):
@@ -121,7 +122,7 @@ if __name__ == '__main__':
     with ZipFile(SOURCE) as archive:
         files = {name: archive.read(name) for name in archive.namelist()}
     if args.phase == 'headers':
-        lamp_patterns(files, args.path)
+        lamp_patterns(args.path)
     else:
         winter_backbox(files)
         package(files, args.path)
