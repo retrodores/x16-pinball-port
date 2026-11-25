@@ -18,7 +18,15 @@ static uint8_t font_cache[96] __attribute__((section(".physics.fontcache")));
 #define MESSAGE_RIGHT 570u
 #define MESSAGE_TOP 306u
 
+#ifdef CHRISTMAS
+/* Both ink banks use pens 5 (face), 13 (shadow) and 8 (stipple). */
+#define HOLIDAY_GREEN 8u
+#define HOLIDAY_RED 6u
+static const uint8_t font_colors[16] = {0x00,0x05,0x0d,0x08,0x50,0x55,0x5d,0x58,
+                                        0xd0,0xd5,0xdd,0xd8,0x80,0x85,0x8d,0x88};
+#else
 static const uint8_t font_colors[16] = MSG_COLOR_TABLE;
+#endif
 static uint8_t font_head,font_tail,player_head,player_tail,font_slot,font_digit;
 static uint16_t font_x,font_y;
 static const char *font_pending,*lower_pending;
@@ -85,9 +93,20 @@ static FONT_CODE void message_banked(void){
    font_pending=0;break;
   }
   if(c=='\n'){font_x=MESSAGE_LEFT;font_y+=MSG_HEIGHT;continue;}
+#ifdef CHRISTMAS
+  /* Give each line one ink so mixed-case words stay easy to read. */
+  uint8_t ink=font_upper?(c=='1'?HOLIDAY_RED:HOLIDAY_GREEN):
+              (font_y==MESSAGE_TOP+MSG_HEIGHT?HOLIDAY_GREEN:HOLIDAY_RED);
+#else
+  const uint8_t ink=2u; /* PBMSG_FT is generated for palette bank 2. */
+#endif
   if(c=='#'&&font_digit>='0'&&font_digit<='9'){
    if(font_x+16<=MESSAGE_RIGHT)
+#ifdef CHRISTMAS
+    tile(font_slot++,SCORE_DIGIT_BASE+(font_digit-'0')*8u,font_x,font_y,(SCORE_DIGIT_ATTR & 0xf0u)|ink);
+#else
     tile(font_slot++,SCORE_DIGIT_BASE+(font_digit-'0')*8u,font_x,font_y,SCORE_DIGIT_ATTR);
+#endif
    font_x+=16+MSG_GAP;
    continue;
   }
@@ -98,7 +117,7 @@ static FONT_CODE void message_banked(void){
   uint8_t width=font_read(code,fresh?pixels:0);
   if(c!=' '&&font_x+width<=MESSAGE_RIGHT){
    if(fresh)slot=font_upload(code,width,pixels);
-   uint8_t attr=0x82;
+   uint8_t attr=0x80u|ink;
    if(width>8)attr+=width>16?32:16;
    if(slot!=255)tile(font_slot++,glyph_pattern(slot),font_x,font_y,attr);
    font_x+=width+MSG_GAP;

@@ -10,6 +10,7 @@ from zipfile import ZIP_DEFLATED, ZipFile, ZipInfo
 import numpy as np
 
 from backbox import LEFT, unpack
+from christmas_art import decorate
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / 'cadet/game'))
@@ -145,6 +146,7 @@ def package(files, output):
         'X16 BASIC: LOAD"PINBALL.PRG",8,1 then RUN from the extracted game folder.',
         '', 'Space launches. Z and / flip. F2 starts a new game. F3 starts the demo.',
         'Music starts automatically. M toggles it. Q or Esc returns to BASIC.',
+        'Winter Village artwork: holly title, holiday display and alpine scenery.',
         'At 0:10 the first guitar chord lights the center ring. At 0:21 the light spreads outward.',
         'COVER.CMD contains the full 3:25 Shchedryk arrangement and lamp cues.',
         'Keep COVER.CMD in the game folder. The separate ZSM is optional.',
@@ -183,4 +185,5 @@ if __name__ == '__main__':
         lamp_patterns(args.path)
     else:
         winter_backbox(files)
+        decorate(files)
         package(files, args.path)

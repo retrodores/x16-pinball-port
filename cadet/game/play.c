@@ -119,6 +119,16 @@ void audio_effect(uint8_t id){
 
 #include "message_display.h"
 #ifdef CHRISTMAS
+/* Only counters have a holiday ink. Ball and flipper drawing stay on their
+ * original path. prepare_runtime verifies ten consecutive 16x32 patterns. */
+static void score_number(uint8_t slot,uint8_t digit,int16_t x,int16_t y){
+ uint8_t ink=slot&1u?HOLIDAY_RED:HOLIDAY_GREEN;
+ tile(slot,SCORE_DIGIT_BASE+8u*digit,x,y,(SCORE_DIGIT_ATTR&0xf0u)|ink);
+}
+#else
+#define score_number(slot,digit,x,y) frame(slot,31+(digit),x,y,1)
+#endif
+#ifdef CHRISTMAS
 _Static_assert(CHRISTMAS_FIRST_SPRITE >= MESSAGE_LAST_SPRITE &&
                CHRISTMAS_FIRST_SPRITE + HOLIDAY_COUNT <= 127, "Holiday sprite attributes overlap");
 _Static_assert(CHRISTMAS_PATTERN >= FAST_TILE_END + FONT_TAIL_CELLS*128UL,
@@ -217,13 +227,13 @@ static void display(bool update_panel){
  if(pose!=plunger_cache){f=16+pose;frame(19,f,sprites[f].x,sprites[f].y,3);plunger_cache=pose;}
  if(game.score_dirty&&update_panel){uint8_t hi=39;while(hi&&!game.digits[hi])--hi;
   for(uint8_t i=0;i<9;++i){uint8_t digit=i<=hi?game.digits[i]:255;if(digit==score_cache[i])continue;score_cache[i]=digit;
-   if(digit==255){hide(22+i);}else frame(22+i,31+digit,553-i*15,197,1);
+   if(digit==255){hide(22+i);}else score_number(22+i,digit,553-i*15,197);
   }
   wide_score=hi>=9;
   if(hi>=9){echo("# EXACT SCORE ");for(int8_t i=hi;i>=0;--i)*(volatile uint8_t*)0x9fbb=48+game.digits[i];echo("\n");}
   game.score_dirty=false;
  }
- uint8_t number=game.ball_number;if(update_panel&&number!=ball_cache){frame(32,31+number,553,152,1);ball_cache=number;}
+ uint8_t number=game.ball_number;if(update_panel&&number!=ball_cache){score_number(32,number,553,152);ball_cache=number;}
  if(update_panel)update_status();
  dynamic_update(update_panel?(game.state==Ready?240:128):0);
  if(update_panel)message_step();
@@ -343,7 +353,7 @@ int main(void){
 #ifdef CHRISTMAS
  *(volatile uint8_t*)0=64;christmas_init();*(volatile uint8_t*)0=11;
 #endif
- frame(31,32,403,197,1);display(true);v[9]=0x51;
+ score_number(31,1,403,197);display(true);v[9]=0x51;
 #ifndef NO_MUSIC
  music_start();
 #endif
