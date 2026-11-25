@@ -131,7 +131,7 @@ def package(files, output):
         'X16 BASIC: LOAD"PINBALL.PRG",8,1 then RUN from the extracted game folder.',
         '', 'Space launches. Z and / flip. F2 starts a new game. F3 starts the demo.',
         'Music starts automatically. M toggles it. Q or Esc returns to BASIC.',
-        'COVER.CMD contains the full 3:24 Shchedryk arrangement and lamp cues.',
+        'COVER.CMD contains the full 3:25 Shchedryk arrangement and lamp cues.',
         'Keep COVER.CMD in the game folder. The separate ZSM is optional.',
         '', 'The holiday lamps follow the score during normal play and the demo.',
         'Startup, tilt, and gameplay mission/rank lamps take priority.',

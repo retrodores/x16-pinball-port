@@ -2,9 +2,9 @@
 
 This 2 MB 65C02 target uses the Space CmdrX16 1.0 Beta RAM-and-Quit
 runtime as its input. The packer pins the base archive by SHA-256.
-The holiday build uses three banks for a new native Shchedryk arrangement
+The current holiday build uses six banks for its native Shchedryk arrangement
 and bank 64 for the holiday lamp renderer. The game stream includes private
-lamp cues and a 204-second loop at 92 Hz. SHCHEDRYK.ZSM contains the same
+lamp cues and a 204.78-second loop at 92 Hz. SHCHEDRYK.ZSM contains the same
 music writes and timing in standard ZSM v1 without the lamp extension.
 The YM2151 and PSG play music while the existing VERA PCM mixer plays
 table sounds. No commercial recording or sampled music is in this build.
@@ -78,3 +78,25 @@ expected 330/370/392 Hz opening motif, and zero PCM underruns.
 The revised score was checked structurally for the full 204 seconds.
 The revision's emulator playback test covered startup and the mute/restart
 sequence. The preceding Santa-cap build supplied the full-loop playtest.
+
+
+### Concert arrangement
+
+The supplied MP3 decodes to 205.009 seconds. Its level envelope puts the first
+full entrance near 1:04, the quiet bridge near 1:36, the second full entrance
+near 2:10, and the final release near 3:12. The original native score follows
+these landmarks using fresh instrumental parts on the Shchedryk melody.
+It contains six YM2151 voices and five VERA PSG voices. VERA PCM stays
+available for table, flipper and plunger samples. The musical accents,
+brief breaks and releases carry their own lamp cues in COVER.CMD.
+
+The opening pairs a tuned FM bell with a triangle voice. An answering bowed
+part and plucked offbeats build toward a brass line, pitched kick and noise
+snare. Two counter-rotating lamp trails approach the inner rank ring. At the
+strongest downbeats that ring fills, then drops back on the same score clock.
+Targets owned by gameplay take priority. The standalone ZSM contains the
+same register writes and loop, with the private lamp extension omitted.
+
+Cold boot, F2, and M restart use the same score. The game reads 64 KiB less
+before playing the opening sample. This startup improvement is shared with
+the standard Space Cadet X16 and Space CmdrX16 runtimes.

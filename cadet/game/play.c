@@ -304,7 +304,14 @@ int main(void){
 #else
  for(uint8_t i=0;i<2;++i){char n[]="MUSIC0.BIN";n[5]+=i;*(volatile uint8_t*)0=32+i*8;if(!load(n,0,0xa000))goto fail;}
 #endif
- for(uint8_t i=0;i<PCM_PARTS;++i){char n[]="PCM0.BIN";n[3]+=i;*(volatile uint8_t*)0=pcm_load_banks[i];if(!load(n,0,0xa000))goto fail;}
+#ifdef GAME_TEST
+ const uint8_t first_pcm=0; /* Fixtures enter gameplay without the opening. */
+#else
+ /* The opening owns banks 19 onward until startup_pcm(false) loads PCM0.
+  * Load the other resident effects now and avoid reading 64 KiB twice. */
+ const uint8_t first_pcm=1;
+#endif
+ for(uint8_t i=first_pcm;i<PCM_PARTS;++i){char n[]="PCM0.BIN";n[3]+=i;*(volatile uint8_t*)0=pcm_load_banks[i];if(!load(n,0,0xa000))goto fail;}
  for(uint8_t i=0;i<9;++i){char n[]="DEPTH00.BIN";n[6]+=i;*(volatile uint8_t*)0=i==0?10:i<3?16+i:i+42;if(!load(n,0,0xa000))goto fail;}
  *(volatile uint8_t*)0=57;if(!load("MSGFONT.BIN",0,0xa400))goto fail;
  *(volatile uint8_t*)0=31;if(!load("RINGS.BIN",0,0xb000))goto fail;

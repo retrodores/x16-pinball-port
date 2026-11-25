@@ -3,7 +3,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from christmas_music import BAR, HZ, build
+from christmas_music import BAR, BARS, HZ, build, key_code
 
 
 def decode(stream, allow_cues):
@@ -44,21 +44,32 @@ class ChristmasMusicTest(unittest.TestCase):
         self.assertEqual(zsm[:9], b'zm\x01\x10\0\0\0\0\0')
         self.assertEqual(int.from_bytes(zsm[12:14], 'little'), HZ)
         tick, writes, cues = decode(zsm[16:], False)
-        self.assertEqual(tick / HZ, 204)
+        self.assertEqual(tick, BARS * BAR)
+        self.assertAlmostEqual(tick / HZ, 205.009, delta=.3)
         self.assertFalse(cues)
         game_tick, game_writes, cues = decode(game, True)
         self.assertEqual(game_tick, tick)
         self.assertEqual(game_writes, writes)
-        self.assertEqual(zsm[10] & 0x20, 0x20)
-        for start in (0, 48 * BAR, 64 * BAR, 96 * BAR):
-            lead_on = [(tick, value) for tick, chip, register, value in writes
-                       if tick == start and chip == 'PSG' and register == 22]
-            self.assertTrue(any(value >= 249 for _, value in lead_on), start)
+        used_fm = {reg & 7 for _, chip, reg, val in writes
+                   if chip == 'FM' and 0x28 <= reg <= 0x2f}
+        used_psg = {reg // 4 for _, chip, reg, val in writes if chip == 'PSG'}
+        self.assertEqual(zsm[9], sum(1 << ch for ch in used_fm))
+        self.assertEqual(int.from_bytes(zsm[10:12], 'little'), sum(1 << ch for ch in used_psg))
+        self.assertIn((0, 'FM', 0x28, 0x48), writes)  # G4 on the centered bell
+        self.assertEqual(key_code(69), 0x4a)  # 440 Hz
+        self.assertEqual(key_code(60), 0x3e)  # middle C is below the KC octave boundary
+        self.assertIn((0, 'PSG', 22, 192 | 60), writes)
         energy = dict(cues)
-        self.assertLess(energy[0], energy[32 * BAR])
-        self.assertLess(energy[48 * BAR], energy[32 * BAR])
-        self.assertGreater(energy[80 * BAR], energy[32 * BAR])
+        for hit in (49, 100, 132):
+            self.assertGreaterEqual(energy[hit * BAR], 10)
+            self.assertLess(energy[hit * BAR + 22], energy[hit * BAR])
+        self.assertEqual(energy[48 * BAR + 80], 0)
+        self.assertLess(energy[74 * BAR], energy[66 * BAR])
         self.assertEqual(cues[-1][1], 0)
+        final_levels = {reg: value & 63 for _, chip, reg, value in writes
+                        if chip == 'PSG' and reg % 4 == 2}
+        self.assertTrue(all(v == 0 for v in final_levels.values()))
+        self.assertLessEqual(len(game), 13 * 8192)
 
 
 if __name__ == '__main__':

@@ -1,126 +1,205 @@
-"""Sequence a native instrumental Shchedryk arrangement and private lamp cues."""
+"""A Shchedryk concert arrangement in E minor for OPM, VERA PSG and the center lamps."""
 from collections import defaultdict
 from pathlib import Path
 
 HZ = 92
-BAR = 184
-BARS = 102
+BAR = 120                     # Three beats of 40 ticks, dotted pulse = 46/min.
+BARS = 157
+KEY_CODES = (0, 1, 2, 4, 5, 6, 8, 9, 10, 12, 13, 14)  # C# through C
 MOTIF = (67, 66, 67, 64)
-MINOR = ((40, 59, 64), (36, 60, 64), (45, 60, 64), (47, 59, 63))
-LIFT = ((36, 60, 67), (38, 62, 69), (43, 59, 67), (47, 63, 66))
-BRIDGE = ((71, 69, 67), (64, 66, 67), (69, 71, 74), (72, 71, 66))
-KEY_CODES = (0, 1, 2, 4, 5, 6, 8, 9, 10, 12, 13, 14)
+# Bass, third, fifth and upper chord tone. The dominant has a raised D#.
+EM, C, AM, B = (40, 55, 59, 64), (36, 55, 60, 64), (45, 57, 60, 64), (35, 54, 59, 63)
+G, D = (43, 55, 59, 62), (38, 54, 57, 62)
+GROUND = (EM, EM, C, C, AM, AM, B, B)
+RISE = (C, D, EM, G, AM, C, B, B)
+ANSWER = ((71, 69, 67), (66, 67, 64), (72, 71, 67), (69, 67, 66),
+          (69, 72, 76), (74, 72, 69), (71, 69, 66), (63, 66, 71))
+BRIDGE = ((64, 67), (71, 69), (67, 64), (62, 64),
+          (69, 72), (76, 74), (71, 66), (63, 59))
+
+# Each entry starts a musical phrase. Drops leave space for the next entrance.
+DYNAMICS = ((0, 2), (4, 3), (8, 4), (16, 5), (22, 3), (24, 4),
+            (30, 5), (36, 6), (43, 7), (46, 8), (49, 10), (58, 7),
+            (66, 9), (72, 5), (74, 3), (86, 4), (90, 5), (94, 6),
+            (96, 7), (98, 8), (100, 10), (112, 9), (114, 7), (116, 10),
+            (128, 10), (132, 11), (140, 10), (146, 9), (147, 5),
+            (148, 4), (151, 3), (154, 2))
+
+
+def key_code(note):
+    # The chip's octave boundary falls between C and C#. A4 is KC $4A.
+    octave, degree = divmod(note - 13, 12)
+    return octave * 16 + KEY_CODES[degree]
+
+
+# Two modulator/carrier pairs (algorithm 4). Tuple fields are ratio,
+# initial attenuation, attack, first decay, second decay, sustain/release.
+BELL = ((7, 33, 31, 20, 8, 0x38), (3, 39, 31, 15, 7, 0x49),
+        (1, 28, 31, 12, 5, 0x48), (2, 31, 31, 16, 6, 0x59))
+BOW = ((1, 31, 20, 6, 1, 0x29), (2, 43, 21, 9, 2, 0x39),
+       (1, 27, 17, 6, 1, 0x29), (1, 33, 19, 7, 2, 0x39))
+PICK = ((2, 28, 31, 19, 11, 0x78), (4, 41, 31, 18, 9, 0x68),
+        (1, 28, 31, 13, 5, 0x49), (1, 39, 31, 15, 6, 0x59))
+BRASS = ((1, 23, 23, 12, 3, 0x39), (3, 34, 25, 13, 4, 0x49),
+         (1, 25, 23, 8, 1, 0x28), (2, 34, 24, 9, 2, 0x38))
 
 
 def arrange():
     events = defaultdict(list)
 
-    def fm(tick, register, value):
-        events[tick].append((1, register, value))
+    def fm(tick, reg, value):
+        events[tick].append((1, reg, value))
 
-    def psg(tick, voice, note, level, wave=0x80):
-        frequency = round(440 * 2 ** ((note - 69) / 12) * (1 << 17) / (25_000_000 / 512))
-        for register, value in enumerate((frequency & 255, frequency >> 8, 192 | level, wave)):
-            events[tick].append((0, voice * 4 + register, value))
+    patches = (BELL, BELL, BOW, PICK, BRASS, BOW)
+    # A centered lead/bass and complementary left/right backing voices.
+    for ch, (patch, pan, feedback) in enumerate(zip(
+            patches, (192, 128, 192, 64, 192, 128), (2, 2, 4, 5, 5, 3))):
+        fm(0, 0x20 + ch, pan | feedback << 3 | 4)
+        fm(0, 0x30 + ch, 0)  # Clear inherited key fraction and modulation sensitivity.
+        fm(0, 0x38 + ch, 0)
+        for slot, params in enumerate(patch):
+            for base, value in zip((0x40, 0x60, 0x80, 0xa0, 0xc0, 0xe0), params):
+                fm(0, base + slot * 8 + ch, value)
 
-    def lead(tick, note, level, duration):
-        # VERA carries the melody immediately, including on setups where
-        # the FM bell layer is quiet or unavailable.
-        psg(tick, 5, note, level)
-        events[tick + 8].append((0, 5 * 4 + 2, 192 | (level - 5)))
-        events[tick + duration].append((0, 5 * 4 + 2, 192))
+    def note(t, ch, pitch, ticks, tl):
+        # Calibrated against the game's opening PCM. Move both carriers,
+        # preserving their ratio and leaving modulator timbre independent.
+        tl = max(0, tl - 7)
+        fm(t, 8, ch)
+        fm(t, 0x28 + ch, key_code(pitch))
+        fm(t, 0x70 + ch, tl)
+        fm(t, 0x78 + ch, tl + (patches[ch][3][1] - patches[ch][2][1]))
+        fm(t, 8, 0x78 | ch)
+        fm(t + ticks, 8, ch)
 
-    def bell(tick, channel, note, level, duration):
-        fm(tick, 8, channel)
-        fm(tick, 0x28 + channel, ((note // 12 - 1) << 4) | KEY_CODES[note % 12])
-        fm(tick, 0x70 + channel, 127 - level)
-        fm(tick, 0x78 + channel, 130 - level)
-        fm(tick, 8, 0x78 | channel)
-        fm(tick + duration, 8, channel)
+    def level(t, ch, volume):
+        events[t].append((0, ch * 4 + 2, 192 | (min(63, volume + 6) if volume else 0)))
 
-    for channel in range(4):
-        fm(0, 0x20 + channel, 0xC0 | (4 if channel < 2 else 3) << 3 | 4)
-        for operator, ratio in ((0, 3 if channel < 2 else 2), (8, 2), (16, 1), (24, 1)):
-            reg = channel + operator
-            fm(0, 0x40 + reg, ratio)
-            fm(0, 0x60 + reg, 38 if operator < 16 else 60)
-            fm(0, 0x80 + reg, 0x1f if channel < 2 else 0x19)
-            fm(0, 0xa0 + reg, 13 if channel < 2 else 4)
-            fm(0, 0xc0 + reg, 5)
-            fm(0, 0xe0 + reg, 0x48)
+    def pitch(t, ch, midi):
+        freq = round(440 * 2 ** ((midi - 69) / 12) * (1 << 17) / (25_000_000 / 512))
+        events[t].extend(((0, ch * 4, freq & 255), (0, ch * 4 + 1, freq >> 8)))
 
-    for bar in range(96):
-        tick = bar * BAR
-        if bar < 16:
-            energy = min(4, 1 + bar // 5)
-        elif bar < 47:
-            energy = min(8, 4 + (bar - 16) // 4)
-            if 38 <= bar < 42:
-                energy = 5
-        elif bar < 62:
-            energy = 2 if bar < 59 else 4
-        else:
-            energy = min(10, 6 + (bar - 62) // 3)
-            if 74 <= bar < 77:
-                energy = 7
-        changes = LIFT if 8 <= bar % 16 <= 11 else MINOR
-        chord = changes[(bar // 2) % 4]
-        if 47 <= bar < 59:
-            phrase = BRIDGE[(bar - 47) % len(BRIDGE)]
-            melody = zip((0, 61, 122), phrase)
-        else:
-            notes = MOTIF if bar % 8 != 7 else (67, 69, 67, 64)
-            melody = zip((0, 61, 92, 122), notes)
-        for index, (offset, note) in enumerate(melody):
-            bell(tick + offset, index % 2, note, 79 + energy + (3 if index == 0 else 0), 34)
-            lead(tick + offset, note, min(62, 56 + energy + (3 if index == 0 else 0)), 28)
-            if energy >= 6 and index in (0, 3):
-                psg(tick + offset, 4, note + 12, energy + 3, 0x80)
-                psg(tick + offset + 19, 4, note + 12, 0, 0x80)
+    def synth(t, ch, midi, volume, hold, steps=()):
+        pitch(t, ch, midi)
+        level(t, ch, volume)
+        for delay, drop in steps:
+            level(t + delay, ch, max(0, volume - drop))
+        level(t + hold, ch, 0)
+
+    for ch, wave in ((0, 0x80), (1, 0x80), (2, 0xc0), (3, 0x19), (5, 0x80)):
+        events[0].append((0, ch * 4 + 3, wave))
+
+    def cue(t, pos, intensity):
+        events[t].append((2, 0, ((pos % 16) << 4) | intensity))
+
+    for bar in range(BARS):
+        t = bar * BAR
+        energy = next(e for first, e in reversed(DYNAMICS) if first <= bar)
+        buildup = 43 <= bar < 49 or 94 <= bar < 100 or 128 <= bar < 132
+        bridge = 74 <= bar < 94
+        peak = energy >= 9
+        chord = (RISE if buildup or 49 <= bar < 58 or 132 <= bar < 146 else GROUND)[bar % 8]
+        bass, third, fifth, top = chord
+        if bar >= 153:
+            chord = (B, EM, EM, EM)[bar - 153]
+            bass, third, fifth, top = chord
+        if bar == BARS - 1:
+            # A release on E leads back into the first G of the bell figure.
+            note(t, 0, 76, 56, 43)
+            note(t, 2, 52, 75, 40)
+            synth(t, 5, 64, 36, 73, ((20, 5), (42, 11), (60, 19)))
+            cue(t, 0, 4)
+            cue(t + 40, 0, 2)
+            cue(t + 80, 0, 0)
+            continue
+
+        break_bar = bar in (48, 99)
+        notes = MOTIF if bar % 8 != 7 else (67, 69, 67, 64)
+        if bridge:
+            # Long cello phrases over high, lightly picked bell fragments.
+            line = BRIDGE[bar % 8]
+            note(t, 2, line[0] - 12, 70, 24)
+            note(t + 80, 2, line[1] - 12, 35, 27)
+            if bar % 2:
+                notes = (71, 69, 67, 66)
+        for j, (offset, duration) in enumerate(((0, 32), (40, 16), (60, 16), (80, 34))):
+            if break_bar and offset >= 60:
+                break
+            n = notes[j]
+            note(t + offset, j & 1, n + (12 if bridge else 0), duration, 24 + (j != 0)*3)
+            lead_level = (42 if bridge else 53) + min(4, energy // 2) - (j & 1)*2
+            if bar >= 147:
+                lead_level -= (bar - 147) * 2
+            synth(t + offset, 5, n + (12 if bridge else 0), lead_level, duration,
+                  ((6, 4), (12, 8)))
+        if bar >= 2 and not bridge:
+            note(t + 1, 2, bass + 12, 52 if energy >= 5 else 107, 29 - min(8, energy))
+            if energy >= 5 and not break_bar:
+                note(t + 68, 2, fifth, 44, 30)
         if energy >= 3:
-            psg(tick, 0, chord[0], energy + 9, 0x5f)
-            psg(tick + 160, 0, chord[0], 0, 0x5f)
+            # Off-beat picked chords leave the center free for pinball contacts.
+            for j, off in enumerate((20, 60, 100) if energy >= 5 else (20, 80)):
+                if break_bar and off >= 60:
+                    break
+                note(t + off, 3, (third, fifth, top)[j], 15, 35 - min(7, energy))
         if energy >= 4:
-            for i, note in enumerate(chord[1:]):
-                bell(tick, i + 2, note + (12 if bar % 8 == 7 else 0), 65 + energy, 149)
+            synth(t + 2, 0, bass, 47 + energy // 2, 47, ((8, 3), (25, 5)))
+            if energy >= 6 and not break_bar:
+                synth(t + 80, 0, bass + (7 if bar % 2 else 12), 46 + energy // 2, 28)
+        if energy >= 5 and not break_bar:
+            a = ANSWER[bar % 8]
+            if peak or buildup:
+                for beat, n in enumerate(a):
+                    note(t + 3 + 40 * beat, 4, n, 31, 30 - (energy - 5))
+            else:
+                note(t + 42, 4, a[1], 65, 32)
+            if energy >= 7:
+                note(t + 4, 5, third + 12, 100, 32 - (energy - 7))
         if energy >= 5:
-            for offset in (0, 61, 122):
-                psg(tick + offset, 1, 31 if offset == 0 else 46, energy + 5, 0xc0)
-                psg(tick + offset + 7, 1, 31, 0, 0xc0)
-        if energy >= 8 and bar % 8 in (4, 5, 6, 7):
-            phrase = BRIDGE[bar % 4]
-            for beat, note in enumerate(phrase):
-                offset = beat * 61
-                psg(tick + offset, 3, note, energy + 5)
-                psg(tick + offset + 53, 3, note, 0)
-        if energy >= 7:
-            for j, offset in enumerate((30, 91, 153)):
-                psg(tick + offset, 2, chord[1 + j % 2] - 12, energy + 2, 0x4e)
-                psg(tick + offset + 25, 2, 48, 0, 0x4e)
-        for beat, offset in enumerate((0, 61, 122)):
-            intensity = energy if beat == 0 else max(1, energy - 2)
-            phase = (bar * 3 + beat) % 16
-            events[tick + offset].append((2, 0, (phase << 4) | intensity))
-
-    tick = 96 * BAR
-    for channel, note in enumerate((52, 59, 64, 67)):
-        bell(tick, channel, note, 94 - channel, 170)
-    lead(tick, 64, 60, 120)
-    for index, intensity in enumerate((10, 8, 6, 4, 2, 1, 0)):
-        events[tick + 61 * index].append((2, 0, (7 << 4) | intensity))
+            # Tuned kick with a falling skin pitch, then noise snare/brushes.
+            synth(t + 3, 1, 45, 54, 14, ((4, 3), (9, 11)))
+            pitch(t + 6, 1, 34)
+            if not break_bar:
+                for off in ((40, 80) if peak else (80,)):
+                    synth(t + off, 2, 70, 47 if peak else 43, 10, ((3, 7), (7, 15)))
+                if energy >= 7:
+                    for off in (20, 60, 100):
+                        synth(t + off, 2, 87, 34, 4, ((2, 8),))
+                if buildup and bar % 4 == 2:
+                    synth(t + 110, 2, 76, 43, 7, ((3, 6),))
+        if peak and not break_bar:
+            # Split the octave attack from the main bell so the hit has an edge.
+            synth(t + 2, 3, notes[0] + 12, 40 + energy // 2, 23, ((7, 5), (16, 10)))
+        for beat, off in enumerate((0, 40, 80)):
+            pos = bar * 3 + beat
+            if break_bar and off >= 40:
+                cue(t + off, pos, 0)
+                continue
+            strength = energy if beat == 0 else max(1, energy - (1 if buildup else 3))
+            # The inner ring fills on the arrival and recedes with each accent.
+            cue(t + off, pos, strength)
+            if energy >= 7:
+                cue(t + off + 22, pos, max(1, strength - 3))
     return events
 
 
 def encode(events, lamps):
     stream = bytearray()
     previous = 0
+    registers = {}
     for tick, writes in sorted(events.items()):
         commands = bytearray()
         for kind, register, value in writes:
             if kind == 2:
                 if lamps:
                     commands.extend((0x40, 0x81, value))
-            elif kind == 1:
+                continue
+            key = (kind, register)
+            # Key-on/off is a strobe. Other identical writes have no effect.
+            if key != (1, 8) and registers.get(key) == value:
+                continue
+            registers[key] = value
+            if kind == 1:
                 commands.extend((0x41, register, value))
             else:
                 commands.extend((register, value))
@@ -145,9 +224,10 @@ def build(output):
     output.mkdir(parents=True, exist_ok=True)
     events = arrange()
     commands = encode(events, lamps=True)
-    assert len(commands) < 13 * 8192
+    if len(commands) > 13 * 8192:
+        raise ValueError('Christmas command stream exceeds banks 32..44')
     (output / 'COVER.CMD').write_bytes(commands)
-    header = b'zm\x01' + (16).to_bytes(3, 'little') + bytes(3) + bytes((0x0f, 0x3f, 0))
+    header = b'zm\x01' + (16).to_bytes(3, 'little') + bytes(3) + bytes((0x3f, 0x2f, 0))
     header += HZ.to_bytes(2, 'little') + bytes(2)
     (output / 'SHCHEDRYK.ZSM').write_bytes(header + encode(events, lamps=False))
 
