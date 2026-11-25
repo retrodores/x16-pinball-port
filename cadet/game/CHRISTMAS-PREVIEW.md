@@ -36,6 +36,37 @@ Each archive has the launcher, PINBALL.PRG, overlays, full song, other assets,
 engine specifications and credits at their runtime paths. The ZSMKit binaries
 from the standalone audition are not required. This is a private playtest.
 
+## Carol Rock playtest
+
+Playable source `fbb8e6c5c6330b902c097699e48dec0bb31d88b3`. The 44-entry runtime ZIP contains 35
+launcher-checked runtime files. The Windows launcher, specs and licenses are
+included. An independent rebuild from the staged ZSM produced the same archive.
+
+| Tested download | SHA-256 |
+| --- | --- |
+| `SpaceCmdrX16-Christmas-1.0-Beta-2MB-Carol-Rock.zip` | `02a6711248684b01ba168fc81761592dd7bb4fe96c2e4214e9f866e8b0af4490` |
+| `SpaceCmdrX16-Christmas-Carol-Rock-Gameplay.mp4` | `66450fa66befd7994974d058a2e7896cd9f5b6a0ad4624c5f9eb8d494947c865` |
+| `SpaceCmdrX16-Christmas-Carol-Rock.png` | `3d9ae132435f3f37b637d8b059c00d42acba42ec5dd3356ae0bed79ac559af2c` |
+
+Linux x16emu r49, stock 65C02 at 8 MHz, 2 MB RAM, using fresh extractions.
+ROM SHA-256 `b81654cc8c87ed96e3ffc7c8e7c312c9f3b7b870c7bb34de61e61eac931b819a`.
+
+| Run | Frames | Over 133,333 cycles | Peak cycles | Song loops | PCM drum triggers | PCM underruns / music errors |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| F3, takeover, F2, launch, flip, mute and resume | 2,854 | 36 | 430,848 | 0 | 0 | 0 / 0 |
+| Unattended startup to scored demo | 3,314 | 199 | 654,889 | 0 | 83 | 0 / 0 |
+| F3 gameplay through the complete 3:53 song | 13,965 | 1,315 | 630,158 | 1 | 563 | 0 / 0 |
+
+- The raw full-demo stereo range was -32,767 to 32,766. The independent audio check counted 23 of 23,120,924 sample values with absolute amplitude at or above 32,767.
+- The full demo recording uses actual 640×480 X16 scanout sampled at 15 fps against the emulated WAV sample clock. Of 3,532 captured video frames, 7 repeated the previous sample at a missed capture deadline. The MP4 uses the game's stereo WAV at original gain.
+- In the manual capture, the two F2 startup waveforms correlated at 0.993 and 0.995 with the source sample. The plunger release correlated at 0.919. Flipper return correlated at 0.655 with music and 0.985 during mute. The stereo music component fell to digital zero during mute. The opening bell returned near 784 Hz on resume.
+- Across 18 passages the level of the isolated stereo difference signal was within 0.20 dB of the standalone take. The timing check matched 452 drum strikes from 20.05 to 219.47 seconds, with 95% within 9.3 ms of the fitted score clock. On looping, the recording returned to the opening bell at 233.63 seconds (envelope correlation 0.997). Source sample matches in gameplay included the flipper (SOUND104), bumper (SOUND12), pop-up target (SOUND49) and rollover (SOUND8).
+- The opening bells lit up to 2 scanned sites at once. The first full-band entrance near 0:40 reached 15. In the recorded full-game fan near 2:30, the screen scan detected up to 10 active holiday sites. The closing chord reached 8. These are image estimates from the gameplay video. A separate 65C02 VERA readback test drove all 31 sites, including the center and outer ring, and verified that active game signals keep their priority.
+- The art converter fixed 2,838 unintended black exterior pixels and 5,412 substitutions in the title's original dark field. Its tests compare board pixels, mechanism tile addresses and display windows. The capture includes the full cabinet and snowy ground under the message pane.
+- At 512 KB the complete game displayed its 2 MB requirement and returned to BASIC. At 2 MB Q returned to BASIC. Both configurations successfully loaded and ran a second PRG. The shared native regression suite passed at both RAM sizes.
+- The actual batch file launched the Windows r49 executable under Wine 11.22 from an outside working directory with spaces in the parent and game paths. F3 entered a scored demo, F2 started manual play, and Q returned to BASIC, where PRINT 37*7 gave 259. A normal close returned status 0. Missing CAROL.ZSM and missing parent ROM each produced the corresponding message and status 1. Native Windows and physical X16 remain untested.
+- The full game exceeds its frame budget on some frames. The cumulative statistics above keep the 133,333-cycle criterion.
+
 ## Winter Village artwork and validation
 
 Build source `bf11ab2a2e88fd4adfcaa30a5687aa789a5a9ae5`. The Christmas-only
