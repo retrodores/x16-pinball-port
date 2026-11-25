@@ -45,6 +45,30 @@ Each archive has the launcher, PINBALL.PRG, overlays, full song, other assets,
 engine specifications and credits at their runtime paths. The ZSMKit binaries
 from the standalone audition are not required. This is a private playtest.
 
+## Finished Christmas table playtest
+
+Playable source `b080750ca5bcac0324bcb1af34969cd776d5671c`.
+ZIP SHA-256 `577e2683e9e6496226077f6d64b22ef38ab6a23545deb0b9601c08dcd42279af`.
+A fresh source export, base headers and the ZSM from the playable reproduced
+the ZIP byte for byte. The root launcher checks all 35 runtime files.
+
+| Linux r49, 65C02 at 8 MHz and 2 MB | Game frames | Frames over 133,333 cycles | Peak cycles | Song loops | Drum triggers |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| Demo through the complete song | 13,965 | 1,337 | 630,110 | 1 | 563 |
+| Demo takeover, F2, launch, flip, mute, resume and Q | 2,852 | 26 | 640,721 | 0 | 0 |
+| Cold start to idle demo | 3,313 | 196 | 644,828 | 0 | 83 |
+
+All runs reported zero music errors and zero PCM underruns. The recorded
+opening bell returned at 233.646 seconds in the full-loop run. The actual
+Windows r49 batch launcher passed under Wine 11.22, including a missing
+score and missing ROM. Native Windows and physical X16 remain untested.
+
+Both RAM configurations passed the native suite and returned to BASIC
+for a second program. The Christmas game requires 2 MB. The art checks
+covered the original transparent pixels, shapes and anchors of 31 moving
+sprite poses and the live centers of 56 bumper poses. Collision, rules,
+music and lamp code are byte-identical to the earlier Carol Rock playtest.
+
 ## Earlier Carol Rock playtest
 
 Playable source `fbb8e6c5c6330b902c097699e48dec0bb31d88b3`. The 44-entry runtime ZIP contains 35
