@@ -1,3 +1,10 @@
+# Space CmdrX16 Christmas Encore · 1.0 Beta
+
+This branch contains a 2 MB holiday edition for the 8 MHz Commander X16.
+The score cues the center and side lamps at 10 and 21 seconds. Some frames
+exceed the 133333-cycle budget. Emulator results, build instructions and
+checksums are in the [Christmas preview notes](cadet/game/CHRISTMAS-PREVIEW.md).
+
 # Current development build: Original Table 0.3.1-dev
 
 This branch restores Space Cadet mechanisms and original visuals/audio on the

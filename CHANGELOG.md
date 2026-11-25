@@ -1,3 +1,10 @@
+# 2026-11-25 — Space CmdrX16 Christmas Encore 1.0 Beta
+
+- Bring two guitar entrances into the first 21 seconds of the full Shchedryk arrangement.
+- Follow the chords with center, side and upper lane inserts while keeping gameplay signals visible.
+- Verify the full loop on a fresh 2 MB extraction and the return to BASIC at 512 KB.
+  [Measurements and package hashes](cadet/game/CHRISTMAS-PREVIEW.md#encore-validation)
+
 # 2026-11-19 — Original Table 0.3.1 development follow-up
 
 - Restore lower slingshot rubber/glow and upper rebounder animations; immediate

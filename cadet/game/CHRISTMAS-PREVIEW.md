@@ -2,20 +2,22 @@
 
 This 2 MB 65C02 target uses the Space CmdrX16 1.0 Beta RAM-and-Quit
 runtime as its input. The packer pins the base archive by SHA-256.
-The current holiday build uses six banks for its native Shchedryk arrangement
+The current holiday build uses seven banks for its native Shchedryk arrangement
 and bank 64 for the holiday lamp renderer. The game stream includes private
 lamp cues and a 204.78-second loop at 92 Hz. SHCHEDRYK.ZSM contains the same
 music writes and timing in standard ZSM v1 without the lamp extension.
 The YM2151 and PSG play music while the existing VERA PCM mixer plays
 table sounds. No commercial recording or sampled music is in this build.
 
-Holiday sprites draw over inactive center inserts only. Normal startup,
-rank progress, rank flash, and tilt retain priority. Active missions
-reserve the outer ring for their chase. Unclaimed inner inserts can still
-follow the song during a mission. The holiday
-display updates seven sprites per normal display frame. F2 and re-enabling
-music restart the score. Ball drains and attract transitions keep the
-current musical position.
+The Encore opening reaches its first guitar chord at 10.43 seconds. At
+20.87 seconds the next chord sends color from the center across the rank ring,
+out to the left and right lamp banks and up to the upper rollovers. The
+choreography addresses 27 ring positions and four playfield inserts. The
+renderer processes eight sprites per display frame. Gameplay owns the lamps
+during startup, tilt and rank flashes. Active missions reserve the outer ring,
+and individual lane, hazard and gravity-well indicators keep priority through
+both halves of a gameplay blink. F2 and re-enabling music restart the score.
+Ball drains and attract transitions keep the current musical position.
 
 Build on the beta toolchain with its matching generated runtime headers
 in cadet/play-build, including the original model and dynamic headers:
@@ -32,7 +34,54 @@ The base edition retains its existing build path. The runtime archive
 contains only the playable files, launcher, documentation and notices.
 The preview uses the original table assets and is a private playtest.
 
-## Preview validation
+## Encore validation
+
+Playable source commit `20d7c4336205f335360b1628b5f2896939b615d2`.
+The two guitar parts use independent YM2151 voices. Short palm-muted notes
+lead into sustained root/fifth chords with pitched pickups and a PSG cymbal.
+The two early accents each follow a half-beat rest. The bell motif, quieter
+middle passage, later entrances and ending still run across all 157 bars.
+The game stream and standalone ZSM contain matching note and timing events.
+
+The ZIP was packed twice and matched byte for byte. Tests used separate fresh
+extractions, stock 65C02 at 8 MHz with 2 MB banked RAM, Linux x16emu r49,
+and ROM `b81654cc8c87ed96e3ffc7c8e7c312c9f3b7b870c7bb34de61e61eac931b819a`.
+
+| Run | Frames | Over 133333 cycles | Peak cycles | Score loops | PCM underruns |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| Cold start and F3 demo | 2015 | 174 | 633815 | 0 | 0 |
+| F2, launch and flipper | 2097 | 42 | 305161 | 0 | 0 |
+| Launch, flip, mute and resume | 2272 | 57 | 230227 | 0 | 0 |
+| Unattended through the score loop | 12581 | 1344 | 623462 | 1 | 0 |
+
+The full-loop emulator WAV peaked at 0.809 full scale, with 0 clipped
+samples. Each run reported zero music errors. Fresh 512 KB startup printed
+the 2 MB memory requirement and returned to BASIC, which then loaded and
+executed a second PRG. Timing still exceeds budget on some frames. Windows
+launcher execution and physical hardware remain unverified.
+
+The 30-second cold-start excerpt uses the emulator's stereo WAV at original
+gain. The screen was sampled at 24 fps against the emulator audio sample clock.
+One sample deadline was missed in each of the 34- and 35-second raw captures.
+A scan for newly lit red/green pixels in the cold-start demo found as many as
+20 lit sites around the first accent and 29 around the second. Both side lamps
+and the upper lane appeared in sequence after the center. The same analysis
+after F2 found 21 and 28 sites. These are image estimates and depend on which
+indicators gameplay owns. Waveform matching against the extracted PCM banks
+found the launch at 6.85 seconds (0.79 correlation), and a flipper at 20.57
+seconds (0.82 correlation) in the demo.
+
+In separate diagnostic emulator runs with table effects muted, the half-second
+after each chord measured about 3.1 and 4.5 dB louder respectively than the
+corresponding passages of the previous Audition. The opening bell level matched.
+
+| File | SHA-256 |
+| --- | --- |
+| `SpaceCmdrX16-Christmas-1.0-Beta-2MB-Encore.zip` | `8ff3fd52f8f899d1f18b90243fe4bd7e5ca8eb8db661077b5b4c8f6e8c4d8c15` |
+| `SpaceCmdrX16-Christmas-Encore-Opening.mp4` | `b490b47ddd9f5131a1fec6c075a698f7127b4b4839da9becbfa0120146a85e61` |
+| `SpaceCmdrX16-Christmas-Encore.zsm` | `2e15c92a9523252548ee195ea11edfd739ed5b4e3f0b2bde27679e27d7fe1f89` |
+
+## Earlier preview validation
 
 Runtime source: 9f4b534aa370fad9231576259e5064ad5b215319.
 ZIP SHA-256: `d69d7eb0198ab6cf1fbdfdf4097af453ea2717b6e4ec60b87802e3ef09bea4f9`.
