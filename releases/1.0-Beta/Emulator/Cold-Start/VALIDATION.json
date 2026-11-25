@@ -1,0 +1,139 @@
+{
+  "engine_source_commit": "ae79024823cbe7a7d555477523e4be9ea459be22",
+  "build_command": "python3 packaging/build_console_beta.py --cold-start ae79024823cbe7a7d555477523e4be9ea459be22",
+  "emulator": "Linux x16emu r49 af102408",
+  "rom_sha256": "b81654cc8c87ed96e3ffc7c8e7c312c9f3b7b870c7bb34de61e61eac931b819a",
+  "zip_hashes": "SHA256SUMS",
+  "windows_tested": false,
+  "hardware_tested": false,
+  "checks": {
+    "SpaceCadet-X16-1.0-Beta-2MB-65C02.zip": {
+      "cpu": "c02",
+      "ram_kb": 2048,
+      "entry": "natural opening",
+      "checked": "cold start, PCM file open order, F2, Q to BASIC",
+      "frames": 721,
+      "over_133333": 71,
+      "peak_cycles": 402282,
+      "changed_files": [
+        "COVER.MEC",
+        "COVER.PHY",
+        "PINBALL.PRG",
+        "COVER.RUL",
+        "README.txt"
+      ]
+    },
+    "SpaceCadet-X16-1.0-Beta-2MB-65C816.zip": {
+      "cpu": "c816",
+      "ram_kb": 2048,
+      "entry": "early-demo",
+      "checked": "cold start, PCM file open order, F2, Q to BASIC",
+      "frames": 376,
+      "over_133333": 42,
+      "peak_cycles": 375072,
+      "changed_files": [
+        "COVER.MEC",
+        "COVER.PHY",
+        "PINBALL.PRG",
+        "COVER.RUL",
+        "README.txt"
+      ]
+    },
+    "SpaceCadet-X16-1.0-Beta-512KB-65C02.zip": {
+      "cpu": "c02",
+      "ram_kb": 512,
+      "entry": "natural opening",
+      "checked": "cold start, PCM file open order, F2, Q to BASIC",
+      "frames": 722,
+      "over_133333": 3,
+      "peak_cycles": 335517,
+      "changed_files": [
+        "CADET.MEC",
+        "CADET.PHY",
+        "PINBALL.PRG",
+        "CADET.RUL",
+        "README.txt"
+      ]
+    },
+    "SpaceCadet-X16-1.0-Beta-512KB-65C816.zip": {
+      "cpu": "c816",
+      "ram_kb": 512,
+      "entry": "early-demo",
+      "checked": "cold start, PCM file open order, F2, Q to BASIC",
+      "frames": 377,
+      "over_133333": 4,
+      "peak_cycles": 212240,
+      "changed_files": [
+        "CADET.MEC",
+        "CADET.PHY",
+        "PINBALL.PRG",
+        "CADET.RUL",
+        "README.txt"
+      ]
+    },
+    "SpaceCmdrX16-1.0-Beta-2MB-65C02.zip": {
+      "cpu": "c02",
+      "ram_kb": 2048,
+      "entry": "natural opening",
+      "checked": "cold start, PCM file open order, F2, Q to BASIC",
+      "frames": 720,
+      "over_133333": 70,
+      "peak_cycles": 528136,
+      "changed_files": [
+        "COVER.MEC",
+        "COVER.PHY",
+        "PINBALL.PRG",
+        "COVER.RUL",
+        "README.txt"
+      ]
+    },
+    "SpaceCmdrX16-1.0-Beta-2MB-65C816.zip": {
+      "cpu": "c816",
+      "ram_kb": 2048,
+      "entry": "early-demo",
+      "checked": "cold start, PCM file open order, F2, Q to BASIC",
+      "frames": 371,
+      "over_133333": 31,
+      "peak_cycles": 341848,
+      "changed_files": [
+        "COVER.MEC",
+        "COVER.PHY",
+        "PINBALL.PRG",
+        "COVER.RUL",
+        "README.txt"
+      ]
+    },
+    "SpaceCmdrX16-1.0-Beta-512KB-65C02.zip": {
+      "cpu": "c02",
+      "ram_kb": 512,
+      "entry": "natural opening",
+      "checked": "cold start, PCM file open order, F2, Q to BASIC",
+      "frames": 721,
+      "over_133333": 1,
+      "peak_cycles": 161658,
+      "changed_files": [
+        "CADET.MEC",
+        "CADET.PHY",
+        "PINBALL.PRG",
+        "CADET.RUL",
+        "README.txt"
+      ]
+    },
+    "SpaceCmdrX16-1.0-Beta-512KB-65C816.zip": {
+      "cpu": "c816",
+      "ram_kb": 512,
+      "entry": "early-demo",
+      "checked": "cold start, PCM file open order, F2, Q to BASIC",
+      "frames": 382,
+      "over_133333": 3,
+      "peak_cycles": 184742,
+      "changed_files": [
+        "CADET.MEC",
+        "CADET.PHY",
+        "PINBALL.PRG",
+        "CADET.RUL",
+        "README.txt"
+      ]
+    }
+  }
+}

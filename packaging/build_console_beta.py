@@ -13,9 +13,10 @@ PLAYER = ROOT / 'cadet/play-build'
 CPUS = {'65C02': b'-c02', '65C816': b'-c816'}
 
 
-def build(engine_commit):
+def build(engine_commit, cold_start=False):
+    destination = OUTPUT.parent / "Cold-Start" if cold_start else OUTPUT
     source = json.loads((SOURCE / 'PACKAGE-MANIFEST.json').read_text())
-    OUTPUT.mkdir(exist_ok=True)
+    destination.mkdir(exist_ok=True)
     archives = {}
     for name, old in source['archives'].items():
         path = SOURCE / name
@@ -47,7 +48,7 @@ def build(engine_commit):
                     f'Run PINBALL.PRG from this folder. Requires {memory} of banked RAM.'.encode())
             )
             archive_name = name.removesuffix('.zip') + f'-{cpu}.zip'
-            output = OUTPUT / archive_name
+            output = destination / archive_name
             with ZipFile(output, 'w', compression=ZIP_DEFLATED, compresslevel=9) as archive:
                 for record in records:
                     archive.writestr(copy(record), runtime[record.filename], compresslevel=9)
@@ -65,21 +66,23 @@ def build(engine_commit):
                 'ram_kb': 2048 if stem == 'COVER' else 512,
                 'release': {
                     'title': title,
-                    'tag': old['release']['tag'].removesuffix('-pinball-prg') + f'-{cpu.lower()}-ram-quit',
+                    'tag': old['release']['tag'].removesuffix('-pinball-prg') + f'-{cpu.lower()}-' + ('cold-start' if cold_start else 'ram-quit'),
                 },
             }
 
     assert len(archives) == 8
-    (OUTPUT / 'PACKAGE-MANIFEST.json').write_text(json.dumps({
+    (destination / 'PACKAGE-MANIFEST.json').write_text(json.dumps({
         'engine_source_commit': engine_commit,
         'specification_commit': source['specification_commit'],
         'archives': archives,
     }, indent=2) + '\n')
-    (OUTPUT / 'SHA256SUMS').write_text(''.join(
+    (destination / 'SHA256SUMS').write_text(''.join(
         f"{metadata['sha256']}  {name}\n" for name, metadata in archives.items()))
 
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('engine_commit', help='Source commit used to build all runtime binaries')
-    build(parser.parse_args().engine_commit)
+    parser.add_argument('--cold-start', action='store_true', help='Stage the cold-start follow-up alongside RAM-and-Quit')
+    args = parser.parse_args()
+    build(args.engine_commit, args.cold_start)

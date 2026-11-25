@@ -3,9 +3,11 @@
 Run under xvfb-run with an extracted runtime as the working directory.
 """
 import argparse
+import ctypes
 import os
 from pathlib import Path
-import re
+import signal
+import struct
 import subprocess as sp
 import tempfile
 import time
@@ -28,10 +30,28 @@ def wait(condition, label):
     raise RuntimeError(label + '\n' + log.read_bytes().decode('ascii', 'replace')[-800:])
 
 
+# Observe HostFS opens without tracing every emulated byte read.
+libc = ctypes.CDLL(None, use_errno=True)
+watch_fd = libc.inotify_init1(os.O_NONBLOCK | os.O_CLOEXEC)
+if watch_fd < 0:
+    raise OSError(ctypes.get_errno(), 'inotify_init1')
+watched = {}
+for filename in ('STARTFX.BIN', 'PCM0.BIN'):
+    wd = libc.inotify_add_watch(watch_fd, os.fsencode(filename), 0x20)  # IN_OPEN
+    if wd < 0:
+        raise OSError(ctypes.get_errno(), filename)
+    watched[wd] = filename
+observed = []
+
+
 def loads():
-    # HostFS opens the asset itself with O_RDONLY. Directory searches, stats
-    # and reads of the emulator binary are irrelevant to the game load order.
-    return re.findall(r'openat\([^\n]*?"(?:[^"]*/)?(STARTFX\.BIN|PCM0\.BIN)", O_RDONLY[^\n]*?= \d+', trace.read_text())
+    try:
+        while True:
+            for wd, mask, _, _ in struct.iter_unpack('iIII', os.read(watch_fd, 4096)):
+                if mask & 0x20:
+                    observed.append(watched[wd])
+    except BlockingIOError:
+        return observed
 
 
 def key(name):
@@ -39,10 +59,9 @@ def key(name):
 
 
 with tempfile.TemporaryDirectory() as temp:
-    log, trace = (Path(temp) / name for name in ('game.log', 'opens.log'))
+    log = Path(temp) / 'game.log'
     with log.open('wb') as out:
-        process = sp.Popen(['strace', '-f', '-s', '300', '-e', 'trace=openat', '-o', str(trace),
-                            '/opt/x16emu-r49/x16emu', '-' + args.cpu, '-mhz', '8',
+        process = sp.Popen(['/opt/x16emu-r49/x16emu', '-' + args.cpu, '-mhz', '8',
                             '-ram', str(args.ram), '-rom', '/opt/x16emu-r49/rom.bin',
                             '-scale', '1', '-fsroot', '.', '-echo', 'raw', '-prg', 'PINBALL.PRG', '-run'],
                            stdout=out, stderr=out, start_new_session=True,
@@ -71,7 +90,7 @@ with tempfile.TemporaryDirectory() as temp:
                   loads(), 'frames', int(result[0], 16), 'over', int(result[3], 16),
                   'peak', int(result[1], 16), flush=True)
         finally:
-            import signal
+            os.close(watch_fd)
             try:
                 os.killpg(process.pid, signal.SIGTERM)
                 process.wait(timeout=4)
