@@ -7,7 +7,7 @@ import numpy as np
 
 from backbox import unpack
 from build_christmas_preview import SOURCE, winter_backbox
-from christmas_art import BANK, WINTER, decorate, pixels
+from christmas_art import BANK, WINTER, cabinet_exterior, decorate, pixels
 
 
 def screen(files):
@@ -37,13 +37,14 @@ class WinterArtTest(unittest.TestCase):
         self.assertEqual({k for k in self.original if self.original[k] != self.winter[k]},
                          {'MAP.BIN', 'TILES.BIN', 'PAL.BIN', 'SPRITES.BIN'})
         self.assertEqual([len(v) for v in self.original.values()], [len(v) for v in self.winter.values()])
-        protected = (a[:27, :24] & 1023) != 0
-        np.testing.assert_array_equal(a[:27, :24][protected], b[:27, :24][protected])
-        for y in range(5, 432):
-            indices = np.where(old[y, :378].any(axis=1))[0]
-            if len(indices):
-                span = slice(indices[0], indices[-1] + 1)
-                np.testing.assert_array_equal(new[y, span], old[y, span], err_msg=f'cabinet row {y}')
+        exterior = cabinet_exterior()
+        affected = exterior.reshape(27,16,24,16).any(axis=(1,3))
+        interior = np.broadcast_to(~affected[:, None, :, None], (27,16,24,16)).reshape(432,384)
+        np.testing.assert_array_equal(a[:27, :24][~affected], b[:27, :24][~affected])
+        np.testing.assert_array_equal(new[:, :384][interior], old[:, :384][interior])
+        mixed = ~exterior & ~interior
+        stable = np.repeat(np.repeat((b[:27, :24] >> 12) != BANK, 16, axis=0), 16, axis=1)
+        np.testing.assert_array_equal(new[:, :384][mixed & stable], old[:, :384][mixed & stable])
         np.testing.assert_array_equal(new[192:394, 386:589], old[192:394, 386:589])
         before = self.original['PAL.BIN']
         after = self.winter['PAL.BIN']
@@ -61,12 +62,14 @@ class WinterArtTest(unittest.TestCase):
     def test_continuous_sky_and_original_title_backdrop(self):
         old, _ = screen(self.original)
         image, mapping = screen(self.winter)
-        for y in range(432):
-            cabinet = np.flatnonzero(old[y, :378].any(axis=1))
-            exterior = np.ones(384, dtype=bool)
-            if len(cabinet):
-                exterior[cabinet[0]:cabinet[-1]+1] = False
-            self.assertTrue(image[y, :384][exterior].any(axis=1).all(), f'black exterior in row {y}')
+        exterior = cabinet_exterior()
+        self.assertTrue(image[:, :384][exterior].any(axis=1).all())
+        # All cells crossing the lip use the scenery palette. Mixed cells
+        # must render the very same scenery colors as the nearby full tiles.
+        self.assertTrue((mapping[0, 4:19] >> 12 == BANK).all())
+        from christmas_art import nearest, scenery
+        sky = WINTER[nearest(scenery()[:5, 64:304], WINTER)]
+        np.testing.assert_array_equal(image[:5, 64:304], sky)
         # The unused old legend now belongs to the same winter background as
         # the gutters. The original display panes remain black behind messages.
         for region in (image[:16,384:], image[400:432,384:]):

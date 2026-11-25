@@ -9,7 +9,7 @@ from backbox import LEFT, unpack
 # Bank 8 is exclusive to the cabinet art in the pinned base. Bank 6 supplies
 # the red font. Both use pen 5 for the face and 8 for its stippled highlights.
 BANK = 8
-PALETTE = ('000', '113', '234', '357', '68a', '4c7', '9bc', 'a23',
+PALETTE = ('000', '113', '234', '346', '667', '4c7', '9bc', 'a23',
            'bf9', 'fc7', 'eee', '111', 'f45', '153', 'f99', '285')
 WINTER = np.array([[int(v, 16)*17 for v in c] for c in PALETTE], dtype=int)
 SCENE = Path(__file__).parent / 'art' / 'winter-village.png'
@@ -152,7 +152,7 @@ def digit_inks(files):
     files['SPRITES.BIN']=bytes(data)
 
 
-def write_scenery_tiles(mapping, tiles, free, scenic, partial):
+def write_scenery_tiles(mapping, tiles, free, scenic):
     # Select a fixed-size dictionary of real 16x16 scenic tiles by color
     # error. Flat sky and foreground can share; distinct roofs, ornaments and
     # candy stripes receive priority. No extra VRAM, per-frame uploads or sprites.
@@ -164,32 +164,34 @@ def write_scenery_tiles(mapping, tiles, free, scenic, partial):
     distances=np.maximum(size[:,None]+size[None,:]-2*(rgb_flat@rgb_flat.T),0)
     count=min(len(patterns),len(free))
     slots=free[:count]
-    # Keep silhouette fragments out of the reusable sky dictionary: a
-    # one-pixel transparent nick repeated across blue sky looks like a grid.
-    edge={int(i) for cell,i in zip(scenic,reverse) if cell in partial}
-    full={int(i) for cell,i in zip(scenic,reverse) if cell not in partial}
-    selected=sorted(edge | {i for i in full if np.all(patterns[i]==patterns[i,0])})
-    if len(selected)>count:
+    selected = [i for i, pattern in enumerate(patterns) if np.all(pattern == pattern[0])]
+    if not selected or len(selected) > count:
         raise ValueError("Scenery exceeds the available VERA tile slots")
-    dist=distances.copy()
-    for i in full:
-        for j in edge-full:
-            dist[i,j]=np.inf
     freq=np.bincount(reverse,minlength=len(patterns))
-    best=dist[:,selected].min(axis=1)
+    best=distances[:,selected].min(axis=1)
     # Spend each available tile on the greatest remaining aggregate error.
     while len(selected)<count:
-        gain=(np.maximum(0,best[:,None]-dist)*freq[:,None]).sum(axis=0)
+        gain=(np.maximum(0,best[:,None]-distances)*freq[:,None]).sum(axis=0)
         choice=int(gain.argmax())
         if gain[choice] <= 0:
             break
         selected.append(choice)
-        best=np.minimum(best,dist[:,choice])
-    closest=dist[:,selected].argmin(axis=1)
+        best=np.minimum(best,distances[:,choice])
+    closest=distances[:,selected].argmin(axis=1)
     for slot,choice in zip(slots,selected):
         tiles[slot]=packed(patterns[choice].reshape(16,16))
     for cell,i in zip(scenic,reverse):
         mapping[cell]=BANK<<12|slots[closest[i]]
+
+
+def cabinet_exterior():
+    # Trace the outer cabinet in the source raster. The straight steel sides
+    # taper symmetrically from the top lip to the bottom of the table.
+    yy, xx = np.ogrid[:432, :384]
+    left = np.interp(yy, [5, 31, 127, 239, 431], [80, 76, 60, 41, 9])
+    right = np.interp(yy, [5, 31, 127, 239, 431], [301, 305, 321, 340, 372])
+    distance = np.maximum.reduce(np.broadcast_arrays(left-xx, xx-right, 5-yy))
+    return distance > 0.5
 
 
 def decorate(files):
@@ -229,23 +231,7 @@ def decorate(files):
             pen=err[:,:,bank].argmin(axis=-1).astype(np.uint8)
             changed[row,col+24]=(bank,packed(pen))
 
-    # Protect all physical playfield pattern addresses. Mechanisms patch bytes
-    # in place. Only exterior pixels can be drawn inside an existing edge tile.
-    board=np.zeros((432,384,3),np.uint8)
-    for row in range(27):
-        for col in range(24):
-            attr=int(mapping[row,col])
-            board[16*row:16*row+16,16*col:16*col+16]=original[attr>>12,pixels(tiles[attr&1023],attr)]
-    mask=np.zeros(board.shape[:2],bool)
-    for y,line in enumerate(board):
-        ink=np.where(line[:378].any(axis=1))[0]
-        if len(ink):
-            left,right=int(ink[0]),int(ink[-1])
-        else:
-            mask[y]=True
-            continue
-        mask[y,:left]=True
-        mask[y,right+1:]=True
+    mask = cabinet_exterior()
     board_scene=scenery()
     # Reflect the village past the right-hand gutter so the display cabinet
     # shares its sky, forest floor and outer margin with the table.
@@ -258,7 +244,6 @@ def decorate(files):
     native[windows]=9
     counts=np.bincount((mapping&1023).ravel(),minlength=len(tiles))
     scenic={}
-    partial=set()
     for row in range(27):
         for col in range(24):
             y,x=row*16,col*16
@@ -267,20 +252,30 @@ def decorate(files):
                 continue
             attr = int(mapping[row, col])
             slot = attr & 1023
-            if slot:
-                if counts[slot] != 1:
-                    continue
-                # Match the original palette and pen indices for all cabinet
-                # pixels that share a tile with a scenic gutter.
-                dest=pixels(tiles[slot],attr)
-                dest[ink]=nearest(rgb[y:y+16,x:x+16][ink],colors[attr>>12])
-                tiles[slot]=packed(dest,attr)
-            else:
-                p=np.where(ink,native[y:y+16,x:x+16],0).astype(np.uint8)
-                if p.any():
-                    scenic[row,col]=p
-                    if not ink.all():
-                        partial.add((row,col))
+            if ink.all():
+                # Fully exterior cells use the same palette as the scenery.
+                mapping[row, col] = 0
+                scenic[row, col] = native[y:y+16, x:x+16]
+                continue
+            if not slot:
+                raise ValueError(f'cabinet trace crosses blank tile {(row, col)}')
+            if counts[slot] != 1:
+                raise ValueError(f'cabinet edge shares tile {slot}')
+            bank = int(attr >> 12)
+            dest = pixels(tiles[slot], attr)
+            desired = native[y:y+16, x:x+16]
+            cab = colors[bank, dest[~ink]]
+            # These upper edge cells are outside the mechanism write spans.
+            # Use the scenery palette where the cabinet pixels are mostly steel.
+            neutral = np.ptp(cab, axis=1) <= 17
+            if row == 0 or (row <= 10 and neutral.mean() >= .95):
+                dest[~ink] = np.where(cab.any(axis=1), nearest(cab, WINTER[1:])+1, 0)
+                dest[ink] = desired[ink]
+                tiles[slot] = packed(dest, attr)
+                mapping[row, col] = (attr & 0x0fff) | (BANK << 12)
+                continue
+            dest[ink] = nearest(WINTER[desired[ink]], colors[bank, 1:]) + 1
+            tiles[slot] = packed(dest, attr)
 
     # A palette bank is selected for a whole 16x16 cell. Align the four
     # outer edges of the scoreboard bezel to this grid so the bright metal
@@ -330,7 +325,7 @@ def decorate(files):
             tiles[idx] = block
         mapping[cell]=bank<<12|cache[key]
 
-    write_scenery_tiles(mapping, tiles, free, scenic, partial)
+    write_scenery_tiles(mapping, tiles, free, scenic)
     files['MAP.BIN']=mapping.astype('<u2').tobytes()
     files['TILES.BIN']=tiles.tobytes()
     digit_inks(files)
