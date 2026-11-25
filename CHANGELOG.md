@@ -1,3 +1,9 @@
+# 2026-11-25 — Christmas Winter Village 1.0 Beta
+
+- Add holiday title holly, berry-red and green lettering, snowy firs, a moonlit chalet and candy canes.
+- Keep the Encore soundtrack and fit the new scene into existing video memory.
+- [Package hashes, timing and emulator checks](cadet/game/CHRISTMAS-PREVIEW.md#winter-village-artwork-and-validation).
+
 # 2026-11-25 — Space CmdrX16 Christmas Encore 1.0 Beta
 
 - Bring two guitar entrances into the first 21 seconds of the full Shchedryk arrangement.

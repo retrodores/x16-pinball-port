@@ -34,6 +34,46 @@ The base edition retains its existing build path. The runtime archive
 contains only the playable files, launcher, documentation and notices.
 The preview uses the original table assets and is a private playtest.
 
+## Winter Village artwork and validation
+
+Build source `bf11ab2a2e88fd4adfcaa30a5687aa789a5a9ae5`. The Christmas-only
+package adds holly and red/green faces to the existing title. Score places
+alternate berry and green, the ball counter is green and each status line
+has a consistent ink. The fonts retain the original glyph geometry and
+stipple. The red BALL label keeps its original pixels.
+
+The village illustration in `packaging/art/winter-village.png` is an original
+generated pixel-art plate. It depicts an alpine chalet and a decorated fir,
+a crescent moon, candy canes and snowbanks. The title leaves and foreground
+snow crystals use native pixel patterns. The packer fits the scene into the
+existing map and tile allocation. Dynamic playfield pattern addresses and
+all static pixels between the outer rails compare equal to Encore.
+
+The complete ZIP contains the same 44 filenames as Encore. The score stream,
+PCM banks, startup effect, gameplay assets and font source are byte-identical
+apart from the themed map, tiles, palette and score digit sprite patterns.
+The executable and overlays are rebuilt together. A second build produced the
+same ZIP. Reproduction checks include `python3 packaging/test_christmas_art.py`
+and `python3 cadet/game/test_christmas_music.py`.
+
+- Runtime SHA-256 `8bc82d6462d59f64a5279a2013eab263efd1048496a82a45a5b81a5226105bb9`.
+- Lossless 640×480 emulator capture SHA-256 `2b9c33102fbce14cb954b650d1c6df65e058c74722ae9c31f7171984224dc781`.
+- Linux x16emu r49, stock 65C02 at 8 MHz, 2 MB banked RAM, ROM SHA-256
+  `b81654cc8c87ed96e3ffc7c8e7c312c9f3b7b870c7bb34de61e61eac931b819a`.
+
+| Fresh ZIP extraction | Frames | Over 133,333 cycles | Peak cycles | Music loops |
+| --- | ---: | ---: | ---: | ---: |
+| Cold start, F3, Q | 2,022 | 171 | 625,376 | 0 |
+| F2, launch, flipper, Q | 2,036 | 43 | 295,256 | 0 |
+| Idle demo through a complete soundtrack loop, Q | 12,584 | 1,347 | 623,752 | 1 |
+
+All three runs reported zero music errors and zero PCM underruns. The screenshot
+shows the 32,500 score and DEMO panel on the second burst, with the lit ring,
+two score inks and both message inks in actual emulator pixels. The original
+purple face color is absent from those text regions. The 512 KB guard printed
+the 2 MB requirement, returned to BASIC and ran a second PRG. The repository
+native suite passed at 512 KB and 2 MB. Windows and hardware remain untested.
+
 ## Encore validation
 
 Playable source commit `20d7c4336205f335360b1628b5f2896939b615d2`.

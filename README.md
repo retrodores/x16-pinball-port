@@ -1,3 +1,9 @@
+# Space CmdrX16 Christmas Winter Village · 1.0 Beta
+
+The latest 2 MB holiday preview adds a wintry alpine backdrop, a holly-trimmed
+title and red and green display lettering to Encore. Build instructions, emulator
+checks and timing limits are in the [winter artwork notes](cadet/game/CHRISTMAS-PREVIEW.md#winter-village-artwork-and-validation).
+
 # Space CmdrX16 Christmas Encore · 1.0 Beta
 
 This branch contains a 2 MB holiday edition for the 8 MHz Commander X16.
