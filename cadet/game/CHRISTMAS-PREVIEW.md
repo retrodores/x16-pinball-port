@@ -100,3 +100,34 @@ same register writes and loop, with the private lamp extension omitted.
 Cold boot, F2, and M restart use the same score. The game reads 64 KiB less
 before playing the opening sample. This startup improvement is shared with
 the standard Space Cadet X16 and Space CmdrX16 runtimes.
+
+Concert runtime source: `2ffeb28820efd24e1be0ad61ad5e4d9d605e8368`.
+Rebuilt ZIP SHA-256: `8309bdf43f4d7dad1de5af3b7265d3c34f23c46bbe3dd540ca24c4d96ad5034e`.
+Standalone ZSM SHA-256: `8da340f45628fb91c832876246e6e0b01023083e0b7b9ed564612008b3d1cc38`.
+Two independently packed ZIPs compared byte for byte. Console, input and
+audio tests used fresh extractions on Linux r49 (af102408), ROM SHA-256
+`b81654cc8c87ed96e3ffc7c8e7c312c9f3b7b870c7bb34de61e61eac931b819a`.
+
+| Run | Frames | Over 133333 cycles | Peak cycles | PCM underruns |
+| --- | ---: | ---: | ---: | ---: |
+| Unattended cold start and idle demo | 3848 | 319 | 623481 | 0 |
+| F2, launch, flip, mute, restart, Q | 2636 | 50 | 227566 | 0 |
+| Recorded F3 demo through loop and Q | 12577 | 1384 | 630813 | 0 |
+
+The recording covered one full loop with a 0.725 full-scale peak and zero
+samples at the rails. Captures showed the tune before keyboard input, after
+F2 and after M restart. A two-second music-off window was digitally silent.
+The previous beta also produced the opening notes on a cold Linux launch.
+The reported silence on the tester's system was not reproduced.
+
+The 12 fps video uses the emulator WAV sample count as its clock. All 2544
+capture deadlines were met. Normalized waveform matching against the extracted
+effect banks found the release (SOUND22) at 6.79 seconds of play and a flipper
+(SOUND104) at 139.46 seconds. Their peak correlations were 0.88 in the mixed
+stereo capture folded to mono. A color scan of center-lamp sites in the video
+counted up to 4 red/green sites together in seconds 8–20 and up to 17 in seconds
+170–182. This is a visual estimate on compressed frames.
+
+A 512 KB launch displayed the 2 MB requirement, returned to BASIC and
+successfully loaded and executed another PRG. The Christmas runtime targets
+2 MB. Windows and physical hardware were not exercised.
