@@ -187,7 +187,13 @@ static RULE_FN uint8_t startup_lamp(uint8_t group){
  return ((group^(group>>3)^game.ring_phase)&3u)<2;
 }
 BANK_TRAMPOLINE uint8_t game_lamp(uint16_t n){RULE_ENTER;uint8_t r=n==OpeningCrossLamp?(game.state==Ready?rules.cross_hold!=0:game.tilted&&rules.blink):
-  game.state==Ready?startup_lamp((uint8_t)n):rule_lamp(n);RULE_LEAVE;return r;}
+  game.state==Ready?startup_lamp((uint8_t)n):rule_lamp(n,rules.blink);RULE_LEAVE;return r;}
+#ifdef CHRISTMAS
+/* Reserve the full gameplay blink cycle, including its dark half. */
+BANK_TRAMPOLINE bool game_claims_accent(uint16_t group){
+ RULE_ENTER;bool claimed=rule_lamp(group,true)!=0;RULE_LEAVE;return claimed;
+}
+#endif
 BANK_TRAMPOLINE uint8_t game_pose(uint16_t n){RULE_ENTER;uint8_t r=rule_pose(n);RULE_LEAVE;return r;}
 /* Rank steps persist across balls. The first-rank practice and launch
  * missions use the original target selection, counts and rank award. */

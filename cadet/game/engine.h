@@ -30,5 +30,8 @@ void game_place(int16_t,int16_t,int16_t,int16_t,uint8_t);
 
 
 uint8_t game_lamp(uint16_t original_bitmap_group);
+#ifdef CHRISTMAS
+bool game_claims_accent(uint16_t group);
+#endif
 uint8_t game_ring_lamp(uint8_t index);
 uint8_t game_pose(uint16_t original_component_group);

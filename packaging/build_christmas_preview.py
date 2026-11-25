@@ -3,6 +3,7 @@ import argparse
 import hashlib
 import json
 import random
+import sys
 from pathlib import Path
 from zipfile import ZIP_DEFLATED, ZipFile, ZipInfo
 
@@ -11,6 +12,9 @@ import numpy as np
 from backbox import LEFT, unpack
 
 ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT / 'cadet/game'))
+from christmas_music import INNER_CHASE, RADIAL_BURST, TWIN_TRAILS, light_scene
+
 BUILD = ROOT / 'cadet/play-build'
 SOURCE = ROOT / ('releases/1.0-Beta/Emulator/RAM-and-Quit/'
                  'SpaceCmdrX16-1.0-Beta-2MB-65C02.zip')
@@ -18,24 +22,34 @@ HOLIDAY_COLORS = {0xa0: (17, 102, 34), 0xb0: (51, 255, 85),
                   0xc0: (119, 17, 17), 0xe0: (255, 51, 34)}
 GROUPS = (196, 160, 197, 159, 198, 158, 199, 157, 200, 156, 201, 155,
           202, 154, 203, 153, 204, 152, *range(205, 214))
+ACCENT_GROUPS = (168, 215, 189, 129)
 
 
 def lamp_patterns(inventory):
     bitmaps = {item['group']: item for item in json.loads(inventory.read_text())['bitmaps']}
     origin = bitmaps[107]
-    x = [bitmaps[i]['x'] - origin['x'] + 8 + (bitmaps[i]['width'] - 8) // 2 for i in GROUPS]
-    y = [bitmaps[i]['y'] - origin['y'] + 5 + (bitmaps[i]['height'] - 8) // 2 for i in GROUPS]
+    groups = GROUPS + ACCENT_GROUPS
+    x = [bitmaps[i]['x'] - origin['x'] + 8 + (bitmaps[i]['width'] - 8) // 2 for i in groups]
+    y = [bitmaps[i]['y'] - origin['y'] + 5 + (bitmaps[i]['height'] - 8) // 2 for i in groups]
     patterns = []
     yy, xx = np.mgrid[:8, :8]
     distance = (xx - 3.5) ** 2 + (yy - 3.5) ** 2
     for dim, bright in ((0xa0, 0xb0), (0xc0, 0xe0)):
         patterns.extend(np.where(distance < 5, bright, np.where(distance < 12, dim, 0)).flatten())
-    assert len(patterns) == 128 and len(set(zip(x, y))) == 27
+    assert len(patterns) == 128 and len(set(zip(x, y))) == len(groups)
     data = {'holiday_x': ('uint16_t', x), 'holiday_y': ('uint16_t', y),
-            'holiday_patterns': ('uint8_t', patterns)}
-    (BUILD / 'christmas_lamp_data.h').write_text(''.join(
+            'holiday_patterns': ('uint8_t', patterns), 'holiday_accent_groups': ('uint8_t', ACCENT_GROUPS)}
+    tables = ''.join(
         f'static const {kind} {name}[] __attribute__((section(".holiday.rodata"))) = {{{", ".join(map(str, values))}}};\n'
-        for name, (kind, values) in data.items()))
+        for name, (kind, values) in data.items())
+    frames = []
+    for scene in (TWIN_TRAILS, INNER_CHASE, RADIAL_BURST):
+        frames.append('{\n' + ',\n'.join('{' + ','.join(map(str, light_scene(scene, phase))) + '}'
+                                         for phase in range(16)) + '\n}')
+    tables += (f'#define HOLIDAY_FIRST_SCENE {TWIN_TRAILS}\n'
+               'static const uint8_t holiday_scenes[3][16][31] '
+               '__attribute__((section(".holiday.rodata"))) = {\n' + ',\n'.join(frames) + '};\n')
+    (BUILD / 'christmas_lamp_data.h').write_text(tables)
 
 
 def santa_cap(target):
@@ -131,6 +145,7 @@ def package(files, output):
         'X16 BASIC: LOAD"PINBALL.PRG",8,1 then RUN from the extracted game folder.',
         '', 'Space launches. Z and / flip. F2 starts a new game. F3 starts the demo.',
         'Music starts automatically. M toggles it. Q or Esc returns to BASIC.',
+        'At 0:10 the first guitar chord lights the center ring. At 0:21 the light spreads outward.',
         'COVER.CMD contains the full 3:25 Shchedryk arrangement and lamp cues.',
         'Keep COVER.CMD in the game folder. The separate ZSM is optional.',
         '', 'The holiday lamps follow the score during normal play and the demo.',

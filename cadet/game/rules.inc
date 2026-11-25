@@ -156,18 +156,18 @@ static RULE_FN void rule_release(void){
  game.disabled[rules.exit_group]=game.captured==Kickout?6:2;touch(rules.exit_group);
  ++game.returns;rule_sound(SoundRelease,rules.exit_group,game.captured);
 }
-static RULE_FN uint8_t rule_lamp(uint16_t gid){
+static RULE_FN uint8_t rule_lamp(uint16_t gid,bool blink){
  if(gid==180||gid==181)return rules.rebounder_fire[gid-180]!=0;
- if(gid>=128&&gid<=130){uint8_t b=gid-128;return rules.lane_flash[0]?rules.blink:(rules.lane_bits[0]>>b)&1;}
- if(gid>=214&&gid<=216){uint8_t b=gid-214;return rules.lane_flash[1]?rules.blink:(rules.lane_bits[1]>>b)&1;}
- if(gid>=185&&gid<=190){uint8_t i=gid-185;return rules.hazard_clear[i/3]||rules.hazard_flash[i]?rules.blink:(rules.hazard_bits[i/3]>>(i%3))&1;}
- if(gid==148||gid==147){uint8_t side=gid==147;return rules.gate[side]?(rules.gate_flash[side]||rules.gate_alert[side]?rules.blink:1):0;}
- if(gid==228||gid==227){uint8_t side=gid==227;return rules.gate[side]&&(rules.gate_flash[side]||rules.gate_alert[side])?rules.blink:0;}
- if(gid==168)return rules.gravity?rules.blink:0;
- if(gid==191)return rules.wormhole_dest?(rules.destination_flash?rules.blink:1):0;
- uint8_t i;if(gid>=125&&gid<=127){i=gid-125;if(rules.wormhole_timer)return i==rules.wormhole_exit?rules.blink:0;return rules.wormhole_dest!=0;}
+ if(gid>=128&&gid<=130){uint8_t b=gid-128;return rules.lane_flash[0]?blink:(rules.lane_bits[0]>>b)&1;}
+ if(gid>=214&&gid<=216){uint8_t b=gid-214;return rules.lane_flash[1]?blink:(rules.lane_bits[1]>>b)&1;}
+ if(gid>=185&&gid<=190){uint8_t i=gid-185;return rules.hazard_clear[i/3]||rules.hazard_flash[i]?blink:(rules.hazard_bits[i/3]>>(i%3))&1;}
+ if(gid==148||gid==147){uint8_t side=gid==147;return rules.gate[side]?(rules.gate_flash[side]||rules.gate_alert[side]?blink:1):0;}
+ if(gid==228||gid==227){uint8_t side=gid==227;return rules.gate[side]&&(rules.gate_flash[side]||rules.gate_alert[side])?blink:0;}
+ if(gid==168)return rules.gravity?blink:0;
+ if(gid==191)return rules.wormhole_dest?(rules.destination_flash?blink:1):0;
+ uint8_t i;if(gid>=125&&gid<=127){i=gid-125;if(rules.wormhole_timer)return i==rules.wormhole_exit?blink:0;return rules.wormhole_dest!=0;}
  if(gid==122)i=0;else if(gid==116)i=1;else if(gid==119)i=2;else return 0;
- if(rules.wormhole_timer)return i==rules.wormhole_exit&&rules.blink?3-i:0;
+ if(rules.wormhole_timer)return i==rules.wormhole_exit&&blink?3-i:0;
  return rules.wormhole_dest?4-rules.wormhole_dest:0;
 }
 static RULE_FN uint8_t rule_pose(uint16_t gid){

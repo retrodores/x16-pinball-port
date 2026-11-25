@@ -120,7 +120,7 @@ void audio_effect(uint8_t id){
 #include "message_display.h"
 #ifdef CHRISTMAS
 _Static_assert(CHRISTMAS_FIRST_SPRITE >= MESSAGE_LAST_SPRITE &&
-               CHRISTMAS_FIRST_SPRITE + 27 <= 127, "Holiday sprite attributes overlap");
+               CHRISTMAS_FIRST_SPRITE + HOLIDAY_COUNT <= 127, "Holiday sprite attributes overlap");
 _Static_assert(CHRISTMAS_PATTERN >= FAST_TILE_END + FONT_TAIL_CELLS*128UL,
                "Holiday sprites overlap the message cache");
 #endif
