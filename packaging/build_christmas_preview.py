@@ -12,6 +12,7 @@ import numpy as np
 
 from backbox import LEFT, unpack
 from christmas_art import decorate
+from christmas_playfield import paint_caps, paint_sprites
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / 'cadet/game'))
@@ -173,7 +174,9 @@ def package(files, output):
         '', 'CAROL.ZSM is the full 3:53 rock arrangement of Carol of the Bells.',
         'Listen for the full band near 0:39, the return near 2:30, and the final',
         'swell near 3:39. The center lamps follow the score during play and demo.',
-        'Startup and gameplay signals have priority. Table effects play with music.',
+        'Candy-striped flippers, peppermint bumpers, a silver bauble ball and a',
+        'brass-and-green plunger carry the cabinet theme onto the playfield.',
+        'The bumper jewels show their upgrade level and flash when struck.',
         '', 'This is a private Christmas playtest. Some frames exceed 133,333 cycles.',
         'See MUSIC-CREDITS.txt for the music and LICENSE and ENGINE-THIRD-PARTY-LICENSE',
         'for code notices. Original table artwork, sounds and PBMSG_FT letterforms',
@@ -215,4 +218,6 @@ if __name__ == '__main__':
     else:
         winter_backbox(files)
         decorate(files)
+        paint_sprites(files)
+        paint_caps(files)
         package(files, args.path)

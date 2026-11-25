@@ -13,6 +13,14 @@ The ending runs to the end of the 13,960-tick score, then the game repeats.
 F2 restarts an enabled score. M turns music off or restarts it. The light
 show uses the current song tick, and gameplay signals retain priority.
 
+The finished playfield uses candy-striped flippers, a polished bauble ball,
+a brass-and-green plunger and peppermint rims on all seven pop bumpers.
+The stripes follow the flipper angle from the hinge to the tip. Each bumper
+keeps its original center jewel as it advances through four levels and
+flashes on impact. The packer draws into the existing 4bpp patterns before
+play. All of the sprite silhouettes, pose origins and tile allocations are
+preserved.
+
 ## Rebuild the playable ZIP
 
 Use the beta toolchain with the existing matching model, dynamic and runtime
@@ -27,16 +35,17 @@ Use the original 2 MB Space CmdrX16 release pinned by the packaging script.
 python3 packaging/build_christmas_preview.py headers /opt/spacecadet-x16-analysis/evidence/inventory.json --song /path/to/CAROL.ZSM
 CADET_CHRISTMAS=1 CADET_BUILD_PLAYER_ONLY=1 python3 cadet/game/build_native.py
 python3 packaging/test_christmas_art.py
+python3 packaging/test_christmas_playfield.py
 python3 cadet/game/test_christmas_carol.py
 python3 cadet/game/test_carol_lamps.py --native cadet/play-build/CAROL.ZSM
-python3 packaging/build_christmas_preview.py package /tmp/SpaceCmdrX16-Christmas-1.0-Beta-2MB-Carol-Rock.zip
+python3 packaging/build_christmas_preview.py package /tmp/SpaceCmdrX16-Christmas-1.0-Beta-2MB.zip
 ```
 
 Each archive has the launcher, PINBALL.PRG, overlays, full song, other assets,
 engine specifications and credits at their runtime paths. The ZSMKit binaries
 from the standalone audition are not required. This is a private playtest.
 
-## Carol Rock playtest
+## Earlier Carol Rock playtest
 
 Playable source `fbb8e6c5c6330b902c097699e48dec0bb31d88b3`. The 44-entry runtime ZIP contains 35
 launcher-checked runtime files. The Windows launcher, specs and licenses are

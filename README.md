@@ -2,8 +2,9 @@
 
 A 2 MB holiday playtest for the stock 8 MHz Commander X16. The game plays
 the complete stereo rock audition during a normal game or F3 demo and cues
-the center and side lamps from the music. The full score is included in the
-runtime ZIP. [Build instructions and playtest results](cadet/game/CHRISTMAS-PREVIEW.md).
+the center and side lamps from the music. Candy-striped flippers swing across
+the winter table. The peppermint bumpers keep their live upgrade and hit
+indicators. A silver bauble serves from the brass-and-green plunger. [Build instructions and playtest results](cadet/game/CHRISTMAS-PREVIEW.md).
 
 # Space CmdrX16 Christmas Winter Village · 1.0 Beta
 

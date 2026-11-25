@@ -1,5 +1,6 @@
 # 2026-11-25 — Christmas Carol of the Bells 1.0 Beta
 
+- Carry the Christmas theme onto both flippers, the seven bumper caps, the ball and the plunger across all their animation poses.
 - Play the full audition ZSM with synthesized stereo drums and the original table effects.
 - Drive the Christmas lamp sequences from the native song clock.
 - [Playable package, tests and known limits](cadet/game/CHRISTMAS-PREVIEW.md).
