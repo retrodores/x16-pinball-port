@@ -1,6 +1,13 @@
+# Space CmdrX16 Christmas · Carol of the Bells · 1.0 Beta
+
+A 2 MB holiday playtest for the stock 8 MHz Commander X16. The game plays
+the complete stereo rock audition during a normal game or F3 demo and cues
+the center and side lamps from the music. The full score is included in the
+runtime ZIP. [Build instructions and playtest results](cadet/game/CHRISTMAS-PREVIEW.md).
+
 # Space CmdrX16 Christmas Winter Village · 1.0 Beta
 
-The latest 2 MB holiday preview adds a wintry alpine backdrop, a holly-trimmed
+The Winter Village preview added a wintry alpine backdrop, a holly-trimmed
 title and red and green display lettering to Encore. Build instructions, emulator
 checks and timing limits are in the [winter artwork notes](cadet/game/CHRISTMAS-PREVIEW.md#winter-village-artwork-and-validation).
 

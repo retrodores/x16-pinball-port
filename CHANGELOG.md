@@ -1,3 +1,9 @@
+# 2026-11-25 — Christmas Carol of the Bells 1.0 Beta
+
+- Play the full audition ZSM with synthesized stereo drums and the original table effects.
+- Drive the Christmas lamp sequences from the native song clock.
+- [Playable package, tests and known limits](cadet/game/CHRISTMAS-PREVIEW.md).
+
 # 2026-11-25 — Christmas Winter Village 1.0 Beta
 
 - Add holiday title holly, berry-red and green lettering, snowy firs, a moonlit chalet and candy canes.

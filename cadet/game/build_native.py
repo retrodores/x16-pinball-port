@@ -54,6 +54,9 @@ if __name__=='__main__':
       'cadet/game/depth_quant.s','cadet/game/mask_pixels.s','cadet/game/depth_rect.s',
       'cadet/game/depth.c','cadet/game/dynamic.c','cadet/game/attract.c','cadet/game/play.c']
     christmas = os.environ.get("CADET_CHRISTMAS") == "1"
+    if christmas:
+        from pack_christmas_carol import prepare
+        prepare(Path(os.environ.get('CADET_CAROL_ZSM', str(OUT/'CAROL.ZSM'))), OUT)
     cover = christmas or os.environ.get('CADET_COVER_AUDIO') == '1'
     attract = os.environ.get('CADET_ATTRACT_TEST') == '1'
     targets = [('COVER' if cover else 'CADET', False)]

@@ -3,6 +3,7 @@ import argparse
 import hashlib
 import json
 import random
+import subprocess
 import sys
 from pathlib import Path
 from zipfile import ZIP_DEFLATED, ZipFile, ZipInfo
@@ -15,10 +16,20 @@ from christmas_art import decorate
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / 'cadet/game'))
 from christmas_music import INNER_CHASE, RADIAL_BURST, TWIN_TRAILS, light_scene
+from pack_christmas_carol import ZSM_SHA256
 
 BUILD = ROOT / 'cadet/play-build'
 SOURCE = ROOT / ('releases/1.0-Beta/Emulator/RAM-and-Quit/'
                  'SpaceCmdrX16-1.0-Beta-2MB-65C02.zip')
+
+
+def checked_song(path):
+    data = path.read_bytes()
+    if hashlib.sha256(data).hexdigest() != ZSM_SHA256:
+        raise ValueError(f'{path} does not match the tested Christmas rock audition')
+    return data
+
+
 HOLIDAY_COLORS = {0xa0: (17, 102, 34), 0xb0: (51, 255, 85),
                   0xc0: (119, 17, 17), 0xe0: (255, 51, 34)}
 GROUPS = (196, 160, 197, 159, 198, 158, 199, 157, 200, 156, 201, 155,
@@ -128,37 +139,47 @@ def package(files, output):
     for pen, (r, g, b) in HOLIDAY_COLORS.items():
         palette[2*pen:2*pen+2] = bytes(((g//17 << 4) | b//17, r//17))
     files['PAL.BIN'] = bytes(palette)
-    for name in ('COVER.HI', 'COVER.PCM'):
+    for name in ('COVER.CMD', 'COVER.HI', 'COVER.PCM'):
         del files[name]
-    for ext in ('CMD', 'XMS', 'MEC', 'PHY', 'RUL', 'PRG'):
+    for ext in ('XMS', 'MEC', 'PHY', 'RUL', 'PRG'):
         files['PINBALL.PRG' if ext == 'PRG' else f'COVER.{ext}'] = (BUILD / f'COVER.{ext}').read_bytes()
-    files['RUN-WINDOWS.bat'] = files['RUN-WINDOWS.bat'].replace(b' COVER.HI COVER.PCM', b' COVER.XMS')
-    files['MUSIC-CREDITS.txt'] = (
-        b'Shchedryk, traditional Ukrainian song arranged for choir by Mykola Leontovych (1916).\r\n'
-        b'New instrumental arrangement for Commander X16, Space CmdrX16 Christmas Edition.\r\n'
-        b'Music is synthesized on YM2151 and VERA PSG.\r\n'
-        b'Score reference: https://imslp.org/wiki/Carol_of_the_Bells_(Leontovych,_Mykola)\r\n'
-    )
+    files['CAROL.ZSM'] = checked_song(BUILD / 'CAROL.ZSM')
+    old_audio = b' COVER.CMD COVER.HI COVER.PCM'
+    launcher = files['RUN-WINDOWS.bat']
+    if launcher.count(old_audio) != 1:
+        raise ValueError('unexpected input launcher asset list')
+    files['RUN-WINDOWS.bat'] = launcher.replace(old_audio, b' CAROL.ZSM COVER.XMS')
+    files['MUSIC-CREDITS.txt'] = ('\r\n'.join([
+        'Carol of the Bells / Shchedryk',
+        'Music based on Shchedryk by Ukrainian composer Mykola Leontovych.',
+        'Reference performance for this instrumental arrangement: Mannheim Steamroller.',
+        'Space CmdrX16 rock arrangement for YM2151, VERA PSG and VERA PCM.',
+        'The drum kit was synthesized for this arrangement. The recording used',
+        'as a reference is not present in the game or sampled in the ZSM.',
+        'Reference pitch analysis used Basic Pitch by Spotify and contributors.',
+        'Original audition tested with ZSMKit by mooinglemur. Pinball uses its',
+        'own audio engine for playback and for the original table sound effects.',
+        'Arrangement source: github.com/retrodores/p8inball, christmas-rock-audition',
+        'The included code licenses apply to the code. The music and original',
+        'game assets retain their respective attributions.', ''])).encode()
     files['README.txt'] = ('\r\n'.join([
-        '2D Pinball - Space CmdrX16 Christmas Edition - 1.0 Beta Preview',
-        '', 'Requires Commander X16 at 8 MHz and 2 MB banked RAM.',
-        'Windows: put x16emu.exe and rom.bin in the parent folder and run RUN-WINDOWS.bat.',
-        'X16 BASIC: LOAD"PINBALL.PRG",8,1 then RUN from the extracted game folder.',
-        '', 'Space launches. Z and / flip. F2 starts a new game. F3 starts the demo.',
-        'Music starts automatically. M toggles it. Q or Esc returns to BASIC.',
-        'Winter Village artwork: holly title, holiday display and alpine scenery.',
-        'At 0:10 the first guitar chord lights the center ring. At 0:21 the light spreads outward.',
-        'COVER.CMD contains the full 3:25 Shchedryk arrangement and lamp cues.',
-        'Keep COVER.CMD in the game folder. The separate ZSM is optional.',
-        '', 'The holiday lamps follow the score during normal play and the demo.',
-        'Startup, tilt, and gameplay mission/rank lamps take priority.',
-        'See MUSIC-CREDITS.txt, LICENSE and ENGINE-THIRD-PARTY-LICENSE.',
-        'Engine specifications describe the base game.',
-        'Development preview. Some frames exceed the 133,333-cycle target.',
-        '', 'LICENSE covers the new code. Original game artwork, audio, and the',
-        'PBMSG_FT letterforms are separate resources. See ENGINE-THIRD-PARTY-LICENSE',
-        'and https://github.com/k4zmu2a/SpaceCadetPinball for engine attribution.',
-        'Specification baseline: 898276b21c124afddbb242fb4dba0ff933feb049.',
+        '2D Pinball - Space CmdrX16 Christmas Edition - Carol of the Bells - 1.0 Beta',
+        '', 'Requires a Commander X16 with a 65C02 at 8 MHz and 2 MB of banked RAM.',
+        'Windows: place x16emu.exe and its matching rom.bin together. Extract this',
+        'ZIP into a folder directly beneath them. Double-click RUN-WINDOWS.bat.',
+        'X16 BASIC: from the extracted game directory, LOAD"PINBALL.PRG",8,1 then RUN.',
+        '', 'Hold Space and release to launch. Z and / flip. F2 starts a new game.',
+        'F3 starts the demo. M toggles music. Q or Esc returns to BASIC.',
+        '', 'CAROL.ZSM is the full 3:53 rock arrangement of Carol of the Bells.',
+        'Listen for the full band near 0:39, the return near 2:30, and the final',
+        'swell near 3:39. The center lamps follow the score during play and demo.',
+        'Startup and gameplay signals have priority. Table effects play with music.',
+        '', 'This is a private Christmas playtest. Some frames exceed 133,333 cycles.',
+        'See MUSIC-CREDITS.txt for the music and LICENSE and ENGINE-THIRD-PARTY-LICENSE',
+        'for code notices. Original table artwork, sounds and PBMSG_FT letterforms',
+        'are separate game resources. Original engine reconstruction:',
+        'https://github.com/k4zmu2a/SpaceCadetPinball',
+        'Base engine specification revision: 898276b21c124afddbb242fb4dba0ff933feb049.',
         ''])).encode()
     output.parent.mkdir(parents=True, exist_ok=True)
     with ZipFile(output, 'w', ZIP_DEFLATED, compresslevel=9) as archive:
@@ -175,6 +196,8 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('phase', choices=('headers', 'package'))
     parser.add_argument('path', type=Path)
+    parser.add_argument('--song', type=Path, default=BUILD / 'CAROL.ZSM',
+                        help='tested Carol ZSM to stage during header generation')
     args = parser.parse_args()
     assert hashlib.sha256(SOURCE.read_bytes()).hexdigest() == (
         '8b3c76c9337c403e587fc925fc87249cf9064a0bd5794980f5ea610c976c6afd'
@@ -182,7 +205,13 @@ if __name__ == '__main__':
     with ZipFile(SOURCE) as archive:
         files = {name: archive.read(name) for name in archive.namelist()}
     if args.phase == 'headers':
+        song = checked_song(args.song)
         lamp_patterns(args.path)
+        staged = BUILD / 'CAROL.ZSM'
+        if args.song.resolve() != staged.resolve():
+            staged.write_bytes(song)
+        subprocess.run([sys.executable, str(ROOT / 'cadet/game/carol_lamps.py'),
+                        str(staged), str(BUILD / 'carol_lamp_score.h')], check=True)
     else:
         winter_backbox(files)
         decorate(files)

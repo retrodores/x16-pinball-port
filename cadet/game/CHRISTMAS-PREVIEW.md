@@ -1,38 +1,40 @@
-# Space CmdrX16 Christmas preview
+# Space CmdrX16 Christmas: Carol of the Bells
 
-This 2 MB 65C02 target uses the Space CmdrX16 1.0 Beta RAM-and-Quit
-runtime as its input. The packer pins the base archive by SHA-256.
-The current holiday build uses seven banks for its native Shchedryk arrangement
-and bank 64 for the holiday lamp renderer. The game stream includes private
-lamp cues and a 204.78-second loop at 92 Hz. SHCHEDRYK.ZSM contains the same
-music writes and timing in standard ZSM v1 without the lamp extension.
-The YM2151 and PSG play music while the existing VERA PCM mixer plays
-table sounds. No commercial recording or sampled music is in this build.
+The playable 1.0 Beta loads the same 209,321-byte CAROL.ZSM as the standalone
+rock audition. The score contains eight YM2151 parts, sixteen VERA PSG parts,
+and a synthesized stereo drum kit. The game includes its own ZSM reader and
+mixes table, flipper and plunger effects into the shared VERA PCM FIFO.
+The stock target for the combined game remains the 8 MHz 65C02 with 2 MB
+of banked RAM. A standalone music player can use less RAM.
 
-The Encore opening reaches its first guitar chord at 10.43 seconds. At
-20.87 seconds the next chord sends color from the center across the rank ring,
-out to the left and right lamp banks and up to the upper rollovers. The
-choreography addresses 27 ring positions and four playfield inserts. The
-renderer processes eight sprites per display frame. Gameplay owns the lamps
-during startup, tilt and rank flashes. Active missions reserve the outer ring,
-and individual lane, hazard and gravity-well indicators keep priority through
-both halves of a gameplay blink. F2 and re-enabling music restart the score.
-Ball drains and attract transitions keep the current musical position.
+The Christmas-only runtime loads the unmodified ZSM beginning in bank 80;
+bank 64 holds the holiday renderer, lighting timeline and drum gain tables.
+The ending runs to the end of the 13,960-tick score, then the game repeats.
+F2 restarts an enabled score. M turns music off or restarts it. The light
+show uses the current song tick, and gameplay signals retain priority.
 
-Build on the beta toolchain with its matching generated runtime headers
-in cadet/play-build, including the original model and dynamic headers:
+## Rebuild the playable ZIP
+
+Use the beta toolchain with the existing matching model, dynamic and runtime
+headers in cadet/play-build. Supply the tested standalone CAROL.ZSM with SHA-256
+`f4cc99564f3a0a23367c22b0d24d7b04a17b8bf950fe01d6b29508de650c57a9`.
+The arrangement generator and player are in the
+[christmas-rock-audition branch](https://github.com/retrodores/p8inball/tree/ac6831db564a2c349670118e37350afd3646f80b/tools/music-auditions/carol-rock).
+The ZSM is included in the playable ZIP and can be extracted from it for a rebuild.
+Use the original 2 MB Space CmdrX16 release pinned by the packaging script.
 
 ```sh
-python3 packaging/build_christmas_preview.py headers /opt/spacecadet-x16-analysis/evidence/inventory.json
-python3 cadet/game/christmas_music.py cadet/play-build
-python3 cadet/game/test_christmas_music.py
+python3 packaging/build_christmas_preview.py headers /opt/spacecadet-x16-analysis/evidence/inventory.json --song /path/to/CAROL.ZSM
 CADET_CHRISTMAS=1 CADET_BUILD_PLAYER_ONLY=1 python3 cadet/game/build_native.py
-python3 packaging/build_christmas_preview.py package /tmp/SpaceCmdrX16-Christmas-1.0-Beta-2MB-Preview.zip
+python3 packaging/test_christmas_art.py
+python3 cadet/game/test_christmas_carol.py
+python3 cadet/game/test_carol_lamps.py --native cadet/play-build/CAROL.ZSM
+python3 packaging/build_christmas_preview.py package /tmp/SpaceCmdrX16-Christmas-1.0-Beta-2MB-Carol-Rock.zip
 ```
 
-The base edition retains its existing build path. The runtime archive
-contains only the playable files, launcher, documentation and notices.
-The preview uses the original table assets and is a private playtest.
+Each archive has the launcher, PINBALL.PRG, overlays, full song, other assets,
+engine specifications and credits at their runtime paths. The ZSMKit binaries
+from the standalone audition are not required. This is a private playtest.
 
 ## Winter Village artwork and validation
 

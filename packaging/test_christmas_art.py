@@ -44,7 +44,7 @@ class WinterArtTest(unittest.TestCase):
             if len(indices):
                 span = slice(indices[0], indices[-1] + 1)
                 np.testing.assert_array_equal(new[y, span], old[y, span], err_msg=f'cabinet row {y}')
-        np.testing.assert_array_equal(new[192:400, 384:], old[192:400, 384:])
+        np.testing.assert_array_equal(new[192:394, 386:589], old[192:394, 386:589])
         before = self.original['PAL.BIN']
         after = self.winter['PAL.BIN']
         self.assertEqual(before[:32*BANK], after[:32*BANK])
@@ -57,6 +57,31 @@ class WinterArtTest(unittest.TestCase):
         # The game asks this offscreen cell for its shared blank tile on entry.
         self.assertEqual(int(b[29, 39]), 0)
         self.assertFalse(any(self.winter['TILES.BIN'][:128]))
+
+    def test_continuous_sky_and_original_title_backdrop(self):
+        old, _ = screen(self.original)
+        image, mapping = screen(self.winter)
+        for y in range(432):
+            cabinet = np.flatnonzero(old[y, :378].any(axis=1))
+            exterior = np.ones(384, dtype=bool)
+            if len(cabinet):
+                exterior[cabinet[0]:cabinet[-1]+1] = False
+            self.assertTrue(image[y, :384][exterior].any(axis=1).all(), f'black exterior in row {y}')
+        # The unused old legend now belongs to the same winter background as
+        # the gutters. The original display panes remain black behind messages.
+        for region in (image[:16,384:], image[400:432,384:]):
+            self.assertTrue(region.any(axis=2).all())
+        self.assertTrue((mapping[0,24:38] >> 12 == BANK).all())
+        self.assertTrue((mapping[25:27,24:38] >> 12 == BANK).all())
+        old_title = old[24:148,398:580]
+        title = image[24:148,398:580]
+        dark = (old_title==17).all(axis=2)
+        self.assertGreater(dark.sum(),10000)
+        self.assertFalse(((title==0).all(axis=2)&dark).any())
+        # The original upper-right fold of Santa's hat remains red among
+        # the green lettering. The sprig sits to the left of the robot.
+        hat = image[79:83,384+141:384+148].astype(int)
+        self.assertGreater((hat[:,:,0]>hat[:,:,1]+34).sum(),10)
 
     def test_only_digit_patterns_change(self):
         ui = self.original['UI.BIN']

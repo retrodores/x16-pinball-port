@@ -3,14 +3,14 @@ from pathlib import Path
 from struct import unpack_from
 
 import numpy as np
-from PIL import Image, ImageDraw
+from PIL import Image, ImageDraw, ImageFilter
 from backbox import LEFT, unpack
 
 # Bank 8 is exclusive to the cabinet art in the pinned base. Bank 6 supplies
 # the red font. Both use pen 5 for the face and 8 for its stippled highlights.
 BANK = 8
 PALETTE = ('000', '113', '234', '357', '68a', '4c7', '9bc', 'a23',
-           'bf9', 'fc7', 'eee', '511', 'f45', '153', 'f99', '285')
+           'bf9', 'fc7', 'eee', '111', 'f45', '153', 'f99', '285')
 WINTER = np.array([[int(v, 16)*17 for v in c] for c in PALETTE], dtype=int)
 SCENE = Path(__file__).parent / 'art' / 'winter-village.png'
 
@@ -50,10 +50,21 @@ def title_art(panel):
     regions = np.asarray(mask)
     r,g,b = panel.astype(int).transpose(2,0,1)
     letters = (regions != 0) & (b >= g+14) & (r >= g+8) & (b >= r-5)
+    # Original lettering also contains neutral stipple and silver edge pixels.
+    # Recover those connected to the purple glyph bodies without picking up
+    # detached stars, the shuttle, or its Santa hat.
+    warm = (r > g+17) & (r > b+17)
+    possible = (regions != 0) & (panel.max(axis=2) > 34) & ~warm
+    while True:
+        neighbors = np.asarray(Image.fromarray(letters.astype(np.uint8)).filter(ImageFilter.MaxFilter(3))) != 0
+        grown = possible & neighbors
+        if np.array_equal(letters, grown):
+            break
+        letters = grown
     level = (r*3 + g*4 + b*2)//9
     steps = np.digitize(level, [52, 101, 180, 216])
     result = panel.copy()
-    for region, ramp in ((1,[11,7,12,14,10]), (2,[13,15,5,8,10])):
+    for region, ramp in ((1,[7,7,12,14,10]), (2,[13,15,5,8,10])):
         use = letters & (regions == region)
         result[use] = WINTER[np.take(ramp, steps[use])]
 
@@ -73,7 +84,7 @@ def title_art(panel):
         d.rectangle((x-1,y-1,x+1,y),fill=ink(12))
         d.point((x-1,y-1),fill=ink(14))
     art = Image.fromarray(result)
-    for patch, xy in ((sprig,(22,26)),(sprig.transpose(Image.Transpose.FLIP_LEFT_RIGHT),(91,97))):
+    for patch, xy in ((sprig,(22,26)),(sprig.transpose(Image.Transpose.FLIP_LEFT_RIGHT),(74,103))):
         art.paste(patch,xy,patch)
     return np.asarray(art)
 
@@ -84,6 +95,9 @@ def scenery():
     source = Image.open(SCENE).convert('RGB').resize((150,224), Image.Resampling.BOX)
     w,h=384,432
     art=Image.new('RGB',(w,h),tuple(WINTER[2]))
+    # Carry the same sky through the strip over the top rail. The central
+    # area below it is covered by the physical cabinet.
+    art.paste(source.resize((w,224), Image.Resampling.NEAREST), (0,0))
     for left in (0,w-source.width):
         art.paste(source,(left,0))
     # The near forest silhouettes hide the bottom of the village illustration.
@@ -228,10 +242,14 @@ def decorate(files):
         if len(ink):
             left,right=int(ink[0]),int(ink[-1])
         else:
-            left,right=79,300
-        mask[y,:max(0,left-2)]=True
-        mask[y,min(384,right+3):]=True
-    rgb=scenery()
+            mask[y]=True
+            continue
+        mask[y,:left]=True
+        mask[y,right+1:]=True
+    board_scene=scenery()
+    # Reflect the village past the right-hand gutter so the display cabinet
+    # shares its sky, forest floor and outer margin with the table.
+    rgb=np.concatenate((board_scene, board_scene[:,::-1][:,:224]),axis=1)
     native=nearest(rgb,WINTER)
     # Keep the amber windows bright when the small spruce and chalet are
     # reduced to the cabinet palette. Candy stripes stay crimson.
@@ -263,6 +281,43 @@ def decorate(files):
                     scenic[row,col]=p
                     if not ink.all():
                         partial.add((row,col))
+
+    # A palette bank is selected for a whole 16x16 cell. Align the four
+    # outer edges of the scoreboard bezel to this grid so the bright metal
+    # and the blue scenery use separate banks. Reuse the existing bevel
+    # strips; all three windows, digits, artwork and message positions stay put.
+    display=np.empty((432,208,3),np.uint8)
+    for row in range(27):
+        for col in range(24,37):
+            cell=(row,col)
+            if cell in changed:
+                bank,block=changed[cell]
+                pens=pixels(block,0)
+            else:
+                attr=int(mapping[cell])
+                bank=attr>>12
+                pens=pixels(tiles[attr&1023],attr)
+            y,x=row*16,(col-24)*16
+            display[y:y+16,x:x+16]=colors[bank,pens]
+    cabinet=display.copy()
+    cabinet[16:22]=display[12:18]
+    cabinet[394:400]=display[400:406]
+    cabinet[:,:2]=cabinet[:,2:3]
+    cabinet[:,205:]=cabinet[:,204:205]
+    for row in range(27):
+        for col in range(24,38):
+            cell=(row,col)
+            y,x=row*16,col*16
+            if row==0 or row>=25 or col==37:
+                changed.pop(cell,None)
+                mapping[cell]=0
+                scenic[cell]=native[y:y+16,x:x+16]
+            else:
+                left=x-384
+                new=cabinet[y:y+16,left:left+16]
+                if not np.array_equal(new,display[y:y+16,left:left+16]):
+                    bank=changed[cell][0] if cell in changed else int(mapping[cell]>>12)
+                    changed[cell]=(bank,packed(nearest(new,colors[bank])))
 
     fixed={int(a)&1023 for cell,a in np.ndenumerate(mapping) if cell not in changed}
     free=[i for i in range(len(tiles)) if i not in fixed]

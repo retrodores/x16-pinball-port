@@ -57,7 +57,11 @@ static void frame(uint8_t n,uint8_t f,int16_t x,int16_t y,uint8_t reserved){
 }
 static uint8_t load(const char*n,uint8_t mode,uint16_t a){cbm_k_setnam(n);cbm_k_setlfs(1,8,2);return(uintptr_t)cbm_k_load(mode,(void*)a)>255;}
 #ifdef COVER_AUDIO
+#ifdef CHRISTMAS
+#include "carol_audio.h"
+#else
 #include "music_cover_data.h"
+#endif
 extern volatile uint16_t cover_triggers;
 #endif
 /* KERNAL MEMTOP returns the usable 8 KB bank count in A. Zero means 256. */
@@ -246,6 +250,7 @@ static void display(bool update_panel){
  }
 #endif
 }
+#ifndef CHRISTMAS
 static __attribute__((section(".mechanics"),noinline)) void compact_footer(void){
  /* The supported maps use private tiles in this part of row 25. The
   * shared blank tiles already have zero in the rows we erase. */
@@ -263,6 +268,7 @@ static __attribute__((section(".mechanics"),noinline)) void compact_footer(void)
   for(uint8_t col=0;col<13;++col){v[3]=lo;v[3]=hi;}
  }
 }
+#endif
 static void restore_keyboard(uint16_t vector){
  __asm__ volatile("php\nsei":::"memory");
  *(volatile uint16_t*)0x032e=vector;
@@ -304,10 +310,11 @@ int main(void){
   for(uint8_t col=0;col<24;++col){v[3]=blank_lo;v[3]=blank_hi;}
  }
 #ifdef COVER_AUDIO
- *(volatile uint8_t*)0=32;if(!load("COVER.CMD",0,0xa000))goto fail;
 #ifdef CHRISTMAS
+ *(volatile uint8_t*)0=CAROL_BANK;if(!load("CAROL.ZSM",0,CAROL_ADDRESS))goto fail;
  *(volatile uint8_t*)0=64;if(!load("COVER.XMS",0,0xa000))goto fail;
 #else
+ *(volatile uint8_t*)0=32;if(!load("COVER.CMD",0,0xa000))goto fail;
  *(volatile uint8_t*)0=64;if(!load("COVER.PCM",0,0xa000))goto fail;
  *(volatile uint8_t*)0=COVER_CMD_HIGH;if(!load("COVER.HI",0,0xa000))goto fail;
 #endif
@@ -332,7 +339,9 @@ int main(void){
  for(uint8_t i=0;i<9;++i)score_cache[i]=254;
  *(volatile uint8_t*)0=10;
  __asm__ volatile("":::"memory");
+#ifndef CHRISTMAS
  compact_footer();
+#endif
  __asm__ volatile("":::"memory");
  *(volatile uint8_t*)0=11;
  /* Fill the 640x480 signal with the playable viewport. Keep the backbox
