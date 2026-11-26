@@ -40,14 +40,14 @@ static uint8_t count(uint16_t tick){
 static void check(uint16_t t,uint8_t expect){uint8_t n=count(t);if(n!=expect){++errors;text("# BAD ");hex(t);text(" ");hex(n);text(" ");hex(expect);text("\n");}}
 int main(void){
  game.state=Serving;music_enabled=1;christmas_init();
- check(0,0);check(64,2);check(84,0);check(2392,31);
- music_enabled=0;check(2392,0);music_enabled=1;check(0,0);
- check(9060,31);reserved=1;check(9060,29);
- reserved=0;game.mission=Practice;check(9060,13);
- game.mission=NoMission;game.tilted=1;check(9060,0);
- game.tilted=0;game.ring_flash=1;check(9060,0);
- game.ring_flash=0;game.state=Ready;check(9060,0);
- game.state=InPlay;check(13280,31);check(13740,0);check(13960,0);check(0,0);
+ check(0,2);check(16,0);check(364,31);
+ music_enabled=0;check(364,0);music_enabled=1;check(0,2);
+ check(2548,31);reserved=1;check(2548,29);
+ reserved=0;game.mission=Practice;check(2548,13);
+ game.mission=NoMission;game.tilted=1;check(2548,0);
+ game.tilted=0;game.ring_flash=1;check(2548,0);
+ game.ring_flash=0;game.state=Ready;check(2548,0);
+ game.state=InPlay;check(4228,31);check(4332,0);check(4452,0);check(0,2);
  text("# SCORE-LAMP ");hex(errors);text(" ");hex(maximum);text("\n# DONE\n");
  return 0;
 }

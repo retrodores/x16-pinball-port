@@ -43,7 +43,7 @@ def verify(build):
     # The effective hardware amplitude differs from the audition by at most
     # half of one DAC step at mixer volume 14, even at both signed endpoints.
     page_addr = 2+symbols['carol_volume_pages']-prg_start
-    for level in (6,7,9,10):
+    for level in (6,7,8):
         start = symbols['carol_gain_start']+prg[page_addr+level]*256
         assert start == symbols[f'carol_gain_{level}'] and start%256 == 0
         gain = holiday[start-0xa000:start-0xa000+256]
@@ -59,7 +59,7 @@ def verify(build):
     for phase in range(42):
         quota = 44 + (phase>=34)
         assert quota == (phase+64*29)//42
-    print(f'{count} linked instruments, {len(covered)} stereo PCM bytes, four '
+    print(f'{count} linked instruments, {len(covered)} stereo PCM bytes, three '
           'ZSM gain pages and the mechanical mix gain verified.')
 
 

@@ -4,7 +4,8 @@ from pathlib import Path
 
 BANK_SIZE = 8192
 FIRST_BANK = 80
-ZSM_SHA256 = 'f4cc99564f3a0a23367c22b0d24d7b04a17b8bf950fe01d6b29508de650c57a9'
+ZSM_SHA256 = '443860718e270cb1bdd4a5eca855c0730ee3e531c4ea1a2aa7907d1173cc4988'
+SONG_TICKS = 4452
 PCM_VOLUME = (0, 1, 2, 3, 4, 5, 6, 8, 11, 14, 18, 23, 30, 38, 49, 64)
 MIX_VOLUME = 14
 
@@ -16,7 +17,7 @@ def prepare(source, output):
     pcm = int.from_bytes(data[6:9], 'little')
     count = data[pcm + 3] + 1
     payload = pcm + 4 + 16 * count
-    assert data[:6] == b'zm\x01\x00\x00\x00' and data[12:14] == b'<\x00'
+    assert data[:6] == b'zm\x01\x10\x00\x00' and data[12:14] == b'<\x00'
     assert data[pcm-1:pcm+3] == b'\x80PCM'
     # An even stereo-frame address keeps L/R together at page and bank boundaries.
     bias = payload & 1
@@ -65,7 +66,7 @@ def prepare(source, output):
                 else:
                     assert reg==2 and value<count
             pos += n
-    assert pos == pcm and ticks == 13960
+    assert pos == pcm and ticks == SONG_TICKS
     inc.extend(['carol_volume_pages:', '.byte ' + ','.join(
         str(sorted(levels).index(v)) if v in levels else '0' for v in range(16)),
         '.section .holiday.rodata,"a",@progbits', '.balign 256'])

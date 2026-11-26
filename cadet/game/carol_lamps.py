@@ -7,21 +7,22 @@ from pathlib import Path
 
 from christmas_music import INNER_CHASE, RADIAL_BURST, TWIN_TRAILS
 
-from pack_christmas_carol import ZSM_SHA256
+from pack_christmas_carol import SONG_TICKS, ZSM_SHA256
 
-TICKS = 13960
+TICKS = SONG_TICKS
 STRIDE = 4
 INNER_PING = 15
 # Instrument indices in this arrangement's stereo sample directory.
-SNARE_HAT, CRASH_KICK = 5, 10
-TOM_FILLS = {1, 2, 3, 8, 9}
+SNARE_HAT, CRASH_KICK = 3, 4
+TOM_FILLS = {0, 1}
+LASER_REGS = (42, 46)
 
 
 @dataclass
 class Beat:
     bells: list = field(default_factory=list)
     drums: list = field(default_factory=list)
-    bass_level: int | None = None
+    laser: bool = False
 
 
 def register_events(data):
@@ -40,8 +41,8 @@ def register_events(data):
         elif cmd < 64:
             value = data[pos]
             pos += 1
-            if cmd == 2:  # PSG voice 0 supplies the final chord's swell and fade.
-                events[tick].bass_level = value & 63 if value & 192 else 0
+            if cmd in LASER_REGS and (value & 63) >= 17:
+                events[tick].laser = True
         elif cmd == 64:
             extension = data[pos]
             size = extension & 63
@@ -71,56 +72,38 @@ def pack(phase, scene):
 def score(events):
     result = []
     phase = bell_count = 0
-    bell = drum = crash = tom = -1000
-    loud = False
-    bass_level = 0
+    bell = drum = crash = tom = laser = -1000
     finale = max(t for t, event in events.items() if event.drums)
     for tick in range(TICKS):
         event = events.get(tick)
         if event:
-            if event.bass_level is not None:
-                bass_level = event.bass_level
             if event.bells:
                 bell = tick
                 bell_count += 1
-            for instrument, volume in event.drums:
+            if event.laser:
+                laser = tick
+            for instrument, _ in event.drums:
                 drum = tick
+                phase += 1 if instrument == SNARE_HAT else 2
                 if instrument in TOM_FILLS:
                     tom = tick
-                elif instrument in (4, SNARE_HAT, CRASH_KICK):
-                    # The kit marks both sections' backbeats at level 9. The
-                    # middle breakdown returns to softer strokes at level 6.
-                    loud = volume >= 9
-                    phase += 2 if instrument != SNARE_HAT else 1
                 if instrument == CRASH_KICK:
                     crash = tick
         if tick % STRIDE:
             continue
-        if tick >= finale:
-            if tick == finale or tick == finale + 1:
-                cue = pack(0, RADIAL_BURST)
-            elif bass_level >= 47:
-                cue = pack(min(8, bass_level - 46), RADIAL_BURST)
-            elif bass_level >= 33:
-                cue = pack(0, INNER_CHASE)
-            elif bass_level >= 15:
-                cue = pack(8, INNER_PING)
-            else:
-                cue = 0
-        elif tick - crash < 56:
-            # Kick/crash opens the center and sends an expanding red/green
-            # fan to both sides and the upper rollover, then back to the ring.
-            cue = pack(min(15, (tick - crash) * 16 // 56), RADIAL_BURST)
-        elif loud and tick - drum < 56:
-            cue = pack(phase, INNER_CHASE if tick - drum < 17 else TWIN_TRAILS)
+        if tick - crash < 56:
+            cue = pack((tick-crash)*16//56, RADIAL_BURST)
+        elif tick >= finale:
+            # After the final crash, let the center ring settle before the motif.
+            cue = pack(8, INNER_PING) if tick-finale < 132 else 0
+        elif tick - laser < 14:
+            cue = pack(phase+8, TWIN_TRAILS)
         elif tick - tom < 14:
-            cue = pack(phase + 2, INNER_PING)
-        elif tick - drum < 22:
-            cue = pack(phase, TWIN_TRAILS)
-        elif tick - bell < 18:
-            # Each of the eight first bell strikes gets a short center/ring
-            # answer; quiet passages return to this smaller vocabulary.
-            cue = pack(bell_count * 3, INNER_PING)
+            cue = pack(phase+2, INNER_PING)
+        elif tick - drum < 15:
+            cue = pack(phase, INNER_CHASE)
+        elif tick - bell < 12:
+            cue = pack(bell_count*3, INNER_PING)
         else:
             cue = 0
         result.append(cue)

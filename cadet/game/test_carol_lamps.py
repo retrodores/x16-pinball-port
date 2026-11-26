@@ -8,7 +8,7 @@ import tempfile
 import time
 
 from carol_lamps import (CRASH_KICK, INNER_CHASE, INNER_PING, RADIAL_BURST,
-                         STRIDE, TICKS, register_events, score)
+                         STRIDE, TICKS, TWIN_TRAILS, register_events, score)
 from christmas_music import light_scene
 
 
@@ -16,19 +16,13 @@ def verify(track):
     events = register_events(track.read_bytes())
     cues = score(events)
     assert len(cues) == TICKS // STRIDE
-    bells = [t for t in sorted(events) if events[t].bells][:8]
-    assert bells == [61, 90, 119, 148, 176, 205, 234, 263]
-    assert all(cue == 0 for cue in cues[:16])
-    for bell in bells:
-        first = (bell + STRIDE - 1) // STRIDE
-        assert cues[first] & 15 == INNER_PING
-        assert cues[first + 5] == 0
-
-    crashes = [t for t, event in sorted(events.items())
-               if any(instrument == CRASH_KICK for instrument, _ in event.drums)]
-    assert crashes[0] == 2361 and crashes[-1] == 13168
-    assert next(t for t in crashes if t >= 149.5 * 60) == 9031
-    for tick in crashes[:-1]:
+    bell_ticks = [tick for tick, e in sorted(events.items()) if e.bells]
+    assert bell_ticks[:4] == [0, 28, 42, 56]
+    assert cues[0] & 15 == INNER_PING
+    crashes = [tick for tick, e in sorted(events.items())
+               if any(i == CRASH_KICK for i, _ in e.drums)]
+    assert crashes[0] == 336 and 2520 in crashes and crashes[-1] == 4200
+    for tick in crashes:
         first = (tick + STRIDE - 1) // STRIDE
         begin, peak = cues[first], cues[first+7]
         assert begin & 15 == peak & 15 == RADIAL_BURST
@@ -36,18 +30,14 @@ def verify(track):
         center = light_scene(RADIAL_BURST, begin >> 4)
         rim = light_scene(RADIAL_BURST, peak >> 4)
         assert center[27] and not any(center[28:])
-        assert all(rim[27:]) and all(rim[:27])
-
-    breakdown = cues[129*60//STRIDE:148*60//STRIDE]
-    assert any(value & 15 == INNER_PING for value in breakdown)
-    assert all(value & 15 != RADIAL_BURST for value in breakdown)
-    # The ending uses the actual volume ramp, even as percussive beats stop.
-    assert cues[13168//STRIDE] == RADIAL_BURST
-    assert cues[13280//STRIDE] == (8 << 4 | RADIAL_BURST)
-    assert cues[13540//STRIDE] & 15 == INNER_CHASE
-    assert cues[13680//STRIDE] & 15 == INNER_PING
-    assert not any(cues[13740//STRIDE:])
-    print(f'{len(cues)} cues, eight opening attacks, {len(crashes)-1} band crashes, final swell and silence verified')
+        assert all(rim)
+    laser_peaks = [tick for tick, e in sorted(events.items()) if e.laser]
+    sweep_starts = [tick for tick in laser_peaks if tick-1 not in laser_peaks]
+    assert sweep_starts == [662, 1335, 2005, 2511, 3686]
+    for tick in sweep_starts:
+        assert cues[(tick+STRIDE-1)//STRIDE] & 15 == TWIN_TRAILS
+    assert not any(cues[4332//STRIDE:])
+    print(f'{len(cues)} cues with five measured sweep starts and restart on the bell motif')
 
 
 def verify_renderer(track, emulator, rom, compiler):

@@ -286,3 +286,23 @@ counted up to 4 red/green sites together in seconds 8–20 and up to 17 in secon
 A 512 KB launch displayed the 2 MB requirement, returned to BASIC and
 successfully loaded and executed another PRG. The Christmas runtime targets
 2 MB. Windows and physical hardware were not exercised.
+
+## Final Christmas game
+
+The final game uses the approved 74.2-second melody-first Shchedryk
+arrangement with five soft VERA PSG laser accents. The Blended table
+art is the reference for this build. The decorative lamps advance on the
+same song ticks as the audio. The outer lights catch each short laser
+sweep, the crash expands from the center, and the final ring fades before
+the opening motif returns.
+
+To build the exact song:
+
+```sh
+python3 tools/music-auditions/carol-final/melody.py /tmp/CAROL.ZSM
+python3 tools/music-auditions/carol-final/inspect_zsm.py /tmp/CAROL.ZSM
+```
+
+Use that file as the song argument for the Christmas header and game build.
+The original choral setting is by Mykola Leontovych. The comparison score
+is the four-voice Shchedryk setting at https://parafia.org.ua/piece/schedryk-3/.
