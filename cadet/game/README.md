@@ -1,5 +1,8 @@
 # CmdrX Cadet development checkpoint
 
+For the public 1.0 editions and the exemplar, use the
+[1.0 build and handoff](../../docs/release-status/v1.0/HANDOFF.md). This page records earlier checkpoints.
+
 This source tree is work toward 0.3, not a new accepted release. Read
 ../STATUS-0.3-WIP.md and ../RESUME.md. The integrated 8 MHz performance gate
 still fails on five of 6000 scripted frames at both supported RAM sizes.

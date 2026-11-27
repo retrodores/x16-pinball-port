@@ -1,4 +1,11 @@
 # Space Cadet fidelity work
+
+## Current release work
+
+Start at the [1.0 handoff](../docs/release-status/v1.0/HANDOFF.md) for the fixed release inputs and
+validation. Keep the exemplar under `releases/1.0/exemplar/`. These earlier
+fidelity notes still apply when working on the engine.
+
 The user now authorizes restoring the original table, artwork, sounds and music
 on top of the accepted integer 65C02 foundation. Work in this separate worktree.
 Preserve wireframe-v0.2 and /opt/cmdrx-cadet-direct unchanged. Use the VM via DC.

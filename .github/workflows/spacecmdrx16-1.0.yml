@@ -1,0 +1,32 @@
+name: Publish Space CmdrX16 2D Pinball 1.0
+on:
+  push:
+    tags:
+      - v1.0
+permissions:
+  contents: write
+concurrency:
+  group: spacecmdrx16-v1.0
+  cancel-in-progress: false
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Verify and publish the two 2D editions
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          cd releases/1.0
+          sha256sum -c SHA256SUMS
+          assets=(
+            SpaceCmdrX16-2D-Pinball-1.0-512KB.zip
+            SpaceCmdrX16-2D-Pinball-1.0-2MB.zip
+            SpaceCmdrX16-2D-Pinball-Christmas-1.0-2MB.zip
+          )
+          gh release create v1.0 "${assets[@]}" --verify-tag --latest \
+            --title "Space CmdrX16 2D Pinball 1.0" --notes-file RELEASE-NOTES.md

@@ -1,192 +1,53 @@
-# Space CmdrX16 Christmas · Carol of the Bells · 1.0 Beta
+# Space CmdrX16 2D Pinball
 
-A 2 MB holiday playtest for the stock 8 MHz Commander X16. The game plays
-the complete stereo rock audition during a normal game or F3 demo and cues
-the center and side lamps from the music. Candy-striped flippers swing across
-the winter table. The peppermint bumpers keep their live upgrade and hit
-indicators. A silver bauble serves from the brass-and-green plunger. [Build instructions and playtest results](cadet/game/CHRISTMAS-PREVIEW.md).
+Space CmdrX16 is an experimental 8-bit interpretation of Space Cadet 3D
+Pinball for the Commander X16. Version 1.0 comes in a standard edition and a
+Christmas edition.
 
-# Space CmdrX16 Christmas Winter Village · 1.0 Beta
+| Edition | Banked RAM | Download |
+| --- | --- | --- |
+| Standard | 512 KB | [ZIP](https://github.com/retrodores/x16-pinball-port/releases/download/v1.0/SpaceCmdrX16-2D-Pinball-1.0-512KB.zip) |
+| Standard with expanded music | 2 MB | [ZIP](https://github.com/retrodores/x16-pinball-port/releases/download/v1.0/SpaceCmdrX16-2D-Pinball-1.0-2MB.zip) |
+| Christmas | 2 MB | [ZIP](https://github.com/retrodores/x16-pinball-port/releases/download/v1.0/SpaceCmdrX16-2D-Pinball-Christmas-1.0-2MB.zip) |
 
-The Winter Village preview added a wintry alpine backdrop, a holly-trimmed
-title and red and green display lettering to Encore. Build instructions, emulator
-checks and timing limits are in the [winter artwork notes](cadet/game/CHRISTMAS-PREVIEW.md#winter-village-artwork-and-validation).
+[Release notes](https://github.com/retrodores/x16-pinball-port/releases/tag/v1.0) · [Wiki](https://github.com/retrodores/x16-pinball-port/wiki) ·
+[Build and handoff](docs/release-status/v1.0/HANDOFF.md) ·
+[Development archive and exemplar](releases/README.md)
 
-# Space CmdrX16 Christmas Encore · 1.0 Beta
+The Christmas table has a snowy backdrop, candy-striped flippers, and
+peppermint bumpers. Its 74-second arrangement of Mykola Leontovych's
+*Shchedryk* (*Carol of the Bells*) drives the holiday lamps, with brief laser
+accents in the mix.
 
-This branch contains a 2 MB holiday edition for the 8 MHz Commander X16.
-The score cues the center and side lamps at 10 and 21 seconds. Some frames
-exceed the 133333-cycle budget. Emulator results, build instructions and
-checksums are in the [Christmas preview notes](cadet/game/CHRISTMAS-PREVIEW.md).
+## Play
 
-# Current development build: Original Table 0.3.1-dev
+The release targets an 8 MHz 65C02. Extract one ZIP into its own directory
+and keep the included files together. On Windows, put the game directory
+next to `x16emu.exe` and its matching `rom.bin`, then run
+`RUN-WINDOWS.bat` from the game directory.
 
-This branch restores Space Cadet mechanisms and original visuals/audio on the
-integer-only stock 65C02 engine. The 0.3.1 development package targets 8 MHz and
-512 KB, and is also tested with 2 MB. It is not a stable or sustained-60-FPS release.
-
-See [cadet/STATUS-0.3.1-DEV.md](cadet/STATUS-0.3.1-DEV.md) for actual results and
-remaining gaps, and [cadet/RESUME.md](cadet/RESUME.md) for recovery/build details.
-The flat package contains CADET.PRG plus required .RUL/.PHY overlays and BIN assets;
-RUN-WINDOWS.bat expects x16emu.exe and rom.bin in the parent folder, keeps the
-game directory current, and uses -c02 -mhz 8 -ram 512 -scale 2.
-
-Music starts enabled; M toggles it with a visible ON/OFF indicator.
-Original Table 0.2, Wireframe 0.2 and the prior 0.3 package are preserved. The sections below describe
-historical prototypes; their CPU, controls and performance claims do not apply
-to the current development build.
-
-# Current playable rebuild: wireframe 0.2
-
-See [wireframe/README.md](wireframe/README.md) for the standalone practice table,
-joined perimeter, animated plunger, live score, soft effects and quiet music.
-The stock 65C02 is primary: playable at 2 MHz, best at 8 MHz.
-Earlier recovered-table engines remain below and in direct/ as reference work.
-
-# Current runnable build: integer engine
-
-The user requested integer-only runtime physics. See
-[direct/integer/README.md](direct/integer/README.md) for the current 8 MHz preview.
-The floating-point port remains the comparison reference.
-
-# Active branch: direct engine port
-
-The user selected a direct C++ port of the recovered original engine. See
-[direct/README.md](direct/README.md) for current implementation, tests, measured
-performance and unfinished work. A runnable direct-engine preview is now available: see [direct/PREVIEW.md](direct/PREVIEW.md).
-Build it with `sh direct/build-preview.sh` after the direct core build.
-The Prog8 prototype below remains a reference.
-
-# CmdrX Cadet 0.2.0
-
-A playable Commander X16 mechanics prototype based on the supplied Space Cadet
-table artwork. This is a native prototype, using the selected 320x240,
-256-color layout. Prog8 handles the game loop; small 65C02 routines handle
-keyboard state, wide score arithmetic, decimal conversion, and digit drawing.
-
-## Run on Windows
-
-Extract this folder beside your r49 x16emu.exe distribution and matching ROM.
-Double-click RUN-WINDOWS.bat, or from Git Bash in the emulator directory:
+With x16emu r49 on Linux or macOS, open a terminal in the extracted directory.
+Set `-ram` to `2048` for either 2 MB ZIP or `512` for the 512 KB ZIP.
 
 ```sh
-./x16emu.exe -run -scale 2 -fsroot ./CmdrX_Cadet_0.2.0 -prg ./CmdrX_Cadet_0.2.0/CMDRX.PRG
+/path/to/x16emu -rom /path/to/rom.bin -c02 -mhz 8 -ram 2048 -scale 2 -fsroot "$PWD" -prg PINBALL.PRG -run
 ```
 
-Keep all seven asset files beside CMDRX.PRG (six .BIN files plus MUSIC.PCM). The Windows installer EXE is not an
-X16 program. A ROM is not included in this package.
-
-At scale 2, the emulator displays a 1280x960 image; the 235-pixel table asset
-is about 940 screen pixels tall. Use fullscreen if desired; preserve the 4:3
-aspect ratio. The internal resolution stays 320x240.
+From X16 BASIC in the game directory, enter `LOAD"PINBALL.PRG",8,1` and
+then `RUN`. The runtime requires the companion files alongside the PRG.
 
 | Key | Action |
 | --- | --- |
-| Space, held then released | Charge and launch |
-| Z or Left Shift | Left flipper, held continuously |
-| / or Right Shift | Right flipper, held continuously |
-| P | Pause/resume |
-| S | Sound effects on/off |
-| M | Music on/off |
-| L | Music-only listening / return |
-| N | Save current best and start a new three-ball game |
-| Esc | Save best, restore keyboard handling, return to BASIC |
+| Hold and release Space | Charge and launch |
+| Z and / | Left and right flippers |
+| Up Arrow | Nudge |
+| F2 | Start a new game or skip an active opening |
+| F3 | Start the demo |
+| M | Toggle music |
+| Q or Esc | Return to BASIC |
 
-## Implemented
+Some frames exceed the 8 MHz frame budget, and some missions remain
+incomplete. See the ZIP's notices for code, engine and asset attribution.
 
-- A ball, gravity, a launch lane, outer boundaries, seven bumpers, original static walls, two animated
-  flippers, draining, three lives, pause and restart.
-- Original table artwork and converted ball/flipper/bumper graphics.
-- Original WAV effects and the complete original MIDI theme, converted to PCM.
-  Music streams from disk so it does not need to fit in banked RAM.
-- Unsigned 128-bit scoring, saturation at the maximum, exact decimal display,
-  full-width comparison and versioned high-score storage in CMDRX.HI.
-- A maximum score of 340282366920938463463374607431768211455.
-  Awards and carry chains cannot silently wrap the total.
-- Score presentation queues complete values: conversion uses two simulation
-  frames and the 39-digit display is drawn in three following frames. Pending
-  values remain coherent while further points accumulate.
-
-BEST shows the stored best from startup/new game. The current score is observed
-for a new best during play and saved on game over, N, or Esc. Close the program
-with Esc to save an unfinished game's best. The CHARGE value beside BALLS shows launch charge (0-64); a 1 beside it indicates pause.
-
-## What this prototype leaves for the next stage
-
-The physics remain a screen-space model. The static wall field is baked from
-56 original base-layer wall groups; ball contact normals are smoothed for the
-low-resolution grid. Bumper radii and responses remain approximate. Flipper pivots, projected endpoints, artwork and bumper centers
-come from the original resources, but the engine does not yet reproduce all
-1,229 original collision edges. Ramps, height/occlusion, slingshots, most target rules, missions, rank progression, multiplayer,
-and a complete high-score table are not implemented. No physical X16 hardware
-test has been performed. The extra artwork does not imply active collisions.
-
-At startup, attract mode automatically plays and cycles lamps. Press N or Space
-to play. Idle games return to attract mode after 30 seconds while waiting for a
-ball. Demo scores are excluded from saved best scores. L plays the theme without
-simulation, and automatically enables music; M can still mute it independently.
-
-The theme uses the original MIDI notes rendered through TimGM6mb instruments.
-It is approximately 8 minutes 57 seconds long and loops. Both music and original
-WAV effects are converted to mono signed 8-bit PCM at about 8 kHz for stock VERA.
-This preserves the original recordings/composition, but is not bit-identical to
-Windows MIDI synthesis. Effects and music are mixed into the PCM FIFO.
-
-The current goal is to judge size, controls, motion and flipper response before
-spending effort reproducing the entire table.
-
-## Build and test
-
-Development and native emulation were performed on the connected Linux VM:
-`/opt/cmdrx-cadet`. The previous study remains at
-`/opt/spacecadet-x16-analysis`.
-
-Required: Java 21, Prog8 14.0-BETA3 (e98adeaf), 64tass, Perl/prove with TAP::Parser
-and Math::BigInt, plus r49 x16emu and its matching ROM.
-Set PROG8C to your compiler launcher, or JAR to its JAR file.
-Set X16EMU and X16ROM when they are not installed at the VM paths used by tests.
-
-```sh
-./build.sh
-prove -v t/native.t
-X16_RAM_KB=2048 prove -v t/native.t
-```
-
-The suite executes the actual production modules as native 65C02 code:
-128-bit boundaries and randomized reference vectors, decimal conversion,
-save/load, raw key press/release and alias behavior, VERA asset loads, mechanics,
-a deterministic 5000-frame soak, continuous natural launches, eight-frame
-plunger animation, attract/listening modes, independent audio controls, sector
-streaming, and measured 8 MHz frame budgets.
-
-Tested contact scenarios include both resting and moving flippers plus the
-maximum 39-digit score. Test results and actual cycle measurements are under
-evidence/. They cover those scenarios, not every possible future table state.
-Music sector refills and mixing are included in the active-play budget tests.
-Initial loading and high-score saves are outside that budget.
-
-To regenerate artwork, supply your own PINBALL.DAT and an inventory made by the
-study's analyze_dat.pl, then run:
-
-```sh
-python3 tools/build_assets.py /path/to/PINBALL.DAT --inventory /path/to/inventory.json
-```
-
-Pillow, NumPy and SciPy are offline conversion dependencies. The additional
-VM scripts tools/build_boundaries.py and tools/build_audio.py use the retained
-analysis workspace. Audio rendering uses FluidSynth and TimGM6mb.
-
-Pillow is an offline conversion dependency only. No Python, Perl, or Prog8
-compiler is needed to play the PRG on an X16.
-
-## Credits and resources
-
-- Original Space Cadet game/table: Cinematronics, Maxis, Microsoft; game assets
-  came from the user's supplied package. Those assets are separate from the new
-  code's license; this package does not relicense them.
-- Andrey Muzychenko / k4zmu2a:
-  https://github.com/k4zmu2a/SpaceCadetPinball
-  Reference commit cb9b7b886244a27773f66b0b19fdc2998392565e.
-  Its MIT license is retained in REFERENCE-LICENSE.txt.
-- Prog8 by Irmen de Jong and contributors; X16 community emulator, ROM and VERA
-  documentation; 64tass by Soci.
+The [earlier development README](https://github.com/retrodores/x16-pinball-port/blob/09bcf4a5e44ac9583a502372d9cbc8a636405fa2/README.md)
+records the prototype stages.

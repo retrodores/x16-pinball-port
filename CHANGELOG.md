@@ -1,3 +1,13 @@
+# 1.0
+
+- Publish Space CmdrX16 2D Pinball in standard 512 KB and 2 MB builds and a
+  Christmas 2 MB build.
+- Ship the approved blended Christmas table and the 74.2-second melody-first
+  *Carol of the Bells* arrangement with synchronized lamps and laser accents.
+- Build all three variants from the repository. Keep the reference exemplar
+  under [releases/1.0/exemplar](releases/1.0/exemplar/).
+- See the [current release handoff](docs/release-status/v1.0/HANDOFF.md) for build inputs and verification.
+
 # 2026-11-25 — Christmas Carol of the Bells 1.0 Beta
 
 - Carry the Christmas theme onto both flippers, the seven bumper caps, the ball and the plunger across all their animation poses.

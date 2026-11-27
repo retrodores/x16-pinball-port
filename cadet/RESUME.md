@@ -1,5 +1,8 @@
 # Resume CmdrX Cadet — 0.3.1 development follow-up
 
+For current work see the [Space CmdrX16 1.0 build and handoff](../docs/release-status/v1.0/HANDOFF.md).
+This page records the 0.3.1 development checkpoint.
+
 Author: Codex, working with Brett Estrade. Session date: November 19, 2026 (America/Chicago).
 
 See [BETA-FOLLOW-UP.md](BETA-FOLLOW-UP.md) for the newer 1.0 Beta audio, outlane,

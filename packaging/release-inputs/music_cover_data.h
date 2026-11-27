@@ -1,0 +1,2 @@
+#define COVER_CMD_HIGH 249
+#define COVER_LAST_BANK 254

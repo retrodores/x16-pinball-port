@@ -1,4 +1,11 @@
 # CmdrX Cadet
+
+## Current release work
+
+Start from `main` in `retrodores/x16-pinball-port`. The [1.0 handoff](docs/release-status/v1.0/HANDOFF.md)
+covers all three builds, approved inputs and release scope. Use that build
+entry point for the releases. The notes below cover the original prototype.
+
 Use /opt/cmdrx-cadet on the connected Linux VM for implementation and emulation.
 The analysis/reference workspace is /opt/spacecadet-x16-analysis; preserve it.
 The selected display is 320x240 8bpp. Keep the game title CmdrX Cadet.

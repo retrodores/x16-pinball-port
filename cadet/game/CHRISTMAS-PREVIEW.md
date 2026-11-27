@@ -1,5 +1,9 @@
 # Space CmdrX16 Christmas: Carol of the Bells
 
+For the playable 1.0 edition, see the [current release handoff](../../docs/release-status/v1.0/HANDOFF.md)
+and the [final Christmas arrangement](#final-christmas-game). The earlier
+sections below document historical playtests and their respective assets.
+
 The playable 1.0 Beta loads the same 209,321-byte CAROL.ZSM as the standalone
 rock audition. The score contains eight YM2151 parts, sixteen VERA PSG parts,
 and a synthesized stereo drum kit. The game includes its own ZSM reader and

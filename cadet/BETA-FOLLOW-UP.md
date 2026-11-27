@@ -1,5 +1,8 @@
 # 1.0 Beta follow-up
 
+For the published builds see the [1.0 build and handoff](../docs/release-status/v1.0/HANDOFF.md).
+This page records beta work.
+
 ## Music-forward and purple panel refresh
 
 The music converter adds 9 dB to the previous melodic settings and retains
